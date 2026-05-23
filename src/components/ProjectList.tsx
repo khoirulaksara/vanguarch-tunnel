@@ -201,7 +201,7 @@ export function ProjectList() {
                         ) : (
                           <Play className="w-3 h-3" />
                         )}
-                        Tunnel
+                        Create Tunnel
                       </button>
                     )}
                   </div>

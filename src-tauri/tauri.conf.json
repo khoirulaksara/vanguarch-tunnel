@@ -15,6 +15,7 @@
         "width": 1024,
         "height": 768,
         "resizable": true,
+        "maximizable": false,
         "fullscreen": false,
         "center": true
       }

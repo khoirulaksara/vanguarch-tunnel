@@ -30,6 +30,37 @@ export default function App() {
     fetchTunnels(cloudflaredPath);
   }, [cloudflaredPath, fetchTunnels]);
 
+  useEffect(() => {
+    let unlisten: any;
+    async function setupTray() {
+      // ONLY RUN IN TAURI
+      if (!(window as any).__TAURI_INTERNALS__) return;
+      try {
+        const { listen } = await import('@tauri-apps/api/event');
+        const { invoke } = await import('@tauri-apps/api/core');
+        unlisten = await listen('tray-quit-requested', async () => {
+          const tunnelState = useTunnelStore.getState();
+          const p = tunnelState.activeProcess;
+          const hasActive = p?.status === 'running' || p?.status === 'starting';
+          
+          if (hasActive) {
+            if (window.confirm("A tunnel is currently running. Are you sure you want to exit?")) {
+              await invoke('force_exit');
+            }
+          } else {
+            await invoke('force_exit');
+          }
+        });
+      } catch (err) {
+        console.error("Tray setup error:", err);
+      }
+    }
+    setupTray();
+    return () => {
+      if (unlisten) unlisten();
+    };
+  }, []);
+
   const isRunning = activeProcess?.status === 'running';
   const isStarting = activeProcess?.status === 'starting';
 

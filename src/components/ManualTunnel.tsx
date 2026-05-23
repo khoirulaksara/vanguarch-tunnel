@@ -51,16 +51,16 @@ export function ManualTunnel() {
 
   return (
     <div className="flex flex-col h-full w-full bg-[#09090b] p-6 text-[#e4e4e7] overflow-y-auto">
-      <div className="p-5 bg-[#0c0c0e] border border-[#27272a] rounded-lg max-w-3xl w-full">
-        <div className="mb-6 flex justify-between items-start">
-          <div>
-            <h2 className="text-xs font-bold uppercase tracking-widest text-[#52525b] flex items-center gap-2">
-              <Globe className="w-4 h-4 text-orange-500" />
-              Manual Tunnel Configuration
-            </h2>
-            <p className="text-[#a1a1aa] text-[10px] mt-1">Configure and launch a local tunnel.</p>
-          </div>
+      <div className="flex flex-col gap-6 max-w-3xl w-full mx-auto">
+        <div>
+          <h2 className="text-xs font-bold uppercase tracking-widest text-[#52525b] flex items-center gap-2 mb-1">
+            <Globe className="w-4 h-4 text-orange-500" />
+            Manual Tunnel Configuration
+          </h2>
+          <p className="text-[#a1a1aa] text-[10px]">Configure custom cloudflared attributes manually.</p>
         </div>
+
+        <div className="p-5 bg-[#0c0c0e] border border-[#27272a] rounded-xl">
 
         <form onSubmit={handleStart} className="space-y-6 flex-1">
           <div className="space-y-4">
@@ -170,6 +170,7 @@ export function ManualTunnel() {
             </button>
           </div>
         </form>
+        </div>
       </div>
     </div>
   );
