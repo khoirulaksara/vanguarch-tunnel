@@ -1,11 +1,11 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use std::sync::Mutex;
-use tauri::{Emitter, Manager, State};
+use tauri::{Emitter, State};
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::{Child, Command};
-use serde::{Deserialize, Serialize};
+use tokio::sync::Mutex;
+use serde::Serialize;
 
 #[derive(Default)]
 struct AppState {
@@ -33,7 +33,10 @@ async fn start_tunnel(
     ipv4_only: bool,
 ) -> Result<(), String> {
     // Hentikan proses yang sedang berjalan jika ada
-    stop_tunnel(state.clone()).await?;
+    let mut process_guard = state.tunnel_process.lock().await;
+    if let Some(mut child) = process_guard.take() {
+        let _ = child.kill().await;
+    }
 
     let mut args = vec![
         "tunnel".to_string(),
@@ -117,15 +120,15 @@ async fn start_tunnel(
         });
     });
 
-    *state.tunnel_process.lock().unwrap() = Some(child);
+    *process_guard = Some(child);
 
     Ok(())
 }
 
 #[tauri::command]
 async fn stop_tunnel(state: State<'_, AppState>) -> Result<(), String> {
-    let mut process = state.tunnel_process.lock().unwrap();
-    if let Some(mut child) = process.take() {
+    let mut process_guard = state.tunnel_process.lock().await;
+    if let Some(mut child) = process_guard.take() {
         let _ = child.kill().await;
     }
     Ok(())
