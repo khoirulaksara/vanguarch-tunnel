@@ -48,7 +48,7 @@ export const useTunnelStore = create<TunnelStore>()(
       })),
       
       startTunnel: async (config) => {
-        const command = `cloudflared tunnel --url ${config.localUrl} ${config.options.httpHostHeader ? '--http-host-header ' + config.publicDomain : ''} run ${config.tunnelName}`;
+        const command = `cloudflared tunnel --url ${config.localUrl} ${config.options.httpHostHeader && config.localVhost ? '--http-host-header ' + config.localVhost : ''} ${config.options.originServerName && config.localVhost ? '--origin-server-name ' + config.localVhost : ''} run ${config.tunnelName}`.replace(/\s+/g, ' ').trim();
         
         set({
           activeProcess: {

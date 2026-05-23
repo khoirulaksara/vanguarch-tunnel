@@ -45,6 +45,12 @@ export function PresetList() {
                     <span className="text-[#52525b] uppercase tracking-wider font-sans font-bold">Local:</span>
                     <span>{preset.localUrl}</span>
                   </div>
+                  {preset.localVhost && (
+                    <div className="flex justify-between">
+                      <span className="text-[#52525b] uppercase tracking-wider font-sans font-bold">Vhost:</span>
+                      <span>{preset.localVhost}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between">
                     <span className="text-[#52525b] uppercase tracking-wider font-sans font-bold">Domain:</span>
                     <span>{preset.publicDomain}</span>

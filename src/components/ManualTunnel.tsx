@@ -8,6 +8,7 @@ export function ManualTunnel() {
   const { startTunnel, stopTunnel, activeProcess, addPreset } = useTunnelStore();
   const [config, setConfig] = useState<Partial<TunnelConfig>>({
     localUrl: 'http://127.0.0.1',
+    localVhost: '',
     publicDomain: '',
     tunnelName: '',
     options: {
@@ -27,6 +28,7 @@ export function ManualTunnel() {
     startTunnel({
       id: Date.now().toString(),
       localUrl: config.localUrl,
+      localVhost: config.localVhost || '',
       publicDomain: config.publicDomain,
       tunnelName: config.tunnelName,
       options: config.options!,
@@ -40,6 +42,7 @@ export function ManualTunnel() {
       id: Date.now().toString(),
       name: config.tunnelName.toUpperCase(),
       localUrl: config.localUrl,
+      localVhost: config.localVhost || '',
       publicDomain: config.publicDomain,
       tunnelName: config.tunnelName,
       options: config.options!,
@@ -73,15 +76,28 @@ export function ManualTunnel() {
               />
             </div>
             <div>
-              <label className="block text-[10px] uppercase text-[#52525b] mb-1.5 font-bold">Public Domain</label>
+              <label className="block text-[10px] uppercase text-[#52525b] mb-1.5 font-bold">Local Host Header / Vhost</label>
+              <input
+                type="text"
+                value={config.localVhost}
+                onChange={e => setConfig(prev => ({ ...prev, localVhost: e.target.value }))}
+                placeholder="misal: arts.test"
+                className="w-full bg-[#18181b] border border-[#27272a] rounded p-2 text-xs focus:outline-none focus:border-orange-500 transition-colors"
+                disabled={isRunning}
+              />
+              <p className="text-[10px] text-[#52525b] mt-1">Hanya diperlukan jika menggunakan Host Header/Origin Server Name (untuk local vhost seperti Laragon).</p>
+            </div>
+            <div>
+              <label className="block text-[10px] uppercase text-[#52525b] mb-1.5 font-bold">Public Domain / URL</label>
               <input
                 type="text"
                 value={config.publicDomain}
                 onChange={e => setConfig(prev => ({ ...prev, publicDomain: e.target.value }))}
-                placeholder="arts.serat.us"
+                placeholder="Manual input (misal: arts-demo.cloudflare.com)"
                 className="w-full bg-[#18181b] border border-[#27272a] rounded p-2 text-xs focus:outline-none focus:border-orange-500 transition-colors"
                 disabled={isRunning}
               />
+              <p className="text-[10px] text-[#52525b] mt-1">Dicatat di sini sebagai referensi URL publik.</p>
             </div>
             <div>
               <label className="block text-[10px] uppercase text-[#52525b] mb-1.5 font-bold">Tunnel Name</label>
@@ -135,7 +151,7 @@ export function ManualTunnel() {
             ) : (
               <button
                 type="submit"
-                disabled={!config.localUrl || !config.publicDomain || !config.tunnelName}
+                disabled={!config.localUrl || !config.tunnelName}
                 className="flex-1 bg-orange-500 hover:bg-orange-600 disabled:bg-[#27272a] disabled:text-[#52525b] text-black font-bold py-2 px-4 rounded text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-colors"
               >
                 <Play className="w-3 h-3" />
@@ -146,7 +162,7 @@ export function ManualTunnel() {
             <button
               type="button"
               onClick={handleSavePreset}
-              disabled={!config.localUrl || !config.publicDomain || !config.tunnelName || isRunning}
+              disabled={!config.localUrl || !config.tunnelName || isRunning}
               className="px-4 py-2 bg-[#18181b] border border-[#27272a] hover:bg-[#27272a] disabled:opacity-50 disabled:cursor-not-allowed rounded text-[#e4e4e7] flex items-center justify-center transition-colors"
               title="Save as Preset"
             >

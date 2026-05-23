@@ -134,6 +134,128 @@ async fn stop_tunnel(state: State<'_, AppState>) -> Result<(), String> {
     Ok(())
 }
 
+#[tauri::command]
+fn check_cloudflared_login() -> bool {
+    let mut cert_path = std::env::var("HOME")
+        .or_else(|_| std::env::var("USERPROFILE"))
+        .map(std::path::PathBuf::from)
+        .unwrap_or_default();
+    
+    if cert_path.as_os_str().is_empty() {
+        return false;
+    }
+    
+    cert_path.push(".cloudflared");
+    cert_path.push("cert.pem");
+    cert_path.exists()
+}
+
+#[tauri::command]
+async fn inject_wp_helper(path: String) -> Result<String, String> {
+    let wp_config_path = std::path::Path::new(&path).join("wp-config.php");
+    
+    if !wp_config_path.exists() {
+        return Err("wp-config.php tidak ditemukan".to_string());
+    }
+
+    let mut content = std::fs::read_to_string(&wp_config_path)
+        .map_err(|e| format!("Gagal membaca wp-config.php: {}", e))?;
+
+    if content.contains("HTTP_X_FORWARDED_HOST") {
+        return Err("Helper sudah terpasang".to_string());
+    }
+
+    let helper_code = r#"
+// -- START CLOUDFLARED TUNNEL HELPER --
+if ( ! defined('WP_CLI') ) {
+    $is_https =
+        (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https'
+        || ($_SERVER['SERVER_PORT'] ?? null) == 443;
+
+    if ($is_https) {
+        $_SERVER['HTTPS'] = 'on';
+    }
+
+    $scheme = $is_https ? 'https' : 'http';
+
+    $host =
+        $_SERVER['HTTP_X_FORWARDED_HOST']
+        ?? $_SERVER['HTTP_HOST'];
+
+    define('WP_HOME', $scheme . '://' . $host);
+
+    define('WP_SITEURL', $scheme . '://' . $host);
+}
+// -- END CLOUDFLARED TUNNEL HELPER --
+"#;
+
+    // Try to insert before "That's all, stop editing!"
+    let target = "/* That's all, stop editing!";
+    if let Some(pos) = content.find(target) {
+        content.insert_str(pos, &(helper_code.to_string() + "\n"));
+    } else {
+        // Fallback: append
+        content.push_str("\n");
+        content.push_str(helper_code);
+    }
+
+    std::fs::write(&wp_config_path, content)
+        .map_err(|e| format!("Gagal menyimpan wp-config.php: {}", e))?;
+
+    Ok("Berhasil memasang WordPress helper".to_string())
+}
+
+#[tauri::command]
+async fn auto_tunnel_setup(
+    cloudflared_path: String,
+    tunnel_name: String,
+    subdomain: String,
+) -> Result<String, String> {
+    let bin_path = if cloudflared_path.trim().is_empty() {
+        "cloudflared".to_string()
+    } else {
+        cloudflared_path
+    };
+
+    // Check if tunnel exists
+    let list_cmd = Command::new(&bin_path)
+        .args(["tunnel", "list"])
+        .output()
+        .await
+        .map_err(|e| format!("Failed to run cloudflared list: {}", e))?;
+
+    let list_out = String::from_utf8_lossy(&list_cmd.stdout);
+    
+    if list_out.contains(&tunnel_name) {
+        return Ok(format!("Tunnel {} already exists, using existing configuration.", tunnel_name));
+    }
+
+    // 1. Create tunnel
+    let _create_cmd = Command::new(&bin_path)
+        .args(["tunnel", "create", &tunnel_name])
+        .output()
+        .await
+        .map_err(|e| format!("Failed to run cloudflared create: {}", e))?;
+    
+    // We ignore errors here because the tunnel might already exist.
+    // If you want better logging, you could capture create_cmd.stderr.
+
+    // 2. Route DNS
+    let route_cmd = Command::new(&bin_path)
+        .args(["tunnel", "route", "dns", &tunnel_name, &subdomain])
+        .output()
+        .await
+        .map_err(|e| format!("Failed to run cloudflared route: {}", e))?;
+
+    let route_err = String::from_utf8_lossy(&route_cmd.stderr);
+    let route_out = String::from_utf8_lossy(&route_cmd.stdout);
+    
+    // Route might also fail if it already exists, which is fine for our case.
+    
+    Ok(format!("Setup complete. Out: {} Err: {}", route_out, route_err))
+}
+
 #[derive(Serialize, Clone)]
 struct DiscoveredProject {
     id: String,
@@ -142,6 +264,8 @@ struct DiscoveredProject {
     framework: String,
     #[serde(rename = "suggestedUrl")]
     suggested_url: String,
+    #[serde(rename = "wpHelperInstalled")]
+    wp_helper_installed: Option<bool>,
 }
 
 #[tauri::command]
@@ -188,12 +312,23 @@ async fn scan_projects(dir: String) -> Result<Vec<DiscoveredProject>, String> {
                     "http://localhost:3000".to_string()
                 };
 
+                let mut wp_helper_installed = None;
+                if framework == "WordPress" {
+                    wp_helper_installed = Some(false);
+                    if let Ok(config) = std::fs::read_to_string(path.join("wp-config.php")) {
+                        if config.contains("HTTP_X_FORWARDED_HOST") {
+                            wp_helper_installed = Some(true);
+                        }
+                    }
+                }
+
                 projects.push(DiscoveredProject {
                     id: uuid::Uuid::new_v4().to_string(),
                     name,
                     path: path.to_string_lossy().to_string(),
                     framework,
                     suggested_url,
+                    wp_helper_installed,
                 });
             }
         }
@@ -262,7 +397,10 @@ fn main() {
             stop_tunnel, 
             scan_projects, 
             cloudflared_login,
-            check_cloudflared
+            check_cloudflared,
+            check_cloudflared_login,
+            inject_wp_helper,
+            auto_tunnel_setup
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

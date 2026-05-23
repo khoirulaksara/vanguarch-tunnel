@@ -17,6 +17,7 @@ type Tab = 'manual' | 'presets' | 'projects' | 'settings';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>('manual');
+  const [isLogsMinimized, setIsLogsMinimized] = useState(false);
   const { activeProcess } = useTunnelStore();
 
   const isRunning = activeProcess?.status === 'running';
@@ -77,7 +78,7 @@ export default function App() {
       <div className="flex-1 flex flex-col min-w-0 bg-[#09090b]">
         
         {/* Top Region - Configuration */}
-        <div className="h-3/5 border-b border-[#27272a] flex overflow-hidden">
+        <div className={cn("border-b border-[#27272a] flex overflow-hidden transition-all duration-300", isLogsMinimized ? "flex-1" : "h-3/5")}>
           {activeTab === 'manual' && <ManualTunnel />}
           {activeTab === 'presets' && <PresetList />}
           {activeTab === 'projects' && <ProjectList />}
@@ -85,8 +86,8 @@ export default function App() {
         </div>
         
         {/* Bottom Region - Logs */}
-        <div className="h-2/5 flex flex-col bg-[#09090b]">
-          <LogsView />
+        <div className={cn("flex flex-col bg-[#09090b] transition-all duration-300", isLogsMinimized ? "h-8 sm:h-[34px] border-t-0" : "h-2/5")}>
+          <LogsView isMinimized={isLogsMinimized} onToggleMinimize={() => setIsLogsMinimized(!isLogsMinimized)} />
         </div>
 
       </div>

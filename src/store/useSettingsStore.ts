@@ -4,8 +4,10 @@ import { persist } from 'zustand/middleware';
 interface SettingsStore {
   cloudflaredPath: string;
   setCloudflaredPath: (path: string) => void;
-  projectsDirectory: string;
-  setProjectsDirectory: (path: string) => void;
+  projectsDirectories: string[];
+  setProjectsDirectories: (paths: string[]) => void;
+  publicDomain: string;
+  setPublicDomain: (domain: string) => void;
 }
 
 export const useSettingsStore = create<SettingsStore>()(
@@ -13,8 +15,10 @@ export const useSettingsStore = create<SettingsStore>()(
     (set) => ({
       cloudflaredPath: '',
       setCloudflaredPath: (path) => set({ cloudflaredPath: path }),
-      projectsDirectory: 'C:/laragon/www',
-      setProjectsDirectory: (path) => set({ projectsDirectory: path }),
+      projectsDirectories: ['C:/laragon/www'],
+      setProjectsDirectories: (paths) => set({ projectsDirectories: paths }),
+      publicDomain: '',
+      setPublicDomain: (domain) => set({ publicDomain: domain }),
     }),
     {
       name: 'vanguarch-settings',

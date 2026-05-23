@@ -2,6 +2,7 @@ export interface TunnelConfig {
   id: string;
   name: string;
   localUrl: string;
+  localVhost: string;
   publicDomain: string;
   tunnelName: string;
   options: {
@@ -34,4 +35,5 @@ export interface DiscoveredProject {
   path: string;
   framework: 'WordPress' | 'Laravel' | 'Next.js' | 'Vite' | 'Unknown';
   suggestedUrl: string;
+  wpHelperInstalled?: boolean;
 }
