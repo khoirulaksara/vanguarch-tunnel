@@ -9,13 +9,20 @@ import { ProjectList } from './components/ProjectList';
 import { PresetList } from './components/PresetList';
 import { LogsView } from './components/LogsView';
 import { SettingsView } from './components/SettingsView';
-import { Shield, TerminalSquare, Plug, FolderSearch, Bookmark, Settings } from 'lucide-react';
+import { Shield, TerminalSquare, Plug, FolderSearch, Bookmark, Settings, Activity } from 'lucide-react';
 import { cn } from './lib/utils';
+import { useTunnelStore } from './store/useTunnelStore';
 
 type Tab = 'manual' | 'presets' | 'projects' | 'settings';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>('manual');
+  const { activeProcess } = useTunnelStore();
+
+  const isRunning = activeProcess?.status === 'running';
+  const isStarting = activeProcess?.status === 'starting';
+  const statusColor = isRunning ? "text-green-500" : isStarting ? "text-orange-500" : "text-[#52525b]";
+  const statusText = isRunning ? "ONLINE" : isStarting ? "STARTING" : "OFFLINE";
 
   return (
     <div className="flex h-screen bg-[#09090b] text-[#e4e4e7] font-sans overflow-hidden selection:bg-orange-500/30">
@@ -56,9 +63,12 @@ export default function App() {
         </nav>
         
         <div className="p-4 border-t border-[#27272a] hidden sm:block">
-          <div className="flex items-center gap-2 text-[10px] text-[#52525b] justify-between">
-            <span>v2.1.0-stable</span>
-            <span>PID: 84920</span>
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] text-[#52525b] font-mono">v2.1.0</span>
+            <div className={`flex items-center gap-1.5 text-[10px] font-bold tracking-wider ${statusColor}`}>
+              <Activity className="w-3.5 h-3.5" />
+              {statusText}
+            </div>
           </div>
         </div>
       </div>
