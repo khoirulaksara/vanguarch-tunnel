@@ -100,7 +100,7 @@ export const useTunnelStore = create<TunnelStore>()(
             await invoke('start_tunnel', {
               cloudflaredPath,
               localUrl: config.localUrl,
-              publicDomain: config.publicDomain,
+              publicDomain: config.localVhost || config.publicDomain,
               tunnelName: config.tunnelName,
               httpHostHeader: config.options.httpHostHeader,
               originServerName: config.options.originServerName,

@@ -44,18 +44,19 @@ export function ProjectList() {
         await new Promise(r => setTimeout(r, 1000));
       }
 
+      const isLocalhost = project.suggestedUrl.includes('localhost') || project.suggestedUrl.includes('127.0.0.1');
       const hostHeader = project.suggestedUrl.replace('http://', '').replace('https://', '');
 
       const config = {
         id: Math.random().toString(36).substring(2, 9),
         name: `Auto: ${project.name}`,
-        localUrl: project.suggestedUrl,
+        localUrl: isLocalhost ? project.suggestedUrl : 'http://127.0.0.1',
         localVhost: hostHeader,
         publicDomain: subdomain,
         tunnelName: tunnelName,
         options: {
-          httpHostHeader: true,
-          originServerName: true,
+          httpHostHeader: !isLocalhost,
+          originServerName: !isLocalhost,
           forceHttp2: false,
           ipv4Only: false
         }

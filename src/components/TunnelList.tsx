@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSettingsStore } from '../store/useSettingsStore';
 import { useTunnelStore } from '../store/useTunnelStore';
+import { useProjectStore } from '../store/useProjectStore';
 import { useCloudflareStore } from '../store/useCloudflareStore';
 import { Cloud, Play, Search, RefreshCw, XCircle } from 'lucide-react';
 
@@ -10,6 +11,7 @@ export function TunnelList() {
   
   const { cloudflaredPath } = useSettingsStore();
   const { startTunnel, activeProcess } = useTunnelStore();
+  const { projects } = useProjectStore();
   const [startingTunnelId, setStartingTunnelId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -19,17 +21,30 @@ export function TunnelList() {
   const handleStartTunnel = async (tunnel: any) => {
     setStartingTunnelId(tunnel.id);
     try {
-      const vhost = tunnel.name.replace('vanguarch-', '') + '.test';
+      const sanitizedName = tunnel.name.replace('vanguarch-', '');
+      const project = projects.find(p => p.name.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase() === sanitizedName);
+      
+      let localUrl = `http://127.0.0.1`;
+      let localVhost = `${sanitizedName}.test`;
+      let publicDomain = '';
+      let isLocalhost = false;
+
+      if (project) {
+        isLocalhost = project.suggestedUrl.includes('localhost') || project.suggestedUrl.includes('127.0.0.1');
+        localUrl = isLocalhost ? project.suggestedUrl : 'http://127.0.0.1';
+        localVhost = project.suggestedUrl.replace('http://', '').replace('https://', '');
+      }
+
       const config = {
         id: Math.random().toString(36).substring(2, 9),
         name: tunnel.name,
-        localUrl: 'http://127.0.0.1',
-        localVhost: vhost,
-        publicDomain: '', 
+        localUrl,
+        localVhost,
+        publicDomain, 
         tunnelName: tunnel.name,
         options: {
-          httpHostHeader: true,
-          originServerName: true,
+          httpHostHeader: !isLocalhost,
+          originServerName: !isLocalhost,
           forceHttp2: false,
           ipv4Only: false
         }

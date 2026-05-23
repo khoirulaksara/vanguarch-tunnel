@@ -10,13 +10,14 @@ import { PresetList } from './components/PresetList';
 import { TunnelList } from './components/TunnelList';
 import { LogsView } from './components/LogsView';
 import { SettingsView } from './components/SettingsView';
-import { Shield, TerminalSquare, Plug, FolderSearch, Bookmark, Settings, Activity, Cloud } from 'lucide-react';
+import { AboutView } from './components/AboutView';
+import { Shield, TerminalSquare, Plug, FolderSearch, Bookmark, Settings, Activity, Cloud, Info } from 'lucide-react';
 import { cn } from './lib/utils';
 import { useTunnelStore } from './store/useTunnelStore';
 import { useCloudflareStore } from './store/useCloudflareStore';
 import { useSettingsStore } from './store/useSettingsStore';
 
-type Tab = 'manual' | 'presets' | 'projects' | 'tunnels' | 'settings';
+type Tab = 'manual' | 'presets' | 'projects' | 'tunnels' | 'settings' | 'about';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>('manual');
@@ -86,6 +87,12 @@ export default function App() {
             active={activeTab === 'settings'} 
             onClick={() => setActiveTab('settings')} 
           />
+          <NavItem 
+            icon={<Info className="w-5 h-5" />} 
+            label="About" 
+            active={activeTab === 'about'} 
+            onClick={() => setActiveTab('about')} 
+          />
         </nav>
         
         <div className="p-4 border-t border-[#27272a] hidden sm:block">
@@ -109,6 +116,7 @@ export default function App() {
           {activeTab === 'projects' && <ProjectList />}
           {activeTab === 'tunnels' && <TunnelList />}
           {activeTab === 'settings' && <SettingsView />}
+          {activeTab === 'about' && <AboutView />}
         </div>
         
         {/* Bottom Region - Logs */}
