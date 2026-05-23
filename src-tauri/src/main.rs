@@ -256,6 +256,27 @@ async fn auto_tunnel_setup(
     Ok(format!("Setup complete. Out: {} Err: {}", route_out, route_err))
 }
 
+#[tauri::command]
+async fn list_tunnels(cloudflared_path: String) -> Result<String, String> {
+    let bin_path = if cloudflared_path.trim().is_empty() {
+        "cloudflared".to_string()
+    } else {
+        cloudflared_path
+    };
+
+    let list_cmd = Command::new(&bin_path)
+        .args(["tunnel", "list", "--output", "json"])
+        .output()
+        .await
+        .map_err(|e| format!("Failed to run cloudflared list: {}", e))?;
+
+    if !list_cmd.status.success() {
+        return Err(String::from_utf8_lossy(&list_cmd.stderr).to_string());
+    }
+
+    Ok(String::from_utf8_lossy(&list_cmd.stdout).to_string())
+}
+
 #[derive(Serialize, Clone)]
 struct DiscoveredProject {
     id: String,
@@ -400,7 +421,8 @@ fn main() {
             check_cloudflared,
             check_cloudflared_login,
             inject_wp_helper,
-            auto_tunnel_setup
+            auto_tunnel_setup,
+            list_tunnels
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

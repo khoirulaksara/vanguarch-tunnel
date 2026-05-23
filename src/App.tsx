@@ -3,25 +3,44 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ManualTunnel } from './components/ManualTunnel';
 import { ProjectList } from './components/ProjectList';
 import { PresetList } from './components/PresetList';
+import { TunnelList } from './components/TunnelList';
 import { LogsView } from './components/LogsView';
 import { SettingsView } from './components/SettingsView';
-import { Shield, TerminalSquare, Plug, FolderSearch, Bookmark, Settings, Activity } from 'lucide-react';
+import { Shield, TerminalSquare, Plug, FolderSearch, Bookmark, Settings, Activity, Cloud } from 'lucide-react';
 import { cn } from './lib/utils';
 import { useTunnelStore } from './store/useTunnelStore';
+import { useCloudflareStore } from './store/useCloudflareStore';
+import { useSettingsStore } from './store/useSettingsStore';
 
-type Tab = 'manual' | 'presets' | 'projects' | 'settings';
+type Tab = 'manual' | 'presets' | 'projects' | 'tunnels' | 'settings';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>('manual');
   const [isLogsMinimized, setIsLogsMinimized] = useState(false);
   const { activeProcess } = useTunnelStore();
+  const { tunnels, fetchTunnels } = useCloudflareStore();
+  const { cloudflaredPath } = useSettingsStore();
+
+  useEffect(() => {
+    fetchTunnels(cloudflaredPath);
+  }, [cloudflaredPath, fetchTunnels]);
 
   const isRunning = activeProcess?.status === 'running';
   const isStarting = activeProcess?.status === 'starting';
+
+  // Count online tunnels. We map over the ones that have connections > 0, 
+  // and we make sure not to double count our own if it has connections in the api response.
+  // Actually, we can just say any tunnel with connections > 0 is online + 1 if our active one isn't in that list? 
+  // Let's just use the api response 'connections' array + the running status of activeProcess for the count.
+  const apiOnlineTunnels = tunnels.filter(t => t.connections && t.connections.length > 0).map(t => t.name);
+  if (isRunning && activeProcess.config?.tunnelName && !apiOnlineTunnels.includes(activeProcess.config.tunnelName)) {
+    apiOnlineTunnels.push(activeProcess.config.tunnelName);
+  }
+  const onlineCount = apiOnlineTunnels.length;
   const statusColor = isRunning ? "text-green-500" : isStarting ? "text-orange-500" : "text-[#52525b]";
   const statusText = isRunning ? "ONLINE" : isStarting ? "STARTING" : "OFFLINE";
 
@@ -56,6 +75,12 @@ export default function App() {
             onClick={() => setActiveTab('projects')} 
           />
           <NavItem 
+            icon={<Cloud className="w-5 h-5" />} 
+            label="Cloud Tunnels" 
+            active={activeTab === 'tunnels'} 
+            onClick={() => setActiveTab('tunnels')} 
+          />
+          <NavItem 
             icon={<Settings className="w-5 h-5" />} 
             label="Settings" 
             active={activeTab === 'settings'} 
@@ -68,7 +93,7 @@ export default function App() {
             <span className="text-[10px] text-[#52525b] font-mono">v2.1.0</span>
             <div className={`flex items-center gap-1.5 text-[10px] font-bold tracking-wider ${statusColor}`}>
               <Activity className="w-3.5 h-3.5" />
-              {statusText}
+              {statusText} {onlineCount > 0 && `(${onlineCount})`}
             </div>
           </div>
         </div>
@@ -82,6 +107,7 @@ export default function App() {
           {activeTab === 'manual' && <ManualTunnel />}
           {activeTab === 'presets' && <PresetList />}
           {activeTab === 'projects' && <ProjectList />}
+          {activeTab === 'tunnels' && <TunnelList />}
           {activeTab === 'settings' && <SettingsView />}
         </div>
         

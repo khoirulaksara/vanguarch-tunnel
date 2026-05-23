@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useProjectStore } from '../store/useProjectStore';
 import { useSettingsStore } from '../store/useSettingsStore';
 import { useTunnelStore } from '../store/useTunnelStore';
-import { Folder, Search, Link as LinkIcon, Code2, RefreshCw, CheckCircle2, XCircle, Plus, ChevronDown, ChevronUp, Play } from 'lucide-react';
+import { useCloudflareStore } from '../store/useCloudflareStore';
+import { Folder, Search, Link as LinkIcon, Code2, RefreshCw, CheckCircle2, XCircle, Plus, ChevronDown, ChevronUp, Play, Cloud } from 'lucide-react';
 
 export function ProjectList() {
   const { projects, isScanning, scanProjects, injectWpHelper } = useProjectStore();
   const { projectsDirectories, cloudflaredPath, publicDomain } = useSettingsStore();
   const { startTunnel } = useTunnelStore();
+  const { tunnels, fetchTunnels } = useCloudflareStore();
 
   const [injectStatus, setInjectStatus] = useState<Record<string, { loading: boolean, error?: string, success?: string }>>({});
   const [expandedHelpers, setExpandedHelpers] = useState<Record<string, boolean>>({});
@@ -15,7 +17,8 @@ export function ProjectList() {
 
   useEffect(() => {
     scanProjects();
-  }, [scanProjects]);
+    fetchTunnels(cloudflaredPath);
+  }, [scanProjects, fetchTunnels, cloudflaredPath]);
 
   const handleAutoTunnel = async (project: any) => {
     if (!publicDomain) {
@@ -61,6 +64,7 @@ export function ProjectList() {
       await startTunnel(config);
       
       setAutoTunnelStatus(prev => ({ ...prev, [project.id]: { loading: false } }));
+      fetchTunnels(cloudflaredPath);
     } catch (err: any) {
       setAutoTunnelStatus(prev => ({ ...prev, [project.id]: { loading: false, error: err.message || String(err) } }));
     }
@@ -133,13 +137,16 @@ export function ProjectList() {
                     <h3 className="text-xs font-bold tracking-tight text-[#e4e4e7]">{project.name}</h3>
                     <p className="text-[10px] text-[#52525b] font-mono mt-1">{project.path}</p>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
+                    {tunnels.some((t: any) => t.name === `vanguarch-${project.name.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase()}`) && (
+                      <span className="text-[10px] px-2 py-1 rounded font-bold uppercase tracking-wider bg-blue-500/10 text-blue-400 flex items-center gap-1"><Cloud className="w-3 h-3"/> Cloudflared</span>
+                    )}
                     {project.framework === 'WordPress' && project.wpHelperInstalled !== undefined && (
                       <div className={`flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider ${project.wpHelperInstalled ? 'text-green-500' : 'text-red-500'}`}>
                         {project.wpHelperInstalled ? (
                           <><CheckCircle2 className="w-3 h-3" /> Terpasang</>
                         ) : (
-                          <><XCircle className="w-3 h-3" /> Belum Terpasang</>
+                          <><XCircle className="w-3 h-3" /> Belum</>
                         )}
                       </div>
                     )}
@@ -155,18 +162,20 @@ export function ProjectList() {
                       <LinkIcon className="w-3 h-3 text-[#52525b]" />
                       <span className="font-mono">{project.suggestedUrl}</span>
                     </div>
-                    <button
-                      onClick={() => handleAutoTunnel(project)}
-                      disabled={autoTunnelStatus[project.id]?.loading}
-                      className="px-2 py-1 bg-white text-black hover:bg-[#e4e4e7] rounded text-[10px] font-bold uppercase tracking-wider disabled:opacity-50 transition-colors flex items-center gap-1.5"
-                    >
-                      {autoTunnelStatus[project.id]?.loading ? (
-                        <RefreshCw className="w-3 h-3 animate-spin" />
-                      ) : (
-                        <Play className="w-3 h-3" />
-                      )}
-                      Tunnel
-                    </button>
+                    {!tunnels.some((t: any) => t.name === `vanguarch-${project.name.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase()}`) && (
+                      <button
+                        onClick={() => handleAutoTunnel(project)}
+                        disabled={autoTunnelStatus[project.id]?.loading}
+                        className="px-2 py-1 bg-white text-black hover:bg-[#e4e4e7] rounded text-[10px] font-bold uppercase tracking-wider disabled:opacity-50 transition-colors flex items-center gap-1.5"
+                      >
+                        {autoTunnelStatus[project.id]?.loading ? (
+                          <RefreshCw className="w-3 h-3 animate-spin" />
+                        ) : (
+                          <Play className="w-3 h-3" />
+                        )}
+                        Tunnel
+                      </button>
+                    )}
                   </div>
                   
                   {autoTunnelStatus[project.id]?.error && (
