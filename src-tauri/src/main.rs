@@ -23,6 +23,7 @@ struct LogMessage {
 async fn start_tunnel(
     app: tauri::AppHandle,
     state: State<'_, AppState>,
+    cloudflared_path: String,
     local_url: String,
     public_domain: String,
     tunnel_name: String,
@@ -62,7 +63,13 @@ async fn start_tunnel(
     args.push("run".to_string());
     args.push(tunnel_name);
 
-    let mut child = Command::new("cloudflared")
+    let bin_path = if cloudflared_path.trim().is_empty() {
+        "cloudflared".to_string()
+    } else {
+        cloudflared_path
+    };
+
+    let mut child = Command::new(bin_path)
         .args(args)
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
