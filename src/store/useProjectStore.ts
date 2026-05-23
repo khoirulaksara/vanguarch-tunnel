@@ -1,5 +1,19 @@
 import { create } from 'zustand';
 import { DiscoveredProject } from '../types';
+import { useSettingsStore } from './useSettingsStore';
+
+// Optional Tauri imports
+let invoke: any = null;
+(async () => {
+  try {
+    if ((window as any).__TAURI_INTERNALS__) {
+      const core = await import('@tauri-apps/api/core');
+      invoke = core.invoke;
+    }
+  } catch (e) {
+    console.error("Not running in Tauri environment");
+  }
+})();
 
 interface ProjectStore {
   projects: DiscoveredProject[];
@@ -43,8 +57,21 @@ export const useProjectStore = create<ProjectStore>((set) => ({
   isScanning: false,
   scanProjects: async () => {
     set({ isScanning: true });
-    // Simulate scan delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-    set({ projects: MOCK_PROJECTS, isScanning: false });
+    
+    const projectsDir = useSettingsStore.getState().projectsDirectory;
+    
+    if (invoke) {
+      try {
+        const foundProjects = await invoke('scan_projects', { dir: projectsDir });
+        set({ projects: foundProjects, isScanning: false });
+      } catch (err) {
+        console.error("Failed to scan projects:", err);
+        set({ isScanning: false });
+      }
+    } else {
+      // Simulate scan delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+      set({ projects: MOCK_PROJECTS, isScanning: false });
+    }
   }
 }));
