@@ -358,12 +358,14 @@ fn detect_project(path: &std::path::Path) -> Option<DiscoveredProject> {
 }
 
 #[tauri::command]
-async fn scan_projects(dir: String) -> Result<Vec<DiscoveredProject>, String> {
+async fn scan_projects(dir: String, is_workspace: bool) -> Result<Vec<DiscoveredProject>, String> {
     let mut projects = Vec::new();
     let root_path = std::path::Path::new(&dir);
     
-    if let Some(project) = detect_project(root_path) {
-        projects.push(project);
+    if !is_workspace {
+        if let Some(project) = detect_project(root_path) {
+            projects.push(project);
+        }
         return Ok(projects);
     }
     

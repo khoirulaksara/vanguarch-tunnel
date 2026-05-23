@@ -62,19 +62,33 @@ export const useProjectStore = create<ProjectStore>((set) => ({
     
     // We get the directories state. Note we fallback to old projectsDirectory if migration is incomplete
     const state = useSettingsStore.getState() as any;
-    const dirs = state.projectsDirectories || (state.projectsDirectory ? [state.projectsDirectory] : ['C:/laragon/www']);
+    const workspaces = state.workspaceDirectories || (state.projectsDirectories ? state.projectsDirectories : (state.projectsDirectory ? [state.projectsDirectory] : ['C:/laragon/www']));
+    const singles = state.singleProjectDirectories || [];
     
     if (invoke) {
       try {
         let allProjects: any[] = [];
-        for (const dir of dirs) {
+        
+        // Scan workspaces
+        for (const dir of workspaces) {
           try {
-            const foundProjects = await invoke('scan_projects', { dir });
+            const foundProjects = await invoke('scan_projects', { dir, isWorkspace: true });
             allProjects = [...allProjects, ...(foundProjects as any[])];
           } catch (err) {
-            console.error(`Failed to scan ${dir}:`, err);
+            console.error(`Failed to scan workspace ${dir}:`, err);
           }
         }
+        
+        // Scan single projects
+        for (const dir of singles) {
+          try {
+            const foundProjects = await invoke('scan_projects', { dir, isWorkspace: false });
+            allProjects = [...allProjects, ...(foundProjects as any[])];
+          } catch (err) {
+            console.error(`Failed to scan single project ${dir}:`, err);
+          }
+        }
+        
         set({ projects: allProjects, isScanning: false });
       } catch (err) {
         console.error("Failed to scan projects:", err);

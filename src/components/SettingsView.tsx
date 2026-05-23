@@ -18,7 +18,14 @@ let openDialog: any = null;
 })();
 
 export function SettingsView() {
-  const { cloudflaredPath, setCloudflaredPath, projectsDirectories, setProjectsDirectories } = useSettingsStore();
+  const { 
+    cloudflaredPath, 
+    setCloudflaredPath, 
+    workspaceDirectories, 
+    setWorkspaceDirectories,
+    singleProjectDirectories,
+    setSingleProjectDirectories
+  } = useSettingsStore();
   const [loginStatus, setLoginStatus] = useState<string>('');
   const [toolVersion, setToolVersion] = useState<string>('');
   const [isChecking, setIsChecking] = useState(false);
@@ -82,18 +89,23 @@ export function SettingsView() {
     }
   };
 
-  const handleBrowseProjects = async () => {
+  const handleBrowseProjects = async (type: 'workspace' | 'single') => {
     if (openDialog) {
       try {
         const selected = await openDialog({
           multiple: false,
           directory: true,
-          title: 'Select Projects Directory',
+          title: type === 'workspace' ? 'Select Workspace Directory' : 'Select Project Directory',
         });
         if (selected && typeof selected === 'string') {
-          // Avoid duplicates
-          if (!projectsDirectories.includes(selected)) {
-            setProjectsDirectories([...projectsDirectories, selected]);
+          if (type === 'workspace') {
+            if (!workspaceDirectories.includes(selected)) {
+              setWorkspaceDirectories([...workspaceDirectories, selected]);
+            }
+          } else {
+            if (!singleProjectDirectories.includes(selected)) {
+              setSingleProjectDirectories([...singleProjectDirectories, selected]);
+            }
           }
         }
       } catch (e) {
@@ -101,16 +113,27 @@ export function SettingsView() {
       }
     } else {
       alert("Browse dialog only available in desktop app.");
-      // Fallback for web preview testing
       const testPath = prompt("Enter directory path:");
-      if (testPath && !projectsDirectories.includes(testPath)) {
-        setProjectsDirectories([...projectsDirectories, testPath]);
+      if (testPath) {
+        if (type === 'workspace') {
+          if (!workspaceDirectories.includes(testPath)) {
+            setWorkspaceDirectories([...workspaceDirectories, testPath]);
+          }
+        } else {
+          if (!singleProjectDirectories.includes(testPath)) {
+            setSingleProjectDirectories([...singleProjectDirectories, testPath]);
+          }
+        }
       }
     }
   };
 
-  const removeProjectDirectory = (pathToRemove: string) => {
-    setProjectsDirectories(projectsDirectories.filter(path => path !== pathToRemove));
+  const removeDirectory = (pathToRemove: string, type: 'workspace' | 'single') => {
+    if (type === 'workspace') {
+      setWorkspaceDirectories(workspaceDirectories.filter(path => path !== pathToRemove));
+    } else {
+      setSingleProjectDirectories(singleProjectDirectories.filter(path => path !== pathToRemove));
+    }
   };
 
   return (
@@ -223,41 +246,78 @@ export function SettingsView() {
           </div>
           
           <div className="pt-4 border-t border-[#27272a]">
-            <div className="flex items-center justify-between mb-3">
-              <label className="block text-[10px] uppercase text-[#52525b] font-bold">Local Projects Directories</label>
-              <button 
-                onClick={handleBrowseProjects}
-                className="px-2 py-1 bg-[#18181b] border border-[#27272a] rounded hover:border-orange-500 hover:text-orange-500 transition-colors flex items-center gap-1 text-[10px] uppercase font-bold text-[#a1a1aa]"
-              >
-                <Plus className="w-3 h-3" /> Add Directory
-              </button>
-            </div>
-            
-            <div className="space-y-2">
-              {projectsDirectories.map((dir, index) => (
-                <div key={index} className="flex gap-2">
-                  <div className="flex-1 bg-[#18181b] border border-[#27272a] rounded p-2 text-xs font-mono text-[#e4e4e7] flex items-center overflow-x-auto truncate">
-                    {dir}
+            {/* Workspace Directories */}
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-3">
+                <label className="block text-[10px] uppercase text-[#52525b] font-bold">Workspace Directories (Multiple Projects)</label>
+                <button 
+                  onClick={() => handleBrowseProjects('workspace')}
+                  className="px-2 py-1 bg-[#18181b] border border-[#27272a] rounded hover:border-orange-500 hover:text-orange-500 transition-colors flex items-center gap-1 text-[10px] uppercase font-bold text-[#a1a1aa]"
+                >
+                  <Plus className="w-3 h-3" /> Add Directory
+                </button>
+              </div>
+              
+              <div className="space-y-2">
+                {workspaceDirectories.map((dir, index) => (
+                  <div key={`ws-${index}`} className="flex gap-2">
+                    <div className="flex-1 bg-[#18181b] border border-[#27272a] rounded p-2 text-xs font-mono text-[#e4e4e7] flex items-center overflow-x-auto truncate">
+                      {dir}
+                    </div>
+                    <button 
+                      onClick={() => removeDirectory(dir, 'workspace')}
+                      className="px-3 bg-[#18181b] border border-[#27272a] rounded hover:border-red-500 hover:text-red-500 transition-colors flex items-center justify-center text-[#a1a1aa]"
+                      title="Remove directory"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
-                  <button 
-                    onClick={() => removeProjectDirectory(dir)}
-                    className="px-3 bg-[#18181b] border border-[#27272a] rounded hover:border-red-500 hover:text-red-500 transition-colors flex items-center justify-center text-[#a1a1aa]"
-                    title="Remove directory"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
-              {projectsDirectories.length === 0 && (
-                <div className="p-4 border border-dashed border-[#27272a] rounded text-center text-[10px] text-[#52525b] uppercase tracking-wider">
-                  No directories added
-                </div>
-              )}
+                ))}
+                {workspaceDirectories.length === 0 && (
+                  <div className="p-4 border border-dashed border-[#27272a] rounded text-center text-[10px] text-[#52525b] uppercase tracking-wider">
+                    No workspace directories added
+                  </div>
+                )}
+              </div>
+              <p className="text-[10px] text-[#52525b] mt-2 leading-relaxed">
+                Directories that contain multiple web projects (e.g., Laragon's www folder). The app will scan subdirectories within these locations.
+              </p>
             </div>
 
-            <p className="text-[10px] text-[#52525b] mt-2 leading-relaxed">
-              Paths to the directories where your local web projects are stored. The app will scan all these locations.
-            </p>
+            {/* Single Project Directories */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <label className="block text-[10px] uppercase text-[#52525b] font-bold">Single Project Directories</label>
+                <button 
+                  onClick={() => handleBrowseProjects('single')}
+                  className="px-2 py-1 bg-[#18181b] border border-[#27272a] rounded hover:border-orange-500 hover:text-orange-500 transition-colors flex items-center gap-1 text-[10px] uppercase font-bold text-[#a1a1aa]"
+                >
+                  <Plus className="w-3 h-3" /> Add Directory
+                </button>
+              </div>
+              
+              <div className="space-y-2">
+                {singleProjectDirectories.map((dir, index) => (
+                  <div key={`sp-${index}`} className="flex gap-2">
+                    <div className="flex-1 bg-[#18181b] border border-[#27272a] rounded p-2 text-xs font-mono text-[#e4e4e7] flex items-center overflow-x-auto truncate">
+                      {dir}
+                    </div>
+                    <button 
+                      onClick={() => removeDirectory(dir, 'single')}
+                      className="px-3 bg-[#18181b] border border-[#27272a] rounded hover:border-red-500 hover:text-red-500 transition-colors flex items-center justify-center text-[#a1a1aa]"
+                      title="Remove directory"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+                {singleProjectDirectories.length === 0 && (
+                  <div className="p-4 border border-dashed border-[#27272a] rounded text-center text-[10px] text-[#52525b] uppercase tracking-wider">
+                    No single project directories added
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>
