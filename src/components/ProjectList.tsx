@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
 import { useProjectStore } from '../store/useProjectStore';
+import { useSettingsStore } from '../store/useSettingsStore';
 import { Folder, Search, Link as LinkIcon, Code2, RefreshCw } from 'lucide-react';
 
 export function ProjectList() {
   const { projects, isScanning, scanProjects } = useProjectStore();
+  const { projectsDirectory } = useSettingsStore();
 
   useEffect(() => {
     scanProjects();
@@ -18,7 +20,7 @@ export function ProjectList() {
               <Folder className="w-4 h-4 text-orange-500" />
               Discovered Projects
             </h2>
-            <p className="text-[#a1a1aa] text-[10px] mt-1">C:/laragon/www</p>
+            <p className="text-[#a1a1aa] text-[10px] mt-1">{projectsDirectory}</p>
           </div>
           <button 
             onClick={() => scanProjects()}

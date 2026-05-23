@@ -134,10 +134,136 @@ async fn stop_tunnel(state: State<'_, AppState>) -> Result<(), String> {
     Ok(())
 }
 
+#[derive(Serialize, Clone)]
+struct DiscoveredProject {
+    id: String,
+    name: String,
+    path: String,
+    framework: String,
+    #[serde(rename = "suggestedUrl")]
+    suggested_url: String,
+}
+
+#[tauri::command]
+async fn scan_projects(dir: String) -> Result<Vec<DiscoveredProject>, String> {
+    let mut projects = Vec::new();
+    let entries = std::fs::read_dir(&dir).map_err(|e| format!("Failed to read directory: {}", e))?;
+
+    for entry in entries.flatten() {
+        let path = entry.path();
+        if path.is_dir() {
+            let name = entry.file_name().to_string_lossy().to_string();
+            let mut framework = "Unknown".to_string();
+            
+            // Basic framework detection
+            if path.join("wp-config.php").exists() || path.join("wp-config-sample.php").exists() {
+                framework = "WordPress".to_string();
+            } else if path.join("artisan").exists() {
+                framework = "Laravel".to_string();
+            } else if path.join("package.json").exists() {
+                let pkg_content = std::fs::read_to_string(path.join("package.json")).unwrap_or_default();
+                if pkg_content.contains("\"next\"") {
+                    framework = "Next.js".to_string();
+                } else if pkg_content.contains("\"vite\"") {
+                    framework = "Vite".to_string();
+                } else if pkg_content.contains("\"react\"") {
+                    framework = "React".to_string();
+                } else if pkg_content.contains("\"vue\"") {
+                    framework = "Vue".to_string();
+                } else {
+                    framework = "Node.js".to_string();
+                }
+            } else if path.join("index.php").exists() {
+                framework = "PHP".to_string();
+            } else if path.join("index.html").exists() {
+                framework = "HTML".to_string();
+            }
+            
+            if framework != "Unknown" {
+                let suggested_url = if framework == "Laravel" {
+                    format!("http://{}.test", name)
+                } else if framework == "WordPress" || framework == "PHP" {
+                    format!("http://{}.test", name)
+                } else {
+                    "http://localhost:3000".to_string()
+                };
+
+                projects.push(DiscoveredProject {
+                    id: uuid::Uuid::new_v4().to_string(),
+                    name,
+                    path: path.to_string_lossy().to_string(),
+                    framework,
+                    suggested_url,
+                });
+            }
+        }
+    }
+
+    Ok(projects)
+}
+
+#[tauri::command]
+async fn cloudflared_login(cloudflared_path: String) -> Result<String, String> {
+    let bin_path = if cloudflared_path.trim().is_empty() {
+        "cloudflared".to_string()
+    } else {
+        cloudflared_path
+    };
+
+    // cloudflared tunnel login ideally opens browser automatically
+    #[cfg(target_os = "windows")]
+    {
+        Command::new("cmd")
+            .args(["/C", "start", &bin_path, "tunnel", "login"])
+            .spawn()
+            .map_err(|e| format!("Failed to start login process: {}", e))?;
+    }
+
+    #[cfg(not(target_os = "windows"))]
+    {
+        Command::new(&bin_path)
+            .args(["tunnel", "login"])
+            .spawn()
+            .map_err(|e| format!("Failed to start login process: {}", e))?;
+    }
+
+    Ok("Login process started. Check your browser or new terminal window.".to_string())
+}
+
+#[tauri::command]
+async fn check_cloudflared(cloudflared_path: String) -> Result<String, String> {
+    let bin_path = if cloudflared_path.trim().is_empty() {
+        "cloudflared".to_string()
+    } else {
+        cloudflared_path
+    };
+
+    let output = Command::new(&bin_path)
+        .arg("--version")
+        .output()
+        .await
+        .map_err(|e| format!("Failed to find or execute cloudflared: {}", e))?;
+
+    if output.status.success() {
+        let version_str = String::from_utf8_lossy(&output.stdout).to_string();
+        Ok(version_str.trim().to_string())
+    } else {
+        let err_str = String::from_utf8_lossy(&output.stderr).to_string();
+        Err(format!("Error running cloudflared: {}", err_str))
+    }
+}
+
 fn main() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_dialog::init())
         .manage(AppState::default())
-        .invoke_handler(tauri::generate_handler![start_tunnel, stop_tunnel])
+        .invoke_handler(tauri::generate_handler![
+            start_tunnel, 
+            stop_tunnel, 
+            scan_projects, 
+            cloudflared_login,
+            check_cloudflared
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
