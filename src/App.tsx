@@ -36,8 +36,8 @@ export default function App() {
   // and we make sure not to double count our own if it has connections in the api response.
   // Actually, we can just say any tunnel with connections > 0 is online + 1 if our active one isn't in that list? 
   // Let's just use the api response 'connections' array + the running status of activeProcess for the count.
-  const apiOnlineTunnels = tunnels.filter(t => t.connections && t.connections.length > 0).map(t => t.name);
-  if (isRunning && activeProcess.config?.tunnelName && !apiOnlineTunnels.includes(activeProcess.config.tunnelName)) {
+  const apiOnlineTunnels = Array.isArray(tunnels) ? tunnels.filter(t => t.connections && t.connections.length > 0).map(t => t.name) : [];
+  if (isRunning && activeProcess?.config?.tunnelName && !apiOnlineTunnels.includes(activeProcess.config.tunnelName)) {
     apiOnlineTunnels.push(activeProcess.config.tunnelName);
   }
   const onlineCount = apiOnlineTunnels.length;

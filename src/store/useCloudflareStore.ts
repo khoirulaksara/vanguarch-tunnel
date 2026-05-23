@@ -26,7 +26,7 @@ export const useCloudflareStore = create<CloudflareStore>((set) => ({
         const core = await import('@tauri-apps/api/core');
         const jsonStr = await core.invoke<string>('list_tunnels', { cloudflaredPath });
         const data = JSON.parse(jsonStr);
-        set({ tunnels: data, loading: false });
+        set({ tunnels: Array.isArray(data) ? data : [], loading: false });
       } else {
         setTimeout(() => {
           set({

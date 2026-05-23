@@ -138,7 +138,7 @@ export function ProjectList() {
                     <p className="text-[10px] text-[#52525b] font-mono mt-1">{project.path}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    {tunnels.some((t: any) => t.name === `vanguarch-${project.name.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase()}`) && (
+                    {Array.isArray(tunnels) && tunnels.some((t: any) => t.name === `vanguarch-${project.name.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase()}`) && (
                       <span className="text-[10px] px-2 py-1 rounded font-bold uppercase tracking-wider bg-blue-500/10 text-blue-400 flex items-center gap-1"><Cloud className="w-3 h-3"/> Cloudflared</span>
                     )}
                     {project.framework === 'WordPress' && project.wpHelperInstalled !== undefined && (
@@ -162,7 +162,7 @@ export function ProjectList() {
                       <LinkIcon className="w-3 h-3 text-[#52525b]" />
                       <span className="font-mono">{project.suggestedUrl}</span>
                     </div>
-                    {!tunnels.some((t: any) => t.name === `vanguarch-${project.name.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase()}`) && (
+                    {(!Array.isArray(tunnels) || !tunnels.some((t: any) => t.name === `vanguarch-${project.name.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase()}`)) && (
                       <button
                         onClick={() => handleAutoTunnel(project)}
                         disabled={autoTunnelStatus[project.id]?.loading}

@@ -43,7 +43,7 @@ export function TunnelList() {
     }
   };
 
-  const filteredTunnels = tunnels.filter((t: any) => t.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredTunnels = Array.isArray(tunnels) ? tunnels.filter((t: any) => (t.name || '').toLowerCase().includes(searchQuery.toLowerCase())) : [];
 
   return (
     <div className="flex flex-col h-full w-full bg-[#09090b] p-6 text-[#e4e4e7] overflow-y-auto">
