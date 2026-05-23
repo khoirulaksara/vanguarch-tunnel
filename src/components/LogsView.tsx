@@ -1,15 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTunnelStore } from '../store/useTunnelStore';
 import { Terminal } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 export function LogsView() {
-  const activeProcess = useTunnelStore(state => state.activeProcess);
+  const { activeProcess, clearLogs } = useTunnelStore();
   const logsEndRef = React.useRef<HTMLDivElement>(null);
+  const [autoScroll, setAutoScroll] = useState(true);
 
   React.useEffect(() => {
-    logsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [activeProcess?.logs]);
+    if (autoScroll) {
+      logsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [activeProcess?.logs, autoScroll]);
 
   if (!activeProcess) {
     return (
@@ -32,14 +35,21 @@ export function LogsView() {
         <div className="flex items-center gap-2">
           <span className="text-[10px] font-bold text-[#52525b] uppercase tracking-widest">Live Output Logs</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className={cn("w-1.5 h-1.5 rounded-full", {
-            'bg-green-500': activeProcess.status === 'running',
-            'bg-orange-500 animate-pulse': activeProcess.status === 'starting',
-            'bg-red-500': activeProcess.status === 'error',
-            'bg-[#52525b]': activeProcess.status === 'stopped',
-          })} />
-          <span className="text-[10px] text-[#52525b] font-bold uppercase tracking-wider">{activeProcess.status}</span>
+        <div className="flex items-center gap-4">
+          <div className="flex gap-3 text-[10px] text-[#52525b]">
+            <button onClick={clearLogs} className="hover:text-[#a1a1aa] transition-colors uppercase tracking-wider font-bold">Clear</button>
+            <button onClick={() => setAutoScroll(!autoScroll)} className={cn("transition-colors uppercase tracking-wider font-bold", autoScroll ? "text-orange-500 hover:text-orange-400" : "hover:text-[#a1a1aa]")}>Scroll</button>
+          </div>
+          <div className="w-px h-3 bg-[#27272a]"></div>
+          <div className="flex items-center gap-2">
+            <div className={cn("w-1.5 h-1.5 rounded-full", {
+              'bg-green-500': activeProcess.status === 'running',
+              'bg-orange-500 animate-pulse': activeProcess.status === 'starting',
+              'bg-red-500': activeProcess.status === 'error',
+              'bg-[#52525b]': activeProcess.status === 'stopped',
+            })} />
+            <span className="text-[10px] text-[#52525b] font-bold uppercase tracking-wider">{activeProcess.status}</span>
+          </div>
         </div>
       </div>
       <div className="flex-1 overflow-y-auto p-4 font-mono text-[10px] leading-relaxed space-y-1">

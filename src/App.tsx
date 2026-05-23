@@ -8,10 +8,11 @@ import { ManualTunnel } from './components/ManualTunnel';
 import { ProjectList } from './components/ProjectList';
 import { PresetList } from './components/PresetList';
 import { LogsView } from './components/LogsView';
-import { Shield, Settings, TerminalSquare, Plug, FolderSearch, Bookmark } from 'lucide-react';
+import { SettingsView } from './components/SettingsView';
+import { Shield, TerminalSquare, Plug, FolderSearch, Bookmark, Settings } from 'lucide-react';
 import { cn } from './lib/utils';
 
-type Tab = 'manual' | 'presets' | 'projects';
+type Tab = 'manual' | 'presets' | 'projects' | 'settings';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>('manual');
@@ -46,6 +47,12 @@ export default function App() {
             active={activeTab === 'projects'} 
             onClick={() => setActiveTab('projects')} 
           />
+          <NavItem 
+            icon={<Settings className="w-5 h-5" />} 
+            label="Settings" 
+            active={activeTab === 'settings'} 
+            onClick={() => setActiveTab('settings')} 
+          />
         </nav>
         
         <div className="p-4 border-t border-[#27272a] hidden sm:block">
@@ -64,6 +71,7 @@ export default function App() {
           {activeTab === 'manual' && <ManualTunnel />}
           {activeTab === 'presets' && <PresetList />}
           {activeTab === 'projects' && <ProjectList />}
+          {activeTab === 'settings' && <SettingsView />}
         </div>
         
         {/* Bottom Region - Logs */}

@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { TunnelConfig, TunnelLog, TunnelProcess, ProcessStatus } from '../types';
+import { useSettingsStore } from './useSettingsStore';
 
 // Optional Tauri imports (only available when running in Tauri context)
 let invoke: any = null;
@@ -29,6 +30,7 @@ interface TunnelStore {
   startTunnel: (config: TunnelConfig) => Promise<void>;
   stopTunnel: () => Promise<void>;
   addLog: (log: Omit<TunnelLog, 'id'>) => void;
+  clearLogs: () => void;
   setupUnlisten: null | (() => void);
 }
 
@@ -93,7 +95,10 @@ export const useTunnelStore = create<TunnelStore>()(
             });
             set({ setupUnlisten: unlisten });
 
+            const cloudflaredPath = useSettingsStore.getState().cloudflaredPath;
+
             await invoke('start_tunnel', {
+              cloudflaredPath,
               localUrl: config.localUrl,
               publicDomain: config.publicDomain,
               tunnelName: config.tunnelName,
@@ -167,7 +172,11 @@ export const useTunnelStore = create<TunnelStore>()(
             logs: [...state.activeProcess.logs, { ...log, id: Date.now().toString() }]
           }
         };
-      })
+      }),
+      
+      clearLogs: () => set((state) => ({
+        activeProcess: state.activeProcess ? { ...state.activeProcess, logs: [] } : null
+      }))
     }),
     {
       name: 'vanguarch-storage',
