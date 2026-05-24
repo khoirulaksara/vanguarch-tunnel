@@ -2,6 +2,15 @@
 
 Vanguarch is a desktop application built with Tauri designed as an integrated control center for managing modern web development projects.
 
+## Preview
+
+![Preview 1](/public/preview1.png)
+![Preview 2](/public/preview2.png)
+![Preview 3](/public/preview3.png)
+![Preview 4](/public/preview4.png)
+![Preview 5](/public/preview5.png)
+![Preview 6](/public/preview6.png)
+
 ## Overview
 
 Vanguarch provides a unified workspace for developers to manage multiple local environments, including applications running on `localhost`, custom local domains, and multi-service architectures. It combines a lightweight native backend with a web-based frontend to deliver high performance and low resource usage compared to traditional Electron-based desktop applications.
