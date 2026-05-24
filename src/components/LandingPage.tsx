@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Shield, Download, Github, Monitor, TerminalSquare, Globe, Loader2 } from 'lucide-react';
 
 export function LandingPage() {
-  const fallbackUrl = "https://github.com/choiroel/vanguarch/releases/latest";
+  const fallbackUrl = "https://github.com/khoirulaksara/vanguarch-tunnel/releases/latest";
   const [downloads, setDownloads] = useState({
     win: fallbackUrl,
     mac: fallbackUrl,
@@ -27,7 +27,7 @@ export function LandingPage() {
   }, [validImages.length]);
 
   useEffect(() => {
-    fetch('https://api.github.com/repos/choiroel/vanguarch/releases/latest')
+    fetch('https://api.github.com/repos/khoirulaksara/vanguarch-tunnel/releases/latest')
       .then(res => res.json())
       .then(data => {
         let win = fallbackUrl;
