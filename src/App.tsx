@@ -19,6 +19,7 @@ import { cn } from './lib/utils';
 import { listen } from '@tauri-apps/api/event';
 import { invoke } from '@tauri-apps/api/core';
 import { listen as listenLog } from '@tauri-apps/api/event';
+import { getCurrentWindow } from '@tauri-apps/api/window';
 import { useCloudflareStore } from './store/useCloudflareStore';
 import { useSettingsStore } from './store/useSettingsStore';
 import { useTunnelStore } from './store/useTunnelStore';
@@ -28,6 +29,7 @@ type Tab = 'manual' | 'presets' | 'projects' | 'tunnels' | 'settings' | 'about';
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>('manual');
   const [isLogsMinimized, setIsLogsMinimized] = useState(false);
+  const [showSplash, setShowSplash] = useState(true);
   const { activeProcesses } = useTunnelStore();
   const { tunnels, fetchTunnels } = useCloudflareStore();
   const { cloudflaredPath } = useSettingsStore();
@@ -42,22 +44,38 @@ export default function App() {
   }, [cloudflaredPath, fetchTunnels]);
 
   useEffect(() => {
+    // Reveal main app after splash
+    const timer = setTimeout(async () => {
+      setShowSplash(false);
+    }, 1500);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
     let unlisten: any;
     async function setupTray() {
       // ONLY RUN IN TAURI
       if (!(window as any).__TAURI_INTERNALS__) return;
       try {
-        unlisten = await listen('tray-quit-requested', async () => {
+        const unlistenFn = await listen('tray-quit-requested', async () => {
+          console.log("TRAY QUIT REQUESTED RECEIVED");
           const tunnelState = useTunnelStore.getState();
           const p = tunnelState.activeProcesses;
           const hasActive = Object.values(p).some(x => x.status === 'running' || x.status === 'starting');
           
           if (hasActive) {
+            console.log("HAS ACTIVE TUNNEL");
+            const win = getCurrentWindow();
+            await win.show();
+            await win.setFocus();
             setExitConfirmOpen(true);
           } else {
+            console.log("FORCE EXIT");
             await invoke('force_exit');
           }
         });
+        unlisten = unlistenFn;
       } catch (err) {
         console.error("Tray setup error:", err);
       }
@@ -105,6 +123,40 @@ export default function App() {
     }
   };
 
+  if (showSplash) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen w-screen bg-[#09090b] font-sans selection:bg-orange-500/30">
+        <style>
+          {`
+            @keyframes load-pulse {
+              0%, 100% { opacity: 1; transform: scale(1); }
+              50% { opacity: .7; transform: scale(0.95); }
+            }
+            @keyframes load-progress {
+              0% { left: -50%; }
+              100% { left: 100%; }
+            }
+          `}
+        </style>
+        <img 
+          src="/icon.png" 
+          alt="Vanguarch Logo" 
+          className="w-16 h-16 object-contain mb-6"
+          style={{ animation: 'load-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' }} 
+        />
+        <div className="w-48 h-1 bg-[#27272a] rounded-full overflow-hidden relative">
+          <div 
+            className="absolute top-0 left-0 h-full w-1/2 bg-orange-500 rounded-full" 
+            style={{ animation: 'load-progress 1.5s ease-in-out infinite' }}
+          ></div>
+        </div>
+        <div className="mt-4 text-[11px] font-bold uppercase tracking-[0.1em] text-[#52525b]">
+          Loading Vanguarch...
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-screen bg-[#09090b] text-[#e4e4e7] font-sans overflow-hidden selection:bg-orange-500/30">
       <Toaster theme="dark" toastOptions={{ className: 'font-sans' }} />
@@ -120,7 +172,15 @@ export default function App() {
       {/* Sidebar Navigation */}
       <div className="w-16 sm:w-64 bg-[#0c0c0e] border-r border-[#27272a] flex flex-col transition-all duration-300 z-10 shrink-0">
         <div className="h-16 flex items-center justify-center sm:justify-start sm:px-6 border-b border-[#27272a] shrink-0">
-          <Shield className="w-6 h-6 text-orange-500" />
+          <div
+            className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500"
+            style={{
+              WebkitMaskImage: `url(/icon.png)`,
+              WebkitMaskRepeat: "no-repeat",
+              WebkitMaskPosition: "center",
+              WebkitMaskSize: "contain",
+            }}
+          />
           <span className="ml-3 font-bold text-sm uppercase tracking-tight hidden sm:block">
             Vanguarch
           </span>
