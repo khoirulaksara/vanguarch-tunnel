@@ -1,20 +1,5 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
-
-# Run and deploy your AI Studio app
-
-This contains everything you need to run your app locally.
-
-View your app in AI Studio: https://ai.studio/apps/c29b445e-36ba-4ad2-8d95-de50cdedc16a
-
-## Run Locally
-
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+Vanguarch is a desktop application built with Tauri designed as an integrated control center for managing modern web development projects.
+It provides a unified workspace where developers can manage multiple local environments, including applications running on localhost, local domains, and multi-service setups. By combining a lightweight native backend with a web-based frontend, Vanguarch delivers high performance while remaining significantly more resource-efficient than traditional Electron-based desktop applications.
+One of its core capabilities is simplifying development networking workflows. Vanguarch supports running and organizing multiple services such as web apps, APIs, and admin panels, while enabling easy exposure of local projects to public domains through tunneling solutions like Cloudflare Tunnel. This removes the need for complex server configuration or manual reverse proxy setup.
+The application is designed to streamline the entire development lifecycle—from local development and testing to lightweight deployment and environment management. It offers centralized control over ports, host routing, and tunnel configurations, making it easier to handle multi-project architectures.
+Overall, Vanguarch acts as a developer control hub that bridges the gap between CLI flexibility and GUI simplicity, making it suitable for modern full-stack workflows involving technologies such as Node.js, Next.js, Laravel, and microservice-based systems.
