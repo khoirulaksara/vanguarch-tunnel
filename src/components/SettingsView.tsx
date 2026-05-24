@@ -1,21 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import { useSettingsStore } from '../store/useSettingsStore';
 import { Settings as SettingsIcon, LogIn, Search, CheckCircle2, XCircle, Plus, Trash2 } from 'lucide-react';
+import { PromptModal } from './ui/PromptModal';
 import { cn } from '../lib/utils';
-
-let invoke: any = null;
-let openDialog: any = null;
-
-(async () => {
-  try {
-    if ((window as any).__TAURI_INTERNALS__) {
-      const core = await import('@tauri-apps/api/core');
-      invoke = core.invoke;
-      const dialog = await import('@tauri-apps/plugin-dialog');
-      openDialog = dialog.open;
-    }
-  } catch (e) {}
-})();
+import { invoke } from '@tauri-apps/api/core';
+import { open as openDialog } from '@tauri-apps/plugin-dialog';
 
 export function SettingsView() {
   const { 
@@ -30,6 +20,9 @@ export function SettingsView() {
   const [toolVersion, setToolVersion] = useState<string>('');
   const [isChecking, setIsChecking] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  
+  const [promptOpen, setPromptOpen] = useState(false);
+  const [promptType, setPromptType] = useState<'workspace' | 'single'>('workspace');
 
   useEffect(() => {
     checkVersion();
@@ -85,7 +78,7 @@ export function SettingsView() {
         console.error("Dialog error:", e);
       }
     } else {
-      alert("Browse dialog only available in desktop app.");
+      toast.warning("Browse dialog only available in desktop app.");
     }
   };
 
@@ -112,18 +105,20 @@ export function SettingsView() {
         console.error("Dialog error:", e);
       }
     } else {
-      alert("Browse dialog only available in desktop app.");
-      const testPath = prompt("Enter directory path:");
-      if (testPath) {
-        if (type === 'workspace') {
-          if (!workspaceDirectories.includes(testPath)) {
-            setWorkspaceDirectories([...workspaceDirectories, testPath]);
-          }
-        } else {
-          if (!singleProjectDirectories.includes(testPath)) {
-            setSingleProjectDirectories([...singleProjectDirectories, testPath]);
-          }
-        }
+      toast.warning("Browse dialog only available in desktop app.");
+      setPromptType(type);
+      setPromptOpen(true);
+    }
+  };
+
+  const handlePromptSubmit = (testPath: string) => {
+    if (promptType === 'workspace') {
+      if (!workspaceDirectories.includes(testPath)) {
+        setWorkspaceDirectories([...workspaceDirectories, testPath]);
+      }
+    } else {
+      if (!singleProjectDirectories.includes(testPath)) {
+        setSingleProjectDirectories([...singleProjectDirectories, testPath]);
       }
     }
   };
@@ -322,8 +317,17 @@ export function SettingsView() {
             </div>
           </div>
         </div>
-        </div>
       </div>
+      </div>
+      <PromptModal
+        isOpen={promptOpen}
+        onClose={() => setPromptOpen(false)}
+        onSubmit={handlePromptSubmit}
+        title={promptType === 'workspace' ? 'Add Workspace Directory' : 'Add Project Directory'}
+        message="Enter the absolute path to the directory:"
+        placeholder="/var/www/html or C:\laragon\www"
+        submitText="Add Directory"
+      />
     </div>
   );
 }

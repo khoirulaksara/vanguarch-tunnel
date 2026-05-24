@@ -5,7 +5,7 @@ import { Play, Square, Save, Github, Globe } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 export function ManualTunnel() {
-  const { startTunnel, stopTunnel, activeProcess, addPreset } = useTunnelStore();
+  const { startTunnel, stopTunnel, activeProcesses, addPreset } = useTunnelStore();
   const [config, setConfig] = useState<Partial<TunnelConfig>>({
     localUrl: 'http://127.0.0.1',
     localVhost: '',
@@ -19,6 +19,7 @@ export function ManualTunnel() {
     }
   });
 
+  const activeProcess = Object.values(activeProcesses).find(p => p.config?.tunnelName === config.tunnelName || p.config?.localUrl === config.localUrl);
   const isRunning = activeProcess?.status === 'running' || activeProcess?.status === 'starting';
 
   const handleStart = (e: React.FormEvent) => {

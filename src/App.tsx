@@ -4,6 +4,8 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { Toaster } from 'sonner';
+import { ConfirmModal } from './components/ui/ConfirmModal';
 import { ManualTunnel } from './components/ManualTunnel';
 import { ProjectList } from './components/ProjectList';
 import { PresetList } from './components/PresetList';
@@ -11,23 +13,32 @@ import { TunnelList } from './components/TunnelList';
 import { LogsView } from './components/LogsView';
 import { SettingsView } from './components/SettingsView';
 import { AboutView } from './components/AboutView';
+import { ServiceStatus } from './components/ServiceStatus';
 import { Shield, TerminalSquare, Plug, FolderSearch, Bookmark, Settings, Activity, Cloud, Info } from 'lucide-react';
 import { cn } from './lib/utils';
-import { useTunnelStore } from './store/useTunnelStore';
+import { listen } from '@tauri-apps/api/event';
+import { invoke } from '@tauri-apps/api/core';
+import { listen as listenLog } from '@tauri-apps/api/event';
 import { useCloudflareStore } from './store/useCloudflareStore';
 import { useSettingsStore } from './store/useSettingsStore';
+import { useTunnelStore } from './store/useTunnelStore';
 
 type Tab = 'manual' | 'presets' | 'projects' | 'tunnels' | 'settings' | 'about';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>('manual');
   const [isLogsMinimized, setIsLogsMinimized] = useState(false);
-  const { activeProcess } = useTunnelStore();
+  const { activeProcesses } = useTunnelStore();
   const { tunnels, fetchTunnels } = useCloudflareStore();
   const { cloudflaredPath } = useSettingsStore();
 
+  const [now, setNow] = useState(Date.now());
+  const [exitConfirmOpen, setExitConfirmOpen] = useState(false);
+
   useEffect(() => {
     fetchTunnels(cloudflaredPath);
+    const interval = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(interval);
   }, [cloudflaredPath, fetchTunnels]);
 
   useEffect(() => {
@@ -36,17 +47,13 @@ export default function App() {
       // ONLY RUN IN TAURI
       if (!(window as any).__TAURI_INTERNALS__) return;
       try {
-        const { listen } = await import('@tauri-apps/api/event');
-        const { invoke } = await import('@tauri-apps/api/core');
         unlisten = await listen('tray-quit-requested', async () => {
           const tunnelState = useTunnelStore.getState();
-          const p = tunnelState.activeProcess;
-          const hasActive = p?.status === 'running' || p?.status === 'starting';
+          const p = tunnelState.activeProcesses;
+          const hasActive = Object.values(p).some(x => x.status === 'running' || x.status === 'starting');
           
           if (hasActive) {
-            if (window.confirm("A tunnel is currently running. Are you sure you want to exit?")) {
-              await invoke('force_exit');
-            }
+            setExitConfirmOpen(true);
           } else {
             await invoke('force_exit');
           }
@@ -61,23 +68,55 @@ export default function App() {
     };
   }, []);
 
-  const isRunning = activeProcess?.status === 'running';
-  const isStarting = activeProcess?.status === 'starting';
+  const isRunning = Object.values(activeProcesses).some(p => p.status === 'running');
+  const isStarting = Object.values(activeProcesses).some(p => p.status === 'starting');
 
   // Count online tunnels. We map over the ones that have connections > 0, 
   // and we make sure not to double count our own if it has connections in the api response.
-  // Actually, we can just say any tunnel with connections > 0 is online + 1 if our active one isn't in that list? 
-  // Let's just use the api response 'connections' array + the running status of activeProcess for the count.
-  const apiOnlineTunnels = Array.isArray(tunnels) ? tunnels.filter(t => t.connections && t.connections.length > 0).map(t => t.name) : [];
-  if (isRunning && activeProcess?.config?.tunnelName && !apiOnlineTunnels.includes(activeProcess.config.tunnelName)) {
-    apiOnlineTunnels.push(activeProcess.config.tunnelName);
-  }
+  let apiOnlineTunnels = Array.isArray(tunnels) ? tunnels.filter(t => t.connections && t.connections.length > 0).map(t => t.name) : [];
+  
+  // Exclude tunnels we recently stopped (within the last 60 seconds) to prevent stale Cloudflare API data 
+  // from showing them as online immediately after stopping.
+  apiOnlineTunnels = apiOnlineTunnels.filter(tunnelName => {
+    const p = activeProcesses[tunnelName];
+    if (p && p.status === 'stopped' && p.stoppedAt && (now - p.stoppedAt < 60000)) {
+      return false; // Ignore connections, we just stopped it
+    }
+    return true;
+  });
+
+  Object.values(activeProcesses).forEach(p => {
+    if (p.status === 'running' && p.config?.tunnelName && !apiOnlineTunnels.includes(p.config.tunnelName)) {
+      apiOnlineTunnels.push(p.config.tunnelName);
+    }
+  });
+  
   const onlineCount = apiOnlineTunnels.length;
   const statusColor = isRunning ? "text-green-500" : isStarting ? "text-orange-500" : "text-[#52525b]";
   const statusText = isRunning ? "ONLINE" : isStarting ? "STARTING" : "OFFLINE";
 
+  const handleConfirmExit = async () => {
+    try {
+      const tunnelState = useTunnelStore.getState();
+      await tunnelState.stopAllTunnels();
+      await invoke('force_exit');
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   return (
     <div className="flex h-screen bg-[#09090b] text-[#e4e4e7] font-sans overflow-hidden selection:bg-orange-500/30">
+      <Toaster theme="dark" toastOptions={{ className: 'font-sans' }} />
+      <ConfirmModal
+        isOpen={exitConfirmOpen}
+        onClose={() => setExitConfirmOpen(false)}
+        onConfirm={handleConfirmExit}
+        title="Exit Vanguarch"
+        message="A tunnel is currently running. Are you sure you want to exit? active tunnels will be stopped."
+        confirmText="Exit"
+        variant="danger"
+      />
       {/* Sidebar Navigation */}
       <div className="w-16 sm:w-64 bg-[#0c0c0e] border-r border-[#27272a] flex flex-col transition-all duration-300 z-10 shrink-0">
         <div className="h-16 flex items-center justify-center sm:justify-start sm:px-6 border-b border-[#27272a] shrink-0">
@@ -125,6 +164,8 @@ export default function App() {
             onClick={() => setActiveTab('about')} 
           />
         </nav>
+        
+        <ServiceStatus />
         
         <div className="p-4 border-t border-[#27272a] hidden sm:block">
           <div className="flex items-center justify-between">

@@ -27,6 +27,7 @@ export interface TunnelProcess {
   status: ProcessStatus;
   logs: TunnelLog[];
   command: string;
+  stoppedAt?: number;
 }
 
 export interface DiscoveredProject {
