@@ -58,9 +58,9 @@ export function AboutView() {
           <div className="bg-[#18181b] border border-[#27272a] rounded-xl p-5 flex flex-col gap-4">
             <h2 className="text-xs font-bold text-white uppercase tracking-wider">Developer</h2>
             <div className="flex items-center gap-4">
-              <img src="https://github.com/khoirulaksara.png" alt="Choiroel" className="w-12 h-12 rounded-full ring-2 ring-[#27272a]" />
+              <img src="https://github.com/khoirulaksara.png" alt="Khoirul Aksara" className="w-12 h-12 rounded-full ring-2 ring-[#27272a]" />
               <div className="flex-1">
-                <h3 className="text-sm font-bold text-white">Choiroel</h3>
+                <h3 className="text-sm font-bold text-white">Khoirul Aksara</h3>
                 <div className="flex items-center gap-4 mt-1.5">
                   <a href="https://github.com/khoirulaksara" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs text-[#a1a1aa] hover:text-white transition-colors">
                     <Github className="w-3.5 h-3.5" /> GitHub
