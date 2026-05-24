@@ -1,5 +1,38 @@
+# Vanguarch
+
 Vanguarch is a desktop application built with Tauri designed as an integrated control center for managing modern web development projects.
-It provides a unified workspace where developers can manage multiple local environments, including applications running on localhost, local domains, and multi-service setups. By combining a lightweight native backend with a web-based frontend, Vanguarch delivers high performance while remaining significantly more resource-efficient than traditional Electron-based desktop applications.
-One of its core capabilities is simplifying development networking workflows. Vanguarch supports running and organizing multiple services such as web apps, APIs, and admin panels, while enabling easy exposure of local projects to public domains through tunneling solutions like Cloudflare Tunnel. This removes the need for complex server configuration or manual reverse proxy setup.
-The application is designed to streamline the entire development lifecycle—from local development and testing to lightweight deployment and environment management. It offers centralized control over ports, host routing, and tunnel configurations, making it easier to handle multi-project architectures.
-Overall, Vanguarch acts as a developer control hub that bridges the gap between CLI flexibility and GUI simplicity, making it suitable for modern full-stack workflows involving technologies such as Node.js, Next.js, Laravel, and microservice-based systems.
+
+## Overview
+
+Vanguarch provides a unified workspace for developers to manage multiple local environments, including applications running on `localhost`, custom local domains, and multi-service architectures. It combines a lightweight native backend with a web-based frontend to deliver high performance and low resource usage compared to traditional Electron-based desktop applications.
+
+## Key Features
+
+- Multi-project environment management
+- Local development orchestration (web apps, APIs, admin panels)
+- Local domain and virtual host routing support
+- Easy exposure of local services to the internet using tunneling (e.g. Cloudflare Tunnel)
+- Centralized control of ports, services, and environments
+- Simplified workflow for multi-service development setups
+
+## Development Workflow
+
+Vanguarch streamlines the entire development lifecycle:
+
+- Local development and testing
+- Service coordination across multiple ports
+- Quick exposure of local apps to public domains
+- Environment switching and project isolation
+
+## Target Users
+
+Vanguarch is designed for developers working with modern stacks such as:
+
+- Node.js
+- Next.js
+- Laravel
+- Microservices architecture
+
+## Purpose
+
+The main goal of Vanguarch is to simplify complex development environments by combining GUI convenience with CLI-level flexibility, allowing developers to manage everything from a single control center.
