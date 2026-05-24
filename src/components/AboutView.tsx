@@ -6,8 +6,8 @@ export function AboutView() {
     <div className="flex flex-col h-full w-full bg-[#09090b] p-6 text-[#e4e4e7] overflow-y-auto">
       <div className="max-w-2xl mx-auto w-full">
         <div className="flex flex-col items-center justify-center gap-4 mb-10 mt-8">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-xl ring-1 ring-white/10">
-            <Shield className="w-8 h-8 text-white" />
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-400 to-red-600 flex items-center justify-center shadow-xl">
+            <img src="/icon.png" alt="Vanguarch" className="w-12 h-12 " />
           </div>
           <div className="text-center">
             <h1 className="text-3xl font-bold tracking-tight text-white mb-1">Vanguarch</h1>

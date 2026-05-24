@@ -13,6 +13,7 @@ import { TunnelList } from './components/TunnelList';
 import { LogsView } from './components/LogsView';
 import { SettingsView } from './components/SettingsView';
 import { AboutView } from './components/AboutView';
+import { LandingPage } from './components/LandingPage';
 import { ServiceStatus } from './components/ServiceStatus';
 import { Shield, TerminalSquare, Plug, FolderSearch, Bookmark, Settings, Activity, Cloud, Info } from 'lucide-react';
 import { cn } from './lib/utils';
@@ -27,6 +28,8 @@ import { useTunnelStore } from './store/useTunnelStore';
 type Tab = 'manual' | 'presets' | 'projects' | 'tunnels' | 'settings' | 'about';
 
 export default function App() {
+  const isTauri = typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
+
   const [activeTab, setActiveTab] = useState<Tab>('manual');
   const [isLogsMinimized, setIsLogsMinimized] = useState(false);
   const [showSplash, setShowSplash] = useState(true);
@@ -122,6 +125,10 @@ export default function App() {
       console.error(e);
     }
   };
+
+  if (!isTauri) {
+    return <LandingPage />;
+  }
 
   if (showSplash) {
     return (
