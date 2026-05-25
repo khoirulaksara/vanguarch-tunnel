@@ -1,0 +1,6 @@
+{
+  "name": "Vanguarch Tunnel",
+  "description": "A stable, predictable UI wrapper for cloudflared and local development tunneling.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
