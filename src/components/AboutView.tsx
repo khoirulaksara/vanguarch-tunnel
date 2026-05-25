@@ -1,7 +1,18 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { getVersion } from '@tauri-apps/api/app';
 import { Shield, Code2, Github, Mail, User } from 'lucide-react';
 
 export function AboutView() {
+  const [appVersion, setAppVersion] = useState<string>('...');
+
+  useEffect(() => {
+    if ((window as any).__TAURI_INTERNALS__) {
+      getVersion().then(v => setAppVersion(v)).catch(() => setAppVersion('2.2.0'));
+    } else {
+      setAppVersion('2.2.0 (Web)');
+    }
+  }, []);
+
   return (
     <div className="flex flex-col h-full w-full bg-[#09090b] text-[#e4e4e7] overflow-y-auto relative">
       <div className="flex flex-col max-w-3xl w-full mx-auto">
@@ -87,7 +98,7 @@ export function AboutView() {
         
         <div className="mt-8 text-center">
             <p className="text-xs font-mono text-[#52525b]">
-              <span className="font-bold text-[#e4e4e7]">v2.1.0</span> • Build 2026.05
+              <span className="font-bold text-[#e4e4e7]">v{appVersion}</span> • Build 2026.05
             </p>
         </div>
         </div>
