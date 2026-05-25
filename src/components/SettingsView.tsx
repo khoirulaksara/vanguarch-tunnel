@@ -91,6 +91,23 @@ export function SettingsView() {
     }
   };
 
+  const handleUpdateCloudflared = async () => {
+    if (invoke) {
+      setIsChecking(true);
+      toast.info("Updating cloudflared...");
+      try {
+        const msg = await invoke('update_cloudflared', { cloudflaredPath });
+        toast.success("Update finished", { description: String(msg) });
+        // Re-check version after update
+        await checkVersion();
+      } catch (err: any) {
+        toast.error("Update Error", { description: String(err) });
+      } finally {
+        setIsChecking(false);
+      }
+    }
+  };
+
   const handleBrowseCloudflared = async () => {
     if (openDialog) {
       try {
@@ -252,6 +269,14 @@ export function SettingsView() {
                   className="px-4 py-2 bg-[#27272a] text-white text-[11px] font-bold uppercase tracking-wider rounded border border-[#3f3f46] hover:bg-[#3f3f46] transition-colors"
                 >
                   Fetch Domain
+                </button>
+              )}
+              {toolVersion && (
+                <button 
+                  onClick={handleUpdateCloudflared}
+                  className="px-4 py-2 bg-[#27272a] text-white text-[11px] font-bold uppercase tracking-wider rounded border border-[#3f3f46] hover:bg-[#3f3f46] transition-colors"
+                >
+                  Check for Updates
                 </button>
               )}
             </div>

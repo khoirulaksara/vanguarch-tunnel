@@ -1,47 +1,20 @@
-# Vanguarch
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
+</div>
 
-Vanguarch is a desktop application built with Tauri designed as an integrated control center for managing modern web development projects.
+# Run and deploy your AI Studio app
 
-## Preview
+This contains everything you need to run your app locally.
 
-![Preview 1](/public/preview1.png)
-![Preview 2](/public/preview2.png)
-![Preview 3](/public/preview3.png)
-![Preview 4](/public/preview4.png)
-![Preview 5](/public/preview5.png)
-![Preview 6](/public/preview6.png)
+View your app in AI Studio: https://ai.studio/apps/c29b445e-36ba-4ad2-8d95-de50cdedc16a
 
-## Overview
+## Run Locally
 
-Vanguarch provides a unified workspace for developers to manage multiple local environments, including applications running on `localhost`, custom local domains, and multi-service architectures. It combines a lightweight native backend with a web-based frontend to deliver high performance and low resource usage compared to traditional Electron-based desktop applications.
+**Prerequisites:**  Node.js
 
-## Key Features
 
-- Multi-project environment management
-- Local development orchestration (web apps, APIs, admin panels)
-- Local domain and virtual host routing support
-- Easy exposure of local services to the internet using tunneling (e.g. Cloudflare Tunnel)
-- Centralized control of ports, services, and environments
-- Simplified workflow for multi-service development setups
-
-## Development Workflow
-
-Vanguarch streamlines the entire development lifecycle:
-
-- Local development and testing
-- Service coordination across multiple ports
-- Quick exposure of local apps to public domains
-- Environment switching and project isolation
-
-## Target Users
-
-Vanguarch is designed for developers working with modern stacks such as:
-
-- Node.js
-- Next.js
-- Laravel
-- Microservices architecture
-
-## Purpose
-
-The main goal of Vanguarch is to simplify complex development environments by combining GUI convenience with CLI-level flexibility, allowing developers to manage everything from a single control center.
+1. Install dependencies:
+   `npm install`
+2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+3. Run the app:
+   `npm run dev`

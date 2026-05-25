@@ -634,6 +634,30 @@ async fn check_cloudflared(cloudflared_path: String) -> Result<String, String> {
 }
 
 #[tauri::command]
+async fn update_cloudflared(cloudflared_path: String) -> Result<String, String> {
+    let bin_path = if cloudflared_path.trim().is_empty() {
+        "cloudflared".to_string()
+    } else {
+        cloudflared_path
+    };
+
+    let output = make_command(&bin_path)
+        .arg("update")
+        .output()
+        .await
+        .map_err(|e| format!("Failed to execute cloudflared update: {}", e))?;
+
+    let stdout = String::from_utf8_lossy(&output.stdout).to_string();
+    let stderr = String::from_utf8_lossy(&output.stderr).to_string();
+
+    if output.status.success() {
+        Ok(format!("Update command finished.\nStdout: {}\nStderr: {}", stdout, stderr))
+    } else {
+        Err(format!("Update failed: {}\n{}", stderr.trim(), stdout.trim()))
+    }
+}
+
+#[tauri::command]
 fn force_exit() {
     std::process::exit(0);
 }
@@ -743,6 +767,7 @@ fn main() {
             auto_tunnel_setup,
             list_tunnels,
             delete_tunnel,
+            update_cloudflared,
             force_exit,
             check_ports
         ])
