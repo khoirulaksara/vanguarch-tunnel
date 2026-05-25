@@ -14,6 +14,7 @@ import { LogsView } from './components/LogsView';
 import { SettingsView } from './components/SettingsView';
 import { AboutView } from './components/AboutView';
 import { ServiceStatus } from './components/ServiceStatus';
+import { Titlebar } from './components/Titlebar';
 import { Shield, TerminalSquare, Plug, FolderSearch, Bookmark, Settings, Activity, Cloud, Info } from 'lucide-react';
 import { cn } from './lib/utils';
 import { listen } from '@tauri-apps/api/event';
@@ -54,34 +55,40 @@ export default function App() {
 
   useEffect(() => {
     let unlisten: any;
+    let isMounted = true;
+    
     async function setupTray() {
-      // ONLY RUN IN TAURI
       if (!(window as any).__TAURI_INTERNALS__) return;
       try {
         const unlistenFn = await listen('tray-quit-requested', async () => {
-          console.log("TRAY QUIT REQUESTED RECEIVED");
           const tunnelState = useTunnelStore.getState();
           const p = tunnelState.activeProcesses;
           const hasActive = Object.values(p).some(x => x.status === 'running' || x.status === 'starting');
           
           if (hasActive) {
-            console.log("HAS ACTIVE TUNNEL");
             const win = getCurrentWindow();
             await win.show();
             await win.setFocus();
             setExitConfirmOpen(true);
           } else {
-            console.log("FORCE EXIT");
             await invoke('force_exit');
           }
         });
-        unlisten = unlistenFn;
+        
+        if (isMounted) {
+          unlisten = unlistenFn;
+        } else {
+          unlistenFn();
+        }
       } catch (err) {
         console.error("Tray setup error:", err);
       }
     }
+    
     setupTray();
+    
     return () => {
+      isMounted = false;
       if (unlisten) unlisten();
     };
   }, []);
@@ -157,15 +164,23 @@ export default function App() {
     );
   }
 
+  const activeCount = Object.values(activeProcesses).filter(p => p.status === 'running' || p.status === 'starting').length;
+  
+  const exitMessage = activeCount > 1 
+    ? `There are ${activeCount} active tunnels currently running. Are you sure you want to exit? They will be forcefully stopped.`
+    : `There is 1 active tunnel currently running. Are you sure you want to exit? It will be forcefully stopped.`;
+
   return (
-    <div className="flex h-screen bg-[#09090b] text-[#e4e4e7] font-sans overflow-hidden selection:bg-orange-500/30">
-      <Toaster theme="dark" toastOptions={{ className: 'font-sans' }} />
+    <div className="flex flex-col h-screen bg-[#09090b] text-[#e4e4e7] font-sans overflow-hidden selection:bg-orange-500/30">
+      <Titlebar />
+      <div className="flex flex-1 overflow-hidden min-h-0">
+        <Toaster theme="dark" toastOptions={{ className: 'font-sans' }} />
       <ConfirmModal
         isOpen={exitConfirmOpen}
         onClose={() => setExitConfirmOpen(false)}
         onConfirm={handleConfirmExit}
         title="Exit Vanguarch"
-        message="A tunnel is currently running. Are you sure you want to exit? active tunnels will be stopped."
+        message={exitMessage}
         confirmText="Exit"
         variant="danger"
       />
@@ -257,6 +272,7 @@ export default function App() {
         </div>
 
       </div>
+    </div>
     </div>
   );
 }

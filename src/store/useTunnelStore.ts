@@ -24,9 +24,9 @@ interface TunnelStore {
   presets: TunnelConfig[];
   activeProcesses: Record<string, TunnelProcess>;
   selectedLogTunnel: string | null;
-  addPreset: (preset: TunnelConfig) => void;
-  removePreset: (id: string) => void;
-  updatePreset: (id: string, preset: Partial<TunnelConfig>) => void;
+  addPreset: (config: Omit<TunnelConfig, 'id'>) => void;
+  removePreset: (id: string) => Promise<void>;
+  updatePreset: (id: string, preset: TunnelConfig) => void;
   selectLogTunnel: (tunnelName: string | null) => void;
   
   // Process Management
@@ -47,10 +47,26 @@ export const useTunnelStore = create<TunnelStore>()(
       selectedLogTunnel: null,
       setupUnlisten: null,
       
-      addPreset: (preset) => set((state) => ({ presets: [...state.presets, preset] })),
-      removePreset: (id) => set((state) => ({ presets: state.presets.filter(p => p.id !== id) })),
-      updatePreset: (id, presetUpdate) => set((state) => ({
-        presets: state.presets.map(p => p.id === id ? { ...p, ...presetUpdate } : p)
+      addPreset: (config) => set((state) => ({
+        presets: [...state.presets, { ...config, id: Math.random().toString(36).substring(2, 9) }]
+      })),
+      removePreset: async (id) => {
+        const preset = get().presets.find(p => p.id === id);
+        if (preset) {
+          if (invoke) {
+            try {
+              const cloudflaredPath = useSettingsStore.getState().cloudflaredPath;
+              await invoke('delete_tunnel', { cloudflaredPath, tunnelName: preset.tunnelName });
+            } catch (err) {
+              console.warn("Failed to delete tunnel from cloudflare:", err);
+            }
+            useCloudflareStore.getState().fetchTunnels(useSettingsStore.getState().cloudflaredPath);
+          }
+          set((state) => ({ presets: state.presets.filter(p => p.id !== id) }));
+        }
+      },
+      updatePreset: (id, config) => set((state) => ({
+        presets: state.presets.map(p => p.id === id ? { ...p, ...config } : p)
       })),
       selectLogTunnel: (tunnelName) => set({ selectedLogTunnel: tunnelName }),
       
@@ -113,6 +129,25 @@ export const useTunnelStore = create<TunnelStore>()(
             }
 
             const cloudflaredPath = useSettingsStore.getState().cloudflaredPath;
+
+            try {
+              const rootDomain = useSettingsStore.getState().publicDomain;
+              const subdomain = config.publicDomain.replace(`.${rootDomain}`, '');
+              await invoke('auto_tunnel_setup', {
+                cloudflaredPath,
+                tunnelName: config.tunnelName,
+                subdomain
+              });
+            } catch (err: any) {
+              const errStr = String(err).toLowerCase();
+              if (!errStr.includes('already exists')) {
+                get().addLog(tunnelName, {
+                  timestamp: new Date().toISOString(),
+                  message: `[Warning] Tunnel setup error (may affect routing): ${err}`,
+                  type: 'error'
+                });
+              }
+            }
 
             await invoke('start_tunnel', {
               cloudflaredPath,

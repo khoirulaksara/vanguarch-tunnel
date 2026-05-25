@@ -14,14 +14,14 @@
         "title": "Vanguarch Tunnel",
         "width": 1024,
         "height": 768,
-        "resizable": true,
+        "resizable": false,
         "maximizable": false,
         "fullscreen": false,
         "center": true,
         "visible": true,
         "backgroundColor": [9, 9, 11, 255],
         "transparent": false,
-        "decorations": true
+        "decorations": false
       
       }
     ],

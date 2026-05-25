@@ -67,16 +67,16 @@ pub async fn start_tunnel(
         cloudflared_path
     };
 
+    use command_group::AsyncCommandGroup;
     let mut child = make_command(&bin_path)
         .args(args)
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
-        .kill_on_drop(true) // Memastikan proses berhenti saat app tutup
-        .spawn()
+        .group_spawn()
         .map_err(|e| format!("Gagal menjalankan cloudflared: {}", e))?;
 
-    let stdout = child.stdout.take().unwrap();
-    let stderr = child.stderr.take().unwrap();
+    let stdout = child.inner().stdout.take().unwrap();
+    let stderr = child.inner().stderr.take().unwrap();
 
     // Stream Stdout
     let app_clone1 = app.clone();

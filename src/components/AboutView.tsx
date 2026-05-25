@@ -3,8 +3,19 @@ import { Shield, Code2, Github, Mail, User } from 'lucide-react';
 
 export function AboutView() {
   return (
-    <div className="flex flex-col h-full w-full bg-[#09090b] p-6 text-[#e4e4e7] overflow-y-auto">
-      <div className="max-w-2xl mx-auto w-full">
+    <div className="flex flex-col h-full w-full bg-[#09090b] text-[#e4e4e7] overflow-y-auto relative">
+      <div className="flex flex-col max-w-3xl w-full mx-auto">
+        <div className="sticky top-0 z-10 bg-[#09090b] h-16 px-6 border-b border-[#27272a] flex items-center justify-between gap-4">
+          <div>
+            <h2 className="text-xs font-bold uppercase tracking-widest text-[#52525b] flex items-center gap-2 mb-1">
+              <User className="w-4 h-4 text-orange-500" />
+              About Vanguarch
+            </h2>
+            <p className="text-[#a1a1aa] text-[10px]">Application info and developer details.</p>
+          </div>
+        </div>
+
+        <div className="px-6 pb-6 pt-4 flex flex-col gap-6">
         <div className="flex flex-col items-center justify-center gap-4 mb-10 mt-8">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-400 to-red-600 flex items-center justify-center shadow-xl">
             <img src="/icon.png" alt="Vanguarch" className="w-12 h-12 " />
@@ -65,8 +76,8 @@ export function AboutView() {
                   <a href="https://github.com/khoirulaksara" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs text-[#a1a1aa] hover:text-white transition-colors">
                     <Github className="w-3.5 h-3.5" /> GitHub
                   </a>
-                  <a href="mailto:choiroel@gmail.com" className="flex items-center gap-1.5 text-xs text-[#a1a1aa] hover:text-white transition-colors">
-                    <Mail className="w-3.5 h-3.5" /> choiroel@gmail.com
+                  <a href="mailto:me@serat.us" className="flex items-center gap-1.5 text-xs text-[#a1a1aa] hover:text-white transition-colors">
+                    <Mail className="w-3.5 h-3.5" /> me@serat.us
                   </a>
                 </div>
               </div>
@@ -78,6 +89,7 @@ export function AboutView() {
             <p className="text-xs font-mono text-[#52525b]">
               <span className="font-bold text-[#e4e4e7]">v2.1.0</span> • Build 2026.05
             </p>
+        </div>
         </div>
       </div>
     </div>

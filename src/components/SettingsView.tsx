@@ -206,17 +206,20 @@ export function SettingsView() {
   };
 
   return (
-    <div className="flex flex-col h-full w-full bg-[#09090b] p-6 text-[#e4e4e7] overflow-y-auto">
-      <div className="flex flex-col gap-6 max-w-3xl w-full mx-auto">
-        <div>
-          <h2 className="text-xs font-bold uppercase tracking-widest text-[#52525b] flex items-center gap-2 mb-1">
-            <SettingsIcon className="w-4 h-4 text-orange-500" />
-            Application Settings
-          </h2>
-          <p className="text-[#a1a1aa] text-[10px]">Configure global preferences and initial setups.</p>
+    <div className="flex flex-col h-full w-full bg-[#09090b] text-[#e4e4e7] overflow-y-auto relative">
+      <div className="flex flex-col max-w-3xl w-full mx-auto">
+        <div className="sticky top-0 z-10 bg-[#09090b] h-16 px-6 border-b border-[#27272a] flex items-center justify-between gap-4">
+          <div>
+            <h2 className="text-xs font-bold uppercase tracking-widest text-[#52525b] flex items-center gap-2 mb-1">
+              <SettingsIcon className="w-4 h-4 text-orange-500" />
+              Application Settings
+            </h2>
+            <p className="text-[#a1a1aa] text-[10px]">Configure global preferences and initial setups.</p>
+          </div>
         </div>
 
-        <div className="p-5 bg-[#0c0c0e] border border-[#27272a] rounded-xl space-y-8">
+        <div className="px-6 pb-6 pt-4 flex flex-col gap-6">
+          <div className="p-5 bg-[#0c0c0e] border border-[#27272a] rounded-xl space-y-8">
           <div className="space-y-6">
           <div className="pb-6 border-b border-[#27272a]">
             <div className="flex items-center justify-between mb-4">
@@ -434,6 +437,7 @@ export function SettingsView() {
             </div>
           </div>
         </div>
+      </div>
       </div>
       </div>
       <PromptModal

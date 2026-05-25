@@ -19,6 +19,7 @@ tauri-plugin-single-instance = "2"
 uuid = { version = "1.8.0", features = ["v4", "fast-rng"] }
 reqwest = { version = "0.11", features = ["json"] }
 base64 = "0.21"
+command-group = { version = "5.0.1", features = ["with-tokio"] }
 
 # --- TAMBAHKAN BLOK INI UNTUK MEMANGKAS UKURAN HINGGA >50% ---
 [profile.release]

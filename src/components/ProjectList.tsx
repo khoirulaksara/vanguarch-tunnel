@@ -109,9 +109,9 @@ export function ProjectList() {
   const allDirectories = [...(workspaceDirectories || []), ...(singleProjectDirectories || [])];
 
   return (
-    <div className="flex flex-col h-full w-full bg-[#09090b] p-6 text-[#e4e4e7] overflow-y-auto">
-      <div className="flex flex-col gap-6 max-w-5xl w-full mx-auto">
-        <div className="flex items-center justify-between gap-4 flex-wrap">
+    <div className="flex flex-col h-full w-full bg-[#09090b] text-[#e4e4e7] overflow-y-auto relative">
+      <div className="flex flex-col max-w-5xl w-full mx-auto">
+        <div className="sticky top-0 z-10 bg-[#09090b] h-16 px-6 border-b border-[#27272a] flex items-center justify-between gap-4">
           <div>
             <h2 className="text-xs font-bold uppercase tracking-widest text-[#52525b] flex items-center gap-2 mb-1">
               <Folder className="w-4 h-4 text-orange-500" />
@@ -147,8 +147,9 @@ export function ProjectList() {
             </button>
           </div>
         </div>
-
-        {isScanning && projects.length === 0 ? (
+        
+        <div className="px-6 pb-6 pt-4 flex flex-col gap-6">
+          {isScanning && projects.length === 0 ? (
           <div className="flex items-center justify-center p-8 text-[#52525b] gap-3 border border-[#27272a] border-dashed rounded-lg bg-[#09090b]">
             <RefreshCw className="w-5 h-5 animate-spin opacity-50" />
             <span className="text-[11px] uppercase tracking-wider">Scanning directory...</span>
@@ -287,6 +288,7 @@ export function ProjectList() {
             ))}
           </div>
         )}
+        </div>
       </div>
     </div>
   );

@@ -104,9 +104,9 @@ export function TunnelList() {
   const anyActiveTunnels = Object.values(activeProcesses).some(p => p.status === 'running' || p.status === 'starting');
 
   return (
-    <div className="flex flex-col h-full w-full bg-[#09090b] p-6 text-[#e4e4e7] overflow-y-auto">
-      <div className="flex flex-col gap-6 max-w-5xl w-full mx-auto">
-        <div className="flex items-center justify-between gap-4 flex-wrap">
+    <div className="flex flex-col h-full w-full bg-[#09090b] text-[#e4e4e7] overflow-y-auto relative">
+      <div className="flex flex-col max-w-5xl w-full mx-auto">
+        <div className="sticky top-0 z-10 bg-[#09090b] h-16 px-6 border-b border-[#27272a] flex items-center justify-between gap-4">
           <div>
             <h2 className="text-xs font-bold uppercase tracking-widest text-[#52525b] flex items-center gap-2 mb-1">
               <Cloud className="w-4 h-4 text-blue-500" />
@@ -135,7 +135,7 @@ export function TunnelList() {
                 className="px-3 py-1.5 bg-red-500/10 text-red-500 hover:bg-red-500/20 border border-red-900/50 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-colors flex items-center gap-2"
               >
                 <XCircle className="w-3.5 h-3.5" />
-                Stop All Tunnels
+                Stop All
               </button>
             )}
             <button
@@ -148,6 +148,8 @@ export function TunnelList() {
             </button>
           </div>
         </div>
+
+        <div className="px-6 pb-6 pt-4 flex flex-col gap-6">
 
         {error && (
           <div className="p-4 bg-red-950/30 border border-red-900/50 rounded mb-4">
@@ -232,7 +234,7 @@ export function TunnelList() {
                         className="px-3 py-1.5 bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded text-[10px] font-bold uppercase tracking-wider transition-colors flex items-center justify-center w-full gap-1.5"
                       >
                         <XCircle className="w-3.5 h-3.5" />
-                        Stop Tunnel
+                        Stop
                       </button>
                     ) : (
                       <button
@@ -246,7 +248,7 @@ export function TunnelList() {
                         ) : (
                           <Play className="w-3.5 h-3.5" />
                         )}
-                        Start Tunnel
+                        Start
                       </button>
                     )}
                   </div>
@@ -254,6 +256,7 @@ export function TunnelList() {
               );
             })
           )}
+        </div>
         </div>
       </div>
       <ConfirmModal

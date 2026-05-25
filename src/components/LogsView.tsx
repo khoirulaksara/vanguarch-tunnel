@@ -32,13 +32,20 @@ export function LogsView({ isMinimized = false, onToggleMinimize }: LogsViewProp
   if (!currentProcess && tunnelKeys.length === 0) {
     return (
       <div className="flex flex-col h-full bg-black overflow-hidden border-t border-[#27272a]">
-        <div className="flex items-center justify-between px-4 py-1.5 bg-[#18181b] border-b border-[#27272a] cursor-pointer" onClick={onToggleMinimize}>
+        <div className="flex items-center justify-between px-4 py-1.5 bg-[#18181b] border-b border-[#27272a]">
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-bold text-[#52525b] uppercase tracking-widest">Live Output Logs</span>
           </div>
-          <div className="flex items-center gap-2 text-[#52525b]">
+          <div className="flex items-center gap-3 text-[#52525b]">
             <span className="text-[10px] uppercase font-bold tracking-wider">No Process</span>
-            {isMinimized ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+            <div className="w-px h-3 bg-[#27272a]"></div>
+            <button 
+              onClick={onToggleMinimize} 
+              className="hover:text-orange-500 transition-colors focus:outline-none"
+              title={isMinimized ? "Restore Logs" : "Minimize Logs"}
+            >
+              {isMinimized ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </button>
           </div>
         </div>
         {!isMinimized && (
@@ -62,11 +69,8 @@ export function LogsView({ isMinimized = false, onToggleMinimize }: LogsViewProp
     <div className="flex flex-col h-full bg-black overflow-hidden border-t border-[#27272a]">
       <div className="flex items-center justify-between px-4 py-1.5 bg-[#18181b] border-b border-[#27272a]">
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 cursor-pointer hover:text-orange-500 transition-colors" onClick={onToggleMinimize}>
-            <span className="text-[10px] font-bold text-[#52525b] uppercase tracking-widest group-hover:text-amber-500">Live Output Logs</span>
-            <div className="text-[#52525b]">
-              {isMinimized ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-            </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-bold text-[#52525b] uppercase tracking-widest">Live Output Logs</span>
           </div>
           
           {!isMinimized && tunnelKeys.length > 1 && (
@@ -113,7 +117,7 @@ export function LogsView({ isMinimized = false, onToggleMinimize }: LogsViewProp
               <div className="w-px h-3 bg-[#27272a]"></div>
             </>
           )}
-          <div className="flex items-center gap-2 cursor-pointer" onClick={onToggleMinimize}>
+          <div className="flex items-center gap-2">
             {currentProcess && (
               <>
                 <div className={cn("w-1.5 h-1.5 rounded-full", {
@@ -126,6 +130,14 @@ export function LogsView({ isMinimized = false, onToggleMinimize }: LogsViewProp
               </>
             )}
           </div>
+          <div className="w-px h-3 bg-[#27272a]"></div>
+          <button 
+            onClick={onToggleMinimize} 
+            className="text-[#52525b] hover:text-orange-500 transition-colors focus:outline-none p-0.5"
+            title={isMinimized ? "Restore Logs" : "Minimize Logs"}
+          >
+            {isMinimized ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </button>
         </div>
       </div>
       {!isMinimized && currentProcess && (
