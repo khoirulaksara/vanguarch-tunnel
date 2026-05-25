@@ -1,24 +1,29 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { toast } from 'sonner';
 import { useProjectStore } from '../store/useProjectStore';
 import { useSettingsStore } from '../store/useSettingsStore';
 import { useTunnelStore } from '../store/useTunnelStore';
 import { useCloudflareStore } from '../store/useCloudflareStore';
 import { Folder, Search, Link as LinkIcon, Code2, RefreshCw, CheckCircle2, XCircle, Plus, ChevronDown, ChevronUp, Play, Cloud } from 'lucide-react';
+import { invoke } from '@tauri-apps/api/core';
 
 export function ProjectList() {
   const { projects, isScanning, scanProjects, injectWpHelper } = useProjectStore();
   const { workspaceDirectories, singleProjectDirectories, cloudflaredPath, publicDomain } = useSettingsStore();
-  const { startTunnel } = useTunnelStore();
   const { tunnels, fetchTunnels } = useCloudflareStore();
+  const { activeProcesses } = useTunnelStore();
 
   const [injectStatus, setInjectStatus] = useState<Record<string, { loading: boolean, error?: string, success?: string }>>({});
   const [expandedHelpers, setExpandedHelpers] = useState<Record<string, boolean>>({});
   const [autoTunnelStatus, setAutoTunnelStatus] = useState<Record<string, { loading: boolean, error?: string }>>({});
   const [searchQuery, setSearchQuery] = useState('');
+  const [now, setNow] = useState(Date.now());
 
   useEffect(() => {
     scanProjects();
     fetchTunnels(cloudflaredPath);
+    const interval = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(interval);
   }, [scanProjects, fetchTunnels, cloudflaredPath]);
 
   const filteredProjects = useMemo(() => {
@@ -31,47 +36,51 @@ export function ProjectList() {
 
   const handleAutoTunnel = async (project: any) => {
     if (!publicDomain) {
-      alert("Please set a Public Root Domain in Settings first.");
+      toast.warning("Please set a Public Root Domain in Settings first.");
       return;
     }
     
     setAutoTunnelStatus(prev => ({ ...prev, [project.id]: { loading: true, error: undefined } }));
     
     try {
-      const sanitizedName = project.name.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase();
-      const tunnelName = 'vanguarch-' + sanitizedName;
-      const subdomain = sanitizedName + '.' + publicDomain.replace(/^\.+/, '');
+      const baseSanitizedName = project.name.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase();
+      
+      let attempt = 0;
+      let success = false;
+      let lastErr = "";
 
       if ((window as any).__TAURI_INTERNALS__) {
-        const core = await import('@tauri-apps/api/core');
-        await core.invoke('auto_tunnel_setup', {
-          cloudflaredPath,
-          tunnelName,
-          subdomain
-        });
+        
+        while (!success && attempt < 10) {
+          try {
+            const suffix = attempt === 0 ? '' : `-${attempt}`;
+            const tunnelName = 'vanguarch-' + baseSanitizedName + suffix;
+            const subdomain = baseSanitizedName + suffix + '.' + publicDomain.replace(/^\.+/, '');
+            
+            await invoke('auto_tunnel_setup', {
+              cloudflaredPath,
+              tunnelName,
+              subdomain
+            });
+            success = true;
+          } catch (err: any) {
+            lastErr = String(err);
+            if (lastErr.toLowerCase().includes("already exists") || lastErr.toLowerCase().includes("validation error") || lastErr.toLowerCase().includes("failed")) {
+              attempt++;
+            } else {
+              throw err;
+            }
+          }
+        }
+        
+        if (!success) {
+          throw new Error(`Could not create tunnel after ${attempt} attempts. Last error: ${lastErr}`);
+        }
       } else {
         await new Promise(r => setTimeout(r, 1000));
       }
 
-      const isLocalhost = project.suggestedUrl.includes('localhost') || project.suggestedUrl.includes('127.0.0.1');
-      const hostHeader = project.suggestedUrl.replace('http://', '').replace('https://', '');
-
-      const config = {
-        id: Math.random().toString(36).substring(2, 9),
-        name: `Auto: ${project.name}`,
-        localUrl: isLocalhost ? project.suggestedUrl : 'http://127.0.0.1',
-        localVhost: hostHeader,
-        publicDomain: subdomain,
-        tunnelName: tunnelName,
-        options: {
-          httpHostHeader: !isLocalhost,
-          originServerName: !isLocalhost,
-          forceHttp2: false,
-          ipv4Only: false
-        }
-      };
-
-      await startTunnel(config);
+      toast.success("Tunnel successfully created! You can now start it from the Cloud Tunnels menu.");
       
       setAutoTunnelStatus(prev => ({ ...prev, [project.id]: { loading: false } }));
       fetchTunnels(cloudflaredPath);
@@ -163,7 +172,14 @@ export function ProjectList() {
                   <div className="flex justify-between items-start gap-2">
                     <h3 className="text-sm font-bold tracking-tight text-[#e4e4e7] truncate" title={project.name}>{project.name}</h3>
                     <div className="flex items-center gap-1 shrink-0">
-                      {Array.isArray(tunnels) && tunnels.some((t: any) => t.name === `vanguarch-${project.name.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase()}`) && (
+                      {Array.isArray(tunnels) && tunnels.some((t: any) => {
+                        const pName = `vanguarch-${project.name.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase()}`;
+                        const isMatch = t.name === pName || t.name.match(new RegExp(`^${pName}-\\d+$`));
+                        const pStore = activeProcesses[t.name];
+                        const isRecentlyStopped = pStore?.status === 'stopped' && pStore?.stoppedAt && (now - pStore.stoppedAt < 60000);
+                        const hasConnections = t.connections && t.connections.length > 0 && !isRecentlyStopped;
+                        return isMatch && hasConnections;
+                      }) && (
                         <span className="text-[10px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider bg-blue-500/10 text-blue-400" title="Active Tunnel"><Cloud className="w-3 h-3"/></span>
                       )}
                       <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider ${project.framework === 'WordPress' ? 'bg-orange-500/10 text-orange-400' : 'bg-[#27272a] text-[#a1a1aa]'}`}>
@@ -190,7 +206,10 @@ export function ProjectList() {
                       <LinkIcon className="w-3 h-3 text-[#52525b] shrink-0" />
                       <span className="font-mono truncate" title={project.suggestedUrl}>{project.suggestedUrl}</span>
                     </div>
-                    {(!Array.isArray(tunnels) || !tunnels.some((t: any) => t.name === `vanguarch-${project.name.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase()}`)) && (
+                    {(!Array.isArray(tunnels) || !tunnels.some((t: any) => {
+                      const pName = `vanguarch-${project.name.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase()}`;
+                      return t.name === pName || t.name.match(new RegExp(`^${pName}-\\d+$`));
+                    })) && (
                       <button
                         onClick={() => handleAutoTunnel(project)}
                         disabled={autoTunnelStatus[project.id]?.loading}
@@ -199,7 +218,7 @@ export function ProjectList() {
                         {autoTunnelStatus[project.id]?.loading ? (
                           <RefreshCw className="w-3 h-3 animate-spin" />
                         ) : (
-                          <Play className="w-3 h-3" />
+                          <Cloud className="w-3 h-3" />
                         )}
                         Create Tunnel
                       </button>

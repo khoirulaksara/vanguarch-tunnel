@@ -4,9 +4,9 @@ import { Bookmark, Play, Trash2 } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 export function PresetList() {
-  const { presets, startTunnel, removePreset, activeProcess } = useTunnelStore();
+  const { presets, startTunnel, removePreset, activeProcesses } = useTunnelStore();
 
-  const isRunning = activeProcess?.status === 'running' || activeProcess?.status === 'starting';
+  const isRunning = Object.values(activeProcesses).some(p => p.status === 'running' || p.status === 'starting');
 
   return (
     <div className="flex flex-col h-full w-full bg-[#09090b] p-6 text-[#e4e4e7] overflow-y-auto">

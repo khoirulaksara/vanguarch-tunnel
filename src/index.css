@@ -6,3 +6,66 @@
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
 
+@layer base {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #27272a;
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #52525b;
+  }
+  
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #27272a transparent;
+  }
+}
+/* global.css */
+body {
+  /* Mencegah highlight/seleksi teks */
+  user-select: none;
+  -webkit-user-select: none;
+
+  /* Mencegah dragging pada elemen seperti gambar atau link */
+  -webkit-user-drag: none;
+}
+
+/* Kembalikan fungsi seleksi khusus untuk input dan textarea */
+input, textarea {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: #050505;
+  overscroll-behavior: none;
+}
+
+* {
+  overscroll-behavior: none;
+}
+
+img,
+a {
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+
+input,
+textarea {
+  user-select: text;
+  -webkit-user-select: text;
+}

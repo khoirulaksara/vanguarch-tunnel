@@ -1,19 +1,7 @@
 import { create } from 'zustand';
 import { DiscoveredProject } from '../types';
 import { useSettingsStore } from './useSettingsStore';
-
-// Optional Tauri imports
-let invoke: any = null;
-(async () => {
-  try {
-    if ((window as any).__TAURI_INTERNALS__) {
-      const core = await import('@tauri-apps/api/core');
-      invoke = core.invoke;
-    }
-  } catch (e) {
-    console.error("Not running in Tauri environment");
-  }
-})();
+import { invoke } from '@tauri-apps/api/core';
 
 interface ProjectStore {
   projects: DiscoveredProject[];
@@ -89,6 +77,21 @@ export const useProjectStore = create<ProjectStore>((set) => ({
           }
         }
         
+        // Sort by path for deterministic deduplication order
+        allProjects.sort((a, b) => a.path.localeCompare(b.path));
+
+        // Deduplicate names
+        const nameCounts: Record<string, number> = {};
+        for (const p of allProjects) {
+          const originalName = p.name;
+          if (nameCounts[originalName] !== undefined) {
+            nameCounts[originalName]++;
+            p.name = `${originalName}-${nameCounts[originalName]}`;
+          } else {
+            nameCounts[originalName] = 0;
+          }
+        }
+
         set({ projects: allProjects, isScanning: false });
       } catch (err) {
         console.error("Failed to scan projects:", err);
@@ -97,7 +100,21 @@ export const useProjectStore = create<ProjectStore>((set) => ({
     } else {
       // Simulate scan delay
       await new Promise(resolve => setTimeout(resolve, 800));
-      set({ projects: MOCK_PROJECTS, isScanning: false });
+      
+      const mockProjects = JSON.parse(JSON.stringify(MOCK_PROJECTS));
+      mockProjects.sort((a, b) => a.path.localeCompare(b.path));
+      const mockNameCounts: Record<string, number> = {};
+      for (const p of mockProjects) {
+        const originalName = p.name;
+        if (mockNameCounts[originalName] !== undefined) {
+          mockNameCounts[originalName]++;
+          p.name = `${originalName}-${mockNameCounts[originalName]}`;
+        } else {
+          mockNameCounts[originalName] = 0;
+        }
+      }
+
+      set({ projects: mockProjects, isScanning: false });
     }
   },
   injectWpHelper: async (id: string, path: string) => {

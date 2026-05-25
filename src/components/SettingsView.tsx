@@ -1,21 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import { useSettingsStore } from '../store/useSettingsStore';
 import { Settings as SettingsIcon, LogIn, Search, CheckCircle2, XCircle, Plus, Trash2 } from 'lucide-react';
+import { PromptModal } from './ui/PromptModal';
 import { cn } from '../lib/utils';
-
-let invoke: any = null;
-let openDialog: any = null;
-
-(async () => {
-  try {
-    if ((window as any).__TAURI_INTERNALS__) {
-      const core = await import('@tauri-apps/api/core');
-      invoke = core.invoke;
-      const dialog = await import('@tauri-apps/plugin-dialog');
-      openDialog = dialog.open;
-    }
-  } catch (e) {}
-})();
+import { invoke } from '@tauri-apps/api/core';
+import { open as openDialog } from '@tauri-apps/plugin-dialog';
 
 export function SettingsView() {
   const { 
@@ -30,10 +20,27 @@ export function SettingsView() {
   const [toolVersion, setToolVersion] = useState<string>('');
   const [isChecking, setIsChecking] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  
+  const [promptOpen, setPromptOpen] = useState(false);
+  const [promptType, setPromptType] = useState<'workspace' | 'single'>('workspace');
 
   useEffect(() => {
     checkVersion();
   }, [cloudflaredPath]);
+
+  useEffect(() => {
+    if (isLoggedIn && invoke) {
+      console.log("Fetching cloudflared domain...");
+      invoke('get_cloudflared_domain').then((domain: any) => {
+        console.log("Fetched domain:", domain);
+        if (domain && typeof domain === 'string') {
+          useSettingsStore.getState().setPublicDomain(domain);
+        }
+      }).catch(err => {
+        console.error("Failed to get domain:", err);
+      });
+    }
+  }, [isLoggedIn]);
 
   const checkVersion = async () => {
     if (invoke) {
@@ -54,20 +61,33 @@ export function SettingsView() {
 
   const handleLogin = async () => {
     if (invoke) {
-      setLoginStatus('Starting login...');
+      setLoginStatus('Opening browser for login...');
       try {
         const msg = await invoke('cloudflared_login', { cloudflaredPath });
-        setLoginStatus(msg as string);
-        // Re-check login status after a delay
+        toast.success("Login successful!", { description: typeof msg === 'string' ? msg : undefined });
+        setLoginStatus('');
         setTimeout(async () => {
           const loggedIn = await invoke('check_cloudflared_login');
           setIsLoggedIn(loggedIn as boolean);
-        }, 3000);
+        }, 1000);
       } catch (err: any) {
-        setLoginStatus(`Error: ${err}`);
+        toast.error("Login Error", { description: String(err) });
+        setLoginStatus('');
       }
     } else {
       setLoginStatus('Action not available in Web Preview. Run in Tauri.');
+    }
+  };
+
+  const handleLogout = async () => {
+    if (invoke) {
+      try {
+        const msg = await invoke('logout_cloudflared', { cloudflaredPath });
+        toast.success("Logged out successfully", { description: typeof msg === 'string' ? msg : undefined });
+        setIsLoggedIn(false);
+      } catch (err: any) {
+        toast.error("Logout Error", { description: String(err) });
+      }
     }
   };
 
@@ -85,7 +105,7 @@ export function SettingsView() {
         console.error("Dialog error:", e);
       }
     } else {
-      alert("Browse dialog only available in desktop app.");
+      toast.warning("Browse dialog only available in desktop app.");
     }
   };
 
@@ -112,18 +132,20 @@ export function SettingsView() {
         console.error("Dialog error:", e);
       }
     } else {
-      alert("Browse dialog only available in desktop app.");
-      const testPath = prompt("Enter directory path:");
-      if (testPath) {
-        if (type === 'workspace') {
-          if (!workspaceDirectories.includes(testPath)) {
-            setWorkspaceDirectories([...workspaceDirectories, testPath]);
-          }
-        } else {
-          if (!singleProjectDirectories.includes(testPath)) {
-            setSingleProjectDirectories([...singleProjectDirectories, testPath]);
-          }
-        }
+      toast.warning("Browse dialog only available in desktop app.");
+      setPromptType(type);
+      setPromptOpen(true);
+    }
+  };
+
+  const handlePromptSubmit = (testPath: string) => {
+    if (promptType === 'workspace') {
+      if (!workspaceDirectories.includes(testPath)) {
+        setWorkspaceDirectories([...workspaceDirectories, testPath]);
+      }
+    } else {
+      if (!singleProjectDirectories.includes(testPath)) {
+        setSingleProjectDirectories([...singleProjectDirectories, testPath]);
       }
     }
   };
@@ -198,13 +220,41 @@ export function SettingsView() {
             <p className="text-[10px] text-[#a1a1aa] mb-4 max-w-lg leading-relaxed">
               If you haven't authenticated Cloudflared on this machine, you need to login before creating named tunnels. This will open a browser window to authenticate with Cloudflare Zero Trust.
             </p>
-            <button 
-              onClick={handleLogin}
-              disabled={!toolVersion}
-              className="px-4 py-2 bg-white text-black text-[11px] font-bold uppercase tracking-wider rounded border border-white hover:bg-transparent hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoggedIn ? 'Re-Login to Cloudflare' : 'Login to Cloudflare'}
-            </button>
+            <div className="flex gap-2">
+              <button 
+                onClick={handleLogin}
+                disabled={!toolVersion}
+                className="px-4 py-2 bg-white text-black text-[11px] font-bold uppercase tracking-wider rounded border border-white hover:bg-transparent hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoggedIn ? 'Re-Login to Cloudflare' : 'Login to Cloudflare'}
+              </button>
+              {isLoggedIn && (
+                <button 
+                  onClick={handleLogout}
+                  className="px-4 py-2 bg-transparent text-white text-[11px] font-bold uppercase tracking-wider rounded border border-[#3f3f46] hover:bg-[#3f3f46] transition-colors"
+                >
+                  Logout (Backup Cert)
+                </button>
+              )}
+              {isLoggedIn && (
+                <button 
+                  onClick={() => {
+                    toast.info("Fetching domain...");
+                    invoke?.('get_cloudflared_domain').then((domain: any) => {
+                      if (domain) {
+                        useSettingsStore.getState().setPublicDomain(domain);
+                        toast.success("Domain fetched: " + domain);
+                      }
+                    }).catch(err => {
+                      toast.error("Fetch Domain Error", { description: String(err) });
+                    });
+                  }}
+                  className="px-4 py-2 bg-[#27272a] text-white text-[11px] font-bold uppercase tracking-wider rounded border border-[#3f3f46] hover:bg-[#3f3f46] transition-colors"
+                >
+                  Fetch Domain
+                </button>
+              )}
+            </div>
             {loginStatus && (
               <p className="mt-2 text-[10px] text-orange-500 font-mono">{loginStatus}</p>
             )}
@@ -213,13 +263,13 @@ export function SettingsView() {
             <label className="block text-[10px] uppercase text-[#52525b] mb-1.5 font-bold">Public Root Domain</label>
             <input
               type="text"
-              value={useSettingsStore(s => s.publicDomain)}
-              onChange={(e) => useSettingsStore.getState().setPublicDomain(e.target.value)}
-              placeholder="e.g. serat.us"
-              className="w-full bg-[#18181b] border border-[#27272a] rounded p-2 text-xs focus:outline-none focus:border-orange-500 transition-colors font-mono"
+              value={useSettingsStore(s => s.publicDomain) || ''}
+              readOnly
+              placeholder="Auto-detected on login..."
+              className="w-full bg-[#18181b] border border-[#27272a] rounded p-2 text-xs text-[#a1a1aa] focus:outline-none transition-colors font-mono cursor-not-allowed"
             />
             <p className="text-[10px] text-[#52525b] mt-2 leading-relaxed">
-              Domain you have access to in Cloudflare (e.g. <code className="bg-black border border-[#27272a] px-1 py-0.5 rounded text-[#a1a1aa] ml-1">serat.us</code>). This will be used when routing Auto Tunnels.
+              Domain you have access to in Cloudflare (e.g. <code className="bg-black border border-[#27272a] px-1 py-0.5 rounded text-[#a1a1aa] ml-1">serat.us</code>). This is auto-detected from your Cloudflared certificate when you login.
             </p>
           </div>
           <div className="pt-4 border-t border-[#27272a]">
@@ -322,8 +372,17 @@ export function SettingsView() {
             </div>
           </div>
         </div>
-        </div>
       </div>
+      </div>
+      <PromptModal
+        isOpen={promptOpen}
+        onClose={() => setPromptOpen(false)}
+        onSubmit={handlePromptSubmit}
+        title={promptType === 'workspace' ? 'Add Workspace Directory' : 'Add Project Directory'}
+        message="Enter the absolute path to the directory:"
+        placeholder="/var/www/html or C:\laragon\www"
+        submitText="Add Directory"
+      />
     </div>
   );
 }

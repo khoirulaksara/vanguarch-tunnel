@@ -1,5 +1,5 @@
 {
-  "productName": "vanguarch",
+  "productName": "Vanguarch",
   "version": "2.1.0",
   "identifier": "com.vanguarch.dev",
   "build": {
@@ -17,7 +17,12 @@
         "resizable": true,
         "maximizable": false,
         "fullscreen": false,
-        "center": true
+        "center": true,
+        "visible": true,
+        "backgroundColor": [9, 9, 11, 255],
+        "transparent": false,
+        "decorations": true
+      
       }
     ],
     "security": {
@@ -26,6 +31,16 @@
   },
   "bundle": {
     "active": true,
-    "targets": "all"
+    "targets": "all",
+    "publisher": "VanguArchangel",
+    "copyright": "Copyright © 2026 VanguArchangel. All rights reserved.",
+    "shortDescription": "A stable, predictable UI wrapper for cloudflared and local development tunneling.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
   }
 }
