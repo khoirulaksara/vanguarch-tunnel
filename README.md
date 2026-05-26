@@ -5,6 +5,7 @@
 </div>
 
 ---
+<a href="https://www.producthunt.com/products/vanguarch-tunnel?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-vanguarch-tunnel" target="_blank" rel="noopener noreferrer"><img alt="Vanguarch Tunnel - The easiest way to manage your Cloudflare Tunnels. | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1156138&amp;theme=neutral&amp;t=1779786182141"></a>
 
 Vanguarch Tunnel is a desktop application built with Tauri and React that simplifies exposing local development environments to the internet via Cloudflare Tunnels. It provides a graphical interface for managing tunnels without relying solely on the command-line interface.
 
