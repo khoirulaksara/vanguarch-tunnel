@@ -83,12 +83,14 @@ fn main() {
             commands::tunnel::delete_tunnel,
             commands::system::force_exit,
             commands::system::check_ports,
+            commands::system::open_url,
             commands::setup::check_cloudflared_status,
             commands::setup::download_cloudflared,
             commands::share::start_static_server,
             commands::share::stop_static_server,
             commands::inspector::start_inspector,
-            commands::inspector::stop_inspector_for_tunnel
+            commands::inspector::stop_inspector_for_tunnel,
+            commands::inspector::replay_request
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

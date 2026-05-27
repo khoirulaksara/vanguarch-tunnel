@@ -28,7 +28,7 @@ interface InspectorStore {
 export const useInspectorStore = create<InspectorStore>((set) => ({
   logs: [],
   addLog: (log) => set((state) => ({ 
-    logs: [log, ...state.logs].slice(0, 200) 
+    logs: [log, ...state.logs].slice(0, 1000) 
   })),
   updateResponse: (log_id, response) => set((state) => ({
     logs: state.logs.map(l => 

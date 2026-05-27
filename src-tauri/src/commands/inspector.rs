@@ -198,3 +198,110 @@ pub async fn stop_inspector_for_tunnel(
     }
     Ok(())
 }
+
+#[tauri::command]
+pub async fn replay_request(
+    app: AppHandle,
+    tunnel_name: String,
+    method: String,
+    url: String,
+    headers: HashMap<String, String>,
+    body: String,
+) -> Result<(), String> {
+    let log_id = Uuid::new_v4().to_string();
+    let timestamp = chrono::Utc::now().to_rfc3339();
+
+    // Parse URL for path and query
+    let parsed_url = reqwest::Url::parse(&url).map_err(|e| e.to_string())?;
+    let path = parsed_url.path().to_string();
+    let query = parsed_url.query().unwrap_or("").to_string();
+
+    let inspector_req = InspectorRequest {
+        method: method.clone(),
+        path: path.clone(),
+        query: query.clone(),
+        headers: headers.clone(),
+        body: body.clone(),
+    };
+
+    let log = InspectorLog {
+        log_id: log_id.clone(),
+        tunnel_name: tunnel_name.clone(),
+        timestamp: timestamp.clone(),
+        request: Some(inspector_req),
+        response: None,
+    };
+
+    let _ = app.emit("inspector-log", log);
+
+    // Perform Request
+    let client = Client::builder()
+        .redirect(reqwest::redirect::Policy::none())
+        .danger_accept_invalid_certs(true)
+        .build()
+        .map_err(|e| e.to_string())?;
+
+    let req_method = reqwest::Method::from_bytes(method.as_bytes()).unwrap_or(reqwest::Method::GET);
+    let mut req_builder = client.request(req_method, url.clone());
+
+    for (k, v) in headers {
+        if let (Ok(h_name), Ok(h_val)) = (reqwest::header::HeaderName::from_bytes(k.as_bytes()), reqwest::header::HeaderValue::from_str(&v)) {
+            req_builder = req_builder.header(h_name, h_val);
+        }
+    }
+
+    if !body.is_empty() {
+        req_builder = req_builder.body(body);
+    }
+
+    let response_result = req_builder.send().await;
+
+    match response_result {
+        Ok(res) => {
+            let status = res.status().as_u16();
+            let mut res_headers = HashMap::new();
+            for (k, v) in res.headers() {
+                res_headers.insert(k.as_str().to_string(), String::from_utf8_lossy(v.as_bytes()).to_string());
+            }
+
+            let res_body_bytes = res.bytes().await.unwrap_or_default();
+            let res_body_str = String::from_utf8_lossy(&res_body_bytes).to_string();
+
+            let inspector_res = InspectorResponse {
+                status,
+                headers: res_headers,
+                body: res_body_str,
+            };
+
+            let log_res = InspectorLog {
+                log_id: log_id.clone(),
+                tunnel_name: tunnel_name.clone(),
+                timestamp: chrono::Utc::now().to_rfc3339(),
+                request: None,
+                response: Some(inspector_res),
+            };
+
+            let _ = app.emit("inspector-log", log_res);
+        }
+        Err(e) => {
+            let inspector_res = InspectorResponse {
+                status: 502,
+                headers: HashMap::new(),
+                body: format!("Vanguarch Replay Error: {}", e),
+            };
+
+            let log_res = InspectorLog {
+                log_id: log_id.clone(),
+                tunnel_name: tunnel_name.clone(),
+                timestamp: chrono::Utc::now().to_rfc3339(),
+                request: None,
+                response: Some(inspector_res),
+            };
+
+            let _ = app.emit("inspector-log", log_res);
+        }
+    }
+
+    Ok(())
+}
+

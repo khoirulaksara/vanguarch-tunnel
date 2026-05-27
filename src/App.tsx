@@ -18,7 +18,8 @@ import { Titlebar } from './components/Titlebar';
 import { CloudflaredBanner } from './components/CloudflaredBanner';
 import { QuickShareView } from './components/QuickShareView';
 import { InspectorView } from './components/InspectorView';
-import { Shield, TerminalSquare, Plug, FolderSearch, Bookmark, Settings, Activity, Cloud, Info, Share2, MousePointerClick } from 'lucide-react';
+import { AnalyticsView } from './components/AnalyticsView';
+import { Shield, TerminalSquare, Plug, FolderSearch, Bookmark, Settings, Activity, Cloud, Info, Share2, MousePointerClick, BarChart3 } from 'lucide-react';
 import { cn } from './lib/utils';
 import { listen } from '@tauri-apps/api/event';
 import { invoke } from '@tauri-apps/api/core';
@@ -29,7 +30,7 @@ import { useSettingsStore } from './store/useSettingsStore';
 import { useTunnelStore } from './store/useTunnelStore';
 import { useInspectorStore } from './store/useInspectorStore';
 
-type Tab = 'manual' | 'presets' | 'projects' | 'tunnels' | 'share' | 'inspector' | 'settings' | 'about';
+type Tab = 'manual' | 'presets' | 'projects' | 'tunnels' | 'share' | 'inspector' | 'analytics' | 'settings' | 'about';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>('manual');
@@ -264,6 +265,12 @@ export default function App() {
             onClick={() => setActiveTab('inspector')} 
           />
           <NavItem 
+            icon={<BarChart3 className="w-5 h-5" />} 
+            label="Analytics" 
+            active={activeTab === 'analytics'} 
+            onClick={() => setActiveTab('analytics')} 
+          />
+          <NavItem 
             icon={<Settings className="w-5 h-5" />} 
             label="Settings" 
             active={activeTab === 'settings'} 
@@ -277,11 +284,9 @@ export default function App() {
           />
         </nav>
         
-        <ServiceStatus />
-        
         <div className="p-4 border-t border-[#27272a] hidden sm:block">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] text-[#52525b] font-mono">v2.1.0</span>
+            <span className="text-[10px] text-[#52525b] font-mono">Archangel</span>
             <div className={`flex items-center gap-1.5 text-[10px] font-bold tracking-wider ${statusColor}`}>
               <Activity className="w-3.5 h-3.5" />
               {statusText} {onlineCount > 0 && `(${onlineCount})`}
@@ -301,9 +306,12 @@ export default function App() {
           {activeTab === 'tunnels' && <TunnelList />}
           {activeTab === 'share' && <QuickShareView />}
           {activeTab === 'inspector' && <InspectorView />}
+          {activeTab === 'analytics' && <AnalyticsView />}
           {activeTab === 'settings' && <SettingsView />}
           {activeTab === 'about' && <AboutView />}
         </div>
+        
+        <ServiceStatus horizontal />
         
         {/* Bottom Region - Logs */}
         <div className={cn("shrink-0 flex flex-col bg-[#09090b] transition-[height] duration-300 ease-in-out", isLogsMinimized ? "h-8 sm:h-[34px] border-t-0" : "h-[40%]")}>
