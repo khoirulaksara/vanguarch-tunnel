@@ -288,10 +288,10 @@ export function SettingsView() {
             <div className="flex gap-2">
               <button 
                 onClick={handleLogin}
-                disabled={!toolVersion}
+                disabled={!toolVersion || isLoggedIn}
                 className="px-4 py-2 bg-white text-black text-[11px] font-bold uppercase tracking-wider rounded border border-white hover:bg-transparent hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoggedIn ? 'Re-Login to Cloudflare' : 'Login to Cloudflare'}
+                Login to Cloudflare
               </button>
               {isLoggedIn && (
                 <button 
@@ -344,7 +344,7 @@ export function SettingsView() {
                 type="text"
                 value={cloudflaredPath}
                 onChange={(e) => setCloudflaredPath(e.target.value)}
-                placeholder="default (uses PATH)"
+                placeholder="Auto-managed Default (AppData)"
                 disabled={!!toolVersion}
                 className="flex-1 bg-[#18181b] border border-[#27272a] rounded p-2 text-xs focus:outline-none focus:border-orange-500 transition-colors font-mono disabled:opacity-50 disabled:cursor-not-allowed"
               />
@@ -357,8 +357,13 @@ export function SettingsView() {
               </button>
             </div>
             <p className="text-[10px] text-[#52525b] mt-2 leading-relaxed">
-              If cloudflared is not in your system PATH, specify the absolute path to the executable here. <br/>
-              Example: <code className="bg-black border border-[#27272a] px-1 py-0.5 rounded text-[#a1a1aa] ml-1">C:\Program Files\cloudflared\cloudflared.exe</code>
+              {cloudflaredPath.trim() === '' ? (
+                <span className="text-orange-500 font-bold">Currently using: Auto-managed Default (AppData)</span>
+              ) : (
+                <span className="text-orange-500 font-bold">Currently using: Custom path</span>
+              )}
+              <br/>
+              If you want to use a custom installation of cloudflared, specify the absolute path to the executable here.
             </p>
           </div>
           

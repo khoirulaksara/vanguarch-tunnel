@@ -14,6 +14,12 @@ pub struct LogMessage {
     pub log_type: String, // "info", "error", "success"
 }
 
+#[derive(Serialize, Clone)]
+pub struct TunnelMetrics {
+    pub tunnel_name: String,
+    pub req_count: u64,
+}
+
 #[tauri::command]
 pub async fn start_tunnel(
     app: tauri::AppHandle,
@@ -33,8 +39,14 @@ pub async fn start_tunnel(
         let _ = child.kill().await;
     }
 
+    let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let metrics_port = listener.local_addr().unwrap().port();
+    drop(listener);
+
     let mut args = vec![
         "tunnel".to_string(),
+        "--metrics".to_string(),
+        format!("localhost:{}", metrics_port),
         "--url".to_string(),
         local_url.clone(),
     ];
@@ -61,10 +73,15 @@ pub async fn start_tunnel(
     args.push("run".to_string());
     args.push(tunnel_name.clone());
 
-    let bin_path = if cloudflared_path.trim().is_empty() {
-        "cloudflared".to_string()
-    } else {
+    let bin_path = if !cloudflared_path.trim().is_empty() {
         cloudflared_path
+    } else {
+        let default_path = crate::commands::setup::get_default_cloudflared_path(&app);
+        if default_path.exists() {
+            default_path.to_string_lossy().to_string()
+        } else {
+            "cloudflared".to_string()
+        }
     };
 
     use command_group::AsyncCommandGroup;
@@ -122,6 +139,47 @@ pub async fn start_tunnel(
 
     process_guard.insert(tunnel_name.clone(), child);
 
+    // Spawn metrics scraper
+    let app_clone3 = app.clone();
+    let tunnel_name_clone3 = tunnel_name.clone();
+    tokio::spawn(async move {
+        let client = reqwest::Client::new();
+        let url = format!("http://localhost:{}/metrics", metrics_port);
+        let mut last_reqs = 0;
+        
+        loop {
+            tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
+            
+            // Check if process is still running via state
+            // If it's killed, this loop will eventually fail the reqwest and we can break.
+            if let Ok(res) = client.get(&url).send().await {
+                if let Ok(text) = res.text().await {
+                    let mut req_count = last_reqs;
+                    for line in text.lines() {
+                        if line.starts_with("cloudflared_tunnel_total_requests") {
+                            let parts: Vec<&str> = line.split_whitespace().collect();
+                            if parts.len() == 2 {
+                                if let Ok(count) = parts[1].parse::<u64>() {
+                                    req_count = count;
+                                }
+                            }
+                        }
+                    }
+                    if req_count > 0 {
+                        last_reqs = req_count;
+                        let _ = app_clone3.emit("tunnel-metrics", TunnelMetrics {
+                            tunnel_name: tunnel_name_clone3.clone(),
+                            req_count,
+                        });
+                    }
+                }
+            } else {
+                // Fails to connect, means cloudflared is down or restarting. Break the scraper.
+                break;
+            }
+        }
+    });
+
     Ok(())
 }
 
@@ -136,14 +194,21 @@ pub async fn stop_tunnel(state: State<'_, AppState>, tunnel_name: String) -> Res
 
 #[tauri::command]
 pub async fn auto_tunnel_setup(
+    app: tauri::AppHandle,
     cloudflared_path: String,
     tunnel_name: String,
     subdomain: String,
+    _local_url: String,
 ) -> Result<String, String> {
-    let bin_path = if cloudflared_path.trim().is_empty() {
-        "cloudflared".to_string()
-    } else {
+    let bin_path = if !cloudflared_path.trim().is_empty() {
         cloudflared_path
+    } else {
+        let default_path = crate::commands::setup::get_default_cloudflared_path(&app);
+        if default_path.exists() {
+            default_path.to_string_lossy().to_string()
+        } else {
+            "cloudflared".to_string()
+        }
     };
 
     // Check if tunnel exists
@@ -199,11 +264,16 @@ pub async fn auto_tunnel_setup(
 }
 
 #[tauri::command]
-pub async fn list_tunnels(cloudflared_path: String) -> Result<String, String> {
-    let bin_path = if cloudflared_path.trim().is_empty() {
-        "cloudflared".to_string()
-    } else {
+pub async fn list_tunnels(app: tauri::AppHandle, cloudflared_path: String) -> Result<String, String> {
+    let bin_path = if !cloudflared_path.trim().is_empty() {
         cloudflared_path
+    } else {
+        let default_path = crate::commands::setup::get_default_cloudflared_path(&app);
+        if default_path.exists() {
+            default_path.to_string_lossy().to_string()
+        } else {
+            "cloudflared".to_string()
+        }
     };
 
     let list_cmd = make_command(&bin_path)
@@ -220,11 +290,16 @@ pub async fn list_tunnels(cloudflared_path: String) -> Result<String, String> {
 }
 
 #[tauri::command]
-pub async fn delete_tunnel(cloudflared_path: String, tunnel_name: String) -> Result<String, String> {
-    let bin_path = if cloudflared_path.trim().is_empty() {
-        "cloudflared".to_string()
-    } else {
+pub async fn delete_tunnel(app: tauri::AppHandle, cloudflared_path: String, tunnel_name: String) -> Result<String, String> {
+    let bin_path = if !cloudflared_path.trim().is_empty() {
         cloudflared_path
+    } else {
+        let default_path = crate::commands::setup::get_default_cloudflared_path(&app);
+        if default_path.exists() {
+            default_path.to_string_lossy().to_string()
+        } else {
+            "cloudflared".to_string()
+        }
     };
 
     let delete_cmd = make_command(&bin_path)

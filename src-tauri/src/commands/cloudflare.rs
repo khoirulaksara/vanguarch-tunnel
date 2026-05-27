@@ -97,11 +97,16 @@ pub fn check_cloudflared_login() -> bool {
 }
 
 #[tauri::command]
-pub async fn logout_cloudflared(cloudflared_path: String) -> Result<String, String> {
-    let bin_path = if cloudflared_path.trim().is_empty() {
-        "cloudflared".to_string()
-    } else {
+pub async fn logout_cloudflared(app: tauri::AppHandle, cloudflared_path: String) -> Result<String, String> {
+    let bin_path = if !cloudflared_path.trim().is_empty() {
         cloudflared_path
+    } else {
+        let default_path = crate::commands::setup::get_default_cloudflared_path(&app);
+        if default_path.exists() {
+            default_path.to_string_lossy().to_string()
+        } else {
+            "cloudflared".to_string()
+        }
     };
 
     let mut dot_cloudflared = std::env::var("HOME")
@@ -195,11 +200,16 @@ pub async fn logout_cloudflared(cloudflared_path: String) -> Result<String, Stri
 }
 
 #[tauri::command]
-pub async fn cloudflared_login(cloudflared_path: String) -> Result<String, String> {
-    let bin_path = if cloudflared_path.trim().is_empty() {
-        "cloudflared".to_string()
-    } else {
+pub async fn cloudflared_login(app: tauri::AppHandle, cloudflared_path: String) -> Result<String, String> {
+    let bin_path = if !cloudflared_path.trim().is_empty() {
         cloudflared_path
+    } else {
+        let default_path = crate::commands::setup::get_default_cloudflared_path(&app);
+        if default_path.exists() {
+            default_path.to_string_lossy().to_string()
+        } else {
+            "cloudflared".to_string()
+        }
     };
 
     let output = make_command(&bin_path)
@@ -219,11 +229,16 @@ pub async fn cloudflared_login(cloudflared_path: String) -> Result<String, Strin
 }
 
 #[tauri::command]
-pub async fn check_cloudflared(cloudflared_path: String) -> Result<String, String> {
-    let bin_path = if cloudflared_path.trim().is_empty() {
-        "cloudflared".to_string()
-    } else {
+pub async fn check_cloudflared(app: tauri::AppHandle, cloudflared_path: String) -> Result<String, String> {
+    let bin_path = if !cloudflared_path.trim().is_empty() {
         cloudflared_path
+    } else {
+        let default_path = crate::commands::setup::get_default_cloudflared_path(&app);
+        if default_path.exists() {
+            default_path.to_string_lossy().to_string()
+        } else {
+            "cloudflared".to_string()
+        }
     };
 
     let output = make_command(&bin_path)
@@ -242,11 +257,16 @@ pub async fn check_cloudflared(cloudflared_path: String) -> Result<String, Strin
 }
 
 #[tauri::command]
-pub async fn update_cloudflared(cloudflared_path: String) -> Result<String, String> {
-    let bin_path = if cloudflared_path.trim().is_empty() {
-        "cloudflared".to_string()
-    } else {
+pub async fn update_cloudflared(app: tauri::AppHandle, cloudflared_path: String) -> Result<String, String> {
+    let bin_path = if !cloudflared_path.trim().is_empty() {
         cloudflared_path
+    } else {
+        let default_path = crate::commands::setup::get_default_cloudflared_path(&app);
+        if default_path.exists() {
+            default_path.to_string_lossy().to_string()
+        } else {
+            "cloudflared".to_string()
+        }
     };
 
     let output = make_command(&bin_path)

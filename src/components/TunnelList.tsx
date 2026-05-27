@@ -4,8 +4,10 @@ import { useSettingsStore } from '../store/useSettingsStore';
 import { useTunnelStore } from '../store/useTunnelStore';
 import { useProjectStore } from '../store/useProjectStore';
 import { useCloudflareStore } from '../store/useCloudflareStore';
-import { Cloud, Play, Search, RefreshCw, XCircle, Copy, Check, Link, Trash2 } from 'lucide-react';
+import { Cloud, Play, Search, RefreshCw, XCircle, Copy, Check, Link, Trash2, Activity } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { QRCodeDisplay } from './ui/QRCodeDisplay';
+import { TrafficMonitor } from './ui/TrafficMonitor';
 
 import { ConfirmModal } from './ui/ConfirmModal';
 
@@ -56,7 +58,7 @@ export function TunnelList() {
     }
   };
 
-  const handleStartTunnel = async (tunnel: any) => {
+  const handleStartTunnel = async (tunnel: any, withInspector: boolean = false) => {
     setStartingTunnelId(tunnel.id);
     try {
       const sanitizedName = tunnel.name.replace('vanguarch-', '');
@@ -88,7 +90,9 @@ export function TunnelList() {
           originServerName: !isLocalhost,
           forceHttp2: false,
           ipv4Only: false
-        }
+        },
+        protocol: 'http',
+        enableInspector: withInspector
       };
 
       await startTunnel(config);
@@ -220,37 +224,55 @@ export function TunnelList() {
                       >
                         {copiedId === tunnel.id ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
                       </button>
+                      <QRCodeDisplay url={url} />
                     </div>
                     <p className="text-[9px] text-[#52525b] font-mono truncate">ID: {tunnel.id}</p>
                   </div>
                   
-                  <div className="flex items-center justify-end pt-3 border-t border-[#27272a]">
-                    {isThisTunnelRunning ? (
-                      <button
-                        onClick={() => {
-                          stopTunnel(tunnel.name);
-                          setTimeout(() => fetchTunnels(cloudflaredPath), 1000);
-                        }}
-                        className="px-3 py-1.5 bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded text-[10px] font-bold uppercase tracking-wider transition-colors flex items-center justify-center w-full gap-1.5"
-                      >
-                        <XCircle className="w-3.5 h-3.5" />
-                        Stop
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => handleStartTunnel(tunnel)}
-                        disabled={startingTunnelId === tunnel.id || isThisTunnelStarting || hasConnections || isRecentlyStopped}
-                        className="px-3 py-1.5 bg-white text-black hover:bg-[#e4e4e7] rounded text-[10px] font-bold uppercase tracking-wider disabled:opacity-50 transition-colors flex items-center justify-center w-full gap-1.5"
-                        title={isRecentlyStopped ? "Cooling down before restart" : hasConnections ? "Tunnel is currently connected elsewhere" : "Start tunnel"}
-                      >
-                        {startingTunnelId === tunnel.id ? (
-                          <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                        ) : (
-                          <Play className="w-3.5 h-3.5" />
-                        )}
-                        Start
-                      </button>
+                  <div className="flex flex-col pt-3 border-t border-[#27272a] gap-2">
+                    {isThisTunnelRunning && (
+                      <div className="px-1 pb-2">
+                        <TrafficMonitor tunnelName={tunnel.name} />
+                      </div>
                     )}
+                    <div className="flex items-center justify-end">
+                      {isThisTunnelRunning ? (
+                        <button
+                          onClick={() => {
+                            stopTunnel(tunnel.name);
+                            setTimeout(() => fetchTunnels(cloudflaredPath), 1000);
+                          }}
+                          className="px-3 py-1.5 bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded text-[10px] font-bold uppercase tracking-wider transition-colors flex items-center justify-center w-full gap-1.5"
+                        >
+                          <XCircle className="w-3.5 h-3.5" />
+                          Stop
+                        </button>
+                      ) : (
+                      <div className="flex w-full gap-2">
+                        <button
+                          onClick={() => handleStartTunnel(tunnel, false)}
+                          disabled={startingTunnelId === tunnel.id || isThisTunnelStarting || hasConnections || isRecentlyStopped}
+                          className="flex-1 py-1.5 bg-white text-black hover:bg-[#e4e4e7] rounded text-[10px] font-bold uppercase tracking-wider disabled:opacity-50 transition-colors flex items-center justify-center gap-1.5"
+                          title={isRecentlyStopped ? "Cooling down before restart" : hasConnections ? "Tunnel is currently connected elsewhere" : "Start tunnel"}
+                        >
+                          {startingTunnelId === tunnel.id ? (
+                            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <Play className="w-3.5 h-3.5" />
+                          )}
+                          Start
+                        </button>
+                        <button
+                          onClick={() => handleStartTunnel(tunnel, true)}
+                          disabled={startingTunnelId === tunnel.id || isThisTunnelStarting || hasConnections || isRecentlyStopped}
+                          className="px-3 py-1.5 bg-[#27272a] text-[#a1a1aa] hover:bg-orange-500 hover:text-black rounded transition-colors disabled:opacity-50"
+                          title="Start with Web Inspector"
+                        >
+                          <Activity className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
+                    </div>
                   </div>
                 </div>
               );

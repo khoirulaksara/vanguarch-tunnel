@@ -1,6 +1,6 @@
 [package]
 name = "vanguarch"
-version = "2.2.2"
+version = "2.3.0"
 description = "Vanguarch Tunnel"
 authors = ["Khoirul Aksara"]
 edition = "2021"
@@ -17,9 +17,13 @@ tokio = { version = "1.36", features = ["rt", "rt-multi-thread", "process", "syn
 tauri-plugin-dialog = "2"
 tauri-plugin-single-instance = "2"
 uuid = { version = "1.8.0", features = ["v4", "fast-rng"] }
-reqwest = { version = "0.11", features = ["json"] }
+reqwest = { version = "0.11", features = ["json", "stream"] }
 base64 = "0.21"
 command-group = { version = "5.0.1", features = ["with-tokio"] }
+futures-util = "0.3"
+warp = "0.3"
+chrono = "0.4.44"
+bytes = "1.11.1"
 
 # --- TAMBAHKAN BLOK INI UNTUK MEMANGKAS UKURAN HINGGA >50% ---
 [profile.release]

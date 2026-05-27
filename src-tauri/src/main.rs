@@ -29,6 +29,7 @@ fn main() {
             
             let _tray = TrayIconBuilder::new()
                 .icon(app.default_window_icon().unwrap().clone())
+                .tooltip("Vanguarch Tunnel")
                 .menu(&menu)
                 .on_menu_event(|app, event| match event.id().as_ref() {
                     "show" => {
@@ -81,7 +82,13 @@ fn main() {
             commands::tunnel::list_tunnels,
             commands::tunnel::delete_tunnel,
             commands::system::force_exit,
-            commands::system::check_ports
+            commands::system::check_ports,
+            commands::setup::check_cloudflared_status,
+            commands::setup::download_cloudflared,
+            commands::share::start_static_server,
+            commands::share::stop_static_server,
+            commands::inspector::start_inspector,
+            commands::inspector::stop_inspector_for_tunnel
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -15,7 +15,10 @@ import { SettingsView } from './components/SettingsView';
 import { AboutView } from './components/AboutView';
 import { ServiceStatus } from './components/ServiceStatus';
 import { Titlebar } from './components/Titlebar';
-import { Shield, TerminalSquare, Plug, FolderSearch, Bookmark, Settings, Activity, Cloud, Info } from 'lucide-react';
+import { CloudflaredBanner } from './components/CloudflaredBanner';
+import { QuickShareView } from './components/QuickShareView';
+import { InspectorView } from './components/InspectorView';
+import { Shield, TerminalSquare, Plug, FolderSearch, Bookmark, Settings, Activity, Cloud, Info, Share2, MousePointerClick } from 'lucide-react';
 import { cn } from './lib/utils';
 import { listen } from '@tauri-apps/api/event';
 import { invoke } from '@tauri-apps/api/core';
@@ -24,12 +27,13 @@ import { getCurrentWindow } from '@tauri-apps/api/window';
 import { useCloudflareStore } from './store/useCloudflareStore';
 import { useSettingsStore } from './store/useSettingsStore';
 import { useTunnelStore } from './store/useTunnelStore';
+import { useInspectorStore } from './store/useInspectorStore';
 
-type Tab = 'manual' | 'presets' | 'projects' | 'tunnels' | 'settings' | 'about';
+type Tab = 'manual' | 'presets' | 'projects' | 'tunnels' | 'share' | 'inspector' | 'settings' | 'about';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>('manual');
-  const [isLogsMinimized, setIsLogsMinimized] = useState(false);
+  const [isLogsMinimized, setIsLogsMinimized] = useState(true);
   const [showSplash, setShowSplash] = useState(true);
   const { activeProcesses } = useTunnelStore();
   const { tunnels, fetchTunnels } = useCloudflareStore();
@@ -79,6 +83,26 @@ export default function App() {
           unlisten = unlistenFn;
         } else {
           unlistenFn();
+        }
+
+        // Global Inspector Listener
+        const unlistenInspector = await listen<any>('inspector-log', (event) => {
+          const payload = event.payload;
+          if (payload.response) {
+            useInspectorStore.getState().updateResponse(payload.log_id, payload.response);
+          } else {
+            useInspectorStore.getState().addLog(payload);
+          }
+        });
+
+        if (isMounted) {
+          const oldUnlisten = unlisten;
+          unlisten = () => {
+            if (oldUnlisten) oldUnlisten();
+            unlistenInspector();
+          };
+        } else {
+          unlistenInspector();
         }
       } catch (err) {
         console.error("Tray setup error:", err);
@@ -173,6 +197,7 @@ export default function App() {
   return (
     <div className="flex flex-col h-screen bg-[#09090b] text-[#e4e4e7] font-sans overflow-hidden selection:bg-orange-500/30">
       <Titlebar />
+      <CloudflaredBanner />
       <div className="flex flex-1 overflow-hidden min-h-0">
         <Toaster theme="dark" toastOptions={{ className: 'font-sans' }} />
       <ConfirmModal
@@ -227,6 +252,18 @@ export default function App() {
             onClick={() => setActiveTab('tunnels')} 
           />
           <NavItem 
+            icon={<Share2 className="w-5 h-5" />} 
+            label="Quick Share" 
+            active={activeTab === 'share'} 
+            onClick={() => setActiveTab('share')} 
+          />
+          <NavItem 
+            icon={<MousePointerClick className="w-5 h-5" />} 
+            label="Inspector" 
+            active={activeTab === 'inspector'} 
+            onClick={() => setActiveTab('inspector')} 
+          />
+          <NavItem 
             icon={<Settings className="w-5 h-5" />} 
             label="Settings" 
             active={activeTab === 'settings'} 
@@ -262,6 +299,8 @@ export default function App() {
           {activeTab === 'presets' && <PresetList />}
           {activeTab === 'projects' && <ProjectList />}
           {activeTab === 'tunnels' && <TunnelList />}
+          {activeTab === 'share' && <QuickShareView />}
+          {activeTab === 'inspector' && <InspectorView />}
           {activeTab === 'settings' && <SettingsView />}
           {activeTab === 'about' && <AboutView />}
         </div>

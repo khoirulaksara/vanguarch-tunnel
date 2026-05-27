@@ -5,6 +5,8 @@ export interface TunnelConfig {
   localVhost: string;
   publicDomain: string;
   tunnelName: string;
+  protocol?: 'http' | 'tcp' | 'ssh' | 'rdp';
+  enableInspector?: boolean;
   options: {
     httpHostHeader: boolean;
     originServerName: boolean;

@@ -5,3 +5,6 @@ pub mod tunnel;
 pub mod cloudflare;
 pub mod project;
 pub mod system;
+pub mod setup;
+pub mod share;
+pub mod inspector;

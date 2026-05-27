@@ -1,10 +1,14 @@
 import React from 'react';
 import { useTunnelStore } from '../store/useTunnelStore';
 import { Bookmark, Play, Trash2, Square } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { useSettingsStore } from '../store/useSettingsStore';
+import { useCloudflaredStatusStore } from '../store/useCloudflaredStatusStore';
+import { QRCodeDisplay } from './ui/QRCodeDisplay';
+import { TrafficMonitor } from './ui/TrafficMonitor';
 
 export function PresetList() {
   const { presets, startTunnel, stopTunnel, removePreset, activeProcesses } = useTunnelStore();
+  const { isInstalled } = useCloudflaredStatusStore();
 
   return (
     <div className="flex flex-col h-full w-full bg-[#09090b] text-[#e4e4e7] overflow-y-auto relative">
@@ -57,6 +61,16 @@ export function PresetList() {
                       </button>
                     </div>
                   </div>
+                  <div className="flex items-center gap-1.5 mb-2 mt-[-8px]">
+                    <span className="bg-[#27272a] text-[#a1a1aa] px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest">
+                      {preset.protocol || 'HTTP'}
+                    </span>
+                    {preset.enableInspector && (
+                      <span className="bg-orange-500/10 text-orange-500 border border-orange-500/20 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest">
+                        Inspector ON
+                      </span>
+                    )}
+                  </div>
                   
                   <div className="space-y-1.5 mt-2 text-[10px] font-mono text-[#a1a1aa]">
                     <div className="flex justify-between items-center gap-2">
@@ -71,7 +85,10 @@ export function PresetList() {
                     )}
                     <div className="flex justify-between items-center gap-2">
                       <span className="text-[#52525b] uppercase tracking-wider font-sans font-bold shrink-0">Domain:</span>
-                      <span className="truncate">{preset.publicDomain}</span>
+                      <div className="flex items-center gap-2 truncate">
+                        <span className="truncate">{preset.publicDomain}</span>
+                        {isThisRunning && <QRCodeDisplay url={`https://${preset.publicDomain}`} />}
+                      </div>
                     </div>
                     <div className="flex justify-between items-center gap-2">
                       <span className="text-[#52525b] uppercase tracking-wider font-sans font-bold shrink-0">Tunnel:</span>
@@ -81,17 +98,41 @@ export function PresetList() {
                 </div>
 
                 {isThisRunning ? (
-                  <button
-                    onClick={() => stopTunnel(preset.tunnelName)}
-                    className="w-full mt-3 bg-red-500 hover:bg-red-600 text-black font-bold transition-colors py-2 rounded-lg text-[10px] uppercase tracking-wider flex items-center justify-center gap-2"
-                  >
-                    <Square className="w-3.5 h-3.5" />
-                    Stop Preset
-                  </button>
+                  <div className="flex flex-col gap-2 mt-2 pt-3 border-t border-[#27272a]">
+                    <div className="flex justify-between items-center gap-2">
+                      <button 
+                        onClick={() => stopTunnel(preset.tunnelName)}
+                        className="px-3 py-1.5 bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors rounded text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5"
+                      >
+                        <Square className="w-3.5 h-3.5" />
+                        Stop Preset
+                      </button>
+                    </div>
+                    {preset.protocol && preset.protocol !== 'http' && (
+                      <div className="pt-2">
+                        <div className="bg-black/50 border border-[#3f3f46] rounded p-2 text-[9px] font-mono text-[#a1a1aa]">
+                          <div className="text-orange-500 mb-1 font-bold">Client Connection Command:</div>
+                          <code className="select-all block p-1 bg-[#18181b] rounded break-all">
+                            cloudflared access {preset.protocol} --hostname {preset.publicDomain} --url localhost:{preset.protocol === 'tcp' ? '3306' : preset.protocol === 'ssh' ? '22' : '3389'}
+                          </code>
+                        </div>
+                      </div>
+                    )}
+                    <div className="pt-2">
+                      <TrafficMonitor tunnelName={preset.tunnelName} />
+                    </div>
+                  </div>
                 ) : (
                   <button
                     onClick={() => startTunnel(preset)}
-                    className="w-full mt-3 bg-white hover:bg-[#e4e4e7] text-black font-bold transition-colors py-2 rounded-lg text-[10px] uppercase tracking-wider flex items-center justify-center gap-2"
+                    disabled={!isInstalled}
+                    title={isInstalled === false ? "Cloudflared is missing" : ""}
+                    className={cn(
+                      "w-full mt-3 font-bold transition-colors py-2 rounded-lg text-[10px] uppercase tracking-wider flex items-center justify-center gap-2",
+                      isInstalled === false 
+                        ? "bg-[#27272a] text-[#52525b] cursor-not-allowed" 
+                        : "bg-white hover:bg-[#e4e4e7] text-black"
+                    )}
                   >
                     <Play className="w-3.5 h-3.5" />
                     Launch Preset

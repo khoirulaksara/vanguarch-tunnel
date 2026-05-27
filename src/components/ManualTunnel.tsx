@@ -2,17 +2,21 @@ import React, { useState } from 'react';
 import { toast } from 'sonner';
 import { useTunnelStore } from '../store/useTunnelStore';
 import { useSettingsStore } from '../store/useSettingsStore';
+import { useCloudflaredStatusStore } from '../store/useCloudflaredStatusStore';
 import { TunnelConfig } from '../types';
 import { Play, Save, Globe } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 export function ManualTunnel() {
   const { startTunnel, addPreset, presets } = useTunnelStore();
+  const { isInstalled } = useCloudflaredStatusStore();
   const [config, setConfig] = useState<Partial<TunnelConfig>>({
     localUrl: 'http://127.0.0.1:3000',
     localVhost: '',
     publicDomain: '',
     tunnelName: '',
+    protocol: 'http',
+    enableInspector: false,
     options: {
       httpHostHeader: false,
       originServerName: false,
@@ -34,6 +38,8 @@ export function ManualTunnel() {
       localVhost: config.localVhost || '',
       publicDomain: config.publicDomain,
       tunnelName: config.tunnelName,
+      protocol: config.protocol || 'http',
+      enableInspector: config.enableInspector || false,
       options: config.options!,
       name: config.tunnelName,
     });
@@ -61,6 +67,8 @@ export function ManualTunnel() {
       localVhost: config.localVhost || '',
       publicDomain: config.publicDomain,
       tunnelName: config.tunnelName,
+      protocol: config.protocol || 'http',
+      enableInspector: config.enableInspector || false,
       options: config.options!,
     });
     
@@ -95,6 +103,33 @@ export function ManualTunnel() {
                 className="w-full bg-[#18181b] border border-[#27272a] rounded p-2 text-xs focus:outline-none focus:border-orange-500 transition-colors"
               />
             </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-[10px] uppercase text-[#52525b] mb-1.5 font-bold">Protocol</label>
+                <select
+                  value={config.protocol || 'http'}
+                  onChange={e => setConfig(prev => ({ ...prev, protocol: e.target.value as any }))}
+                  className="w-full bg-[#18181b] border border-[#27272a] rounded p-2 text-xs focus:outline-none focus:border-orange-500 transition-colors text-[#e4e4e7]"
+                >
+                  <option value="http">HTTP/HTTPS (Website)</option>
+                  <option value="tcp">TCP (Database/Generic)</option>
+                  <option value="ssh">SSH</option>
+                  <option value="rdp">RDP (Remote Desktop)</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-[10px] uppercase text-[#52525b] mb-1.5 font-bold">Tunnel Name</label>
+                <input
+                  type="text"
+                  value={config.tunnelName}
+                  onChange={e => setConfig(prev => ({ ...prev, tunnelName: e.target.value }))}
+                  placeholder="arts-demo"
+                  className="w-full bg-[#18181b] border border-[#27272a] rounded p-2 text-xs focus:outline-none focus:border-orange-500 transition-colors"
+                />
+              </div>
+            </div>
+
             <div>
               <label className="block text-[10px] uppercase text-[#52525b] mb-1.5 font-bold">Local Host Header / Vhost</label>
               <input
@@ -122,16 +157,21 @@ export function ManualTunnel() {
               </div>
               <p className="text-[10px] text-[#52525b] mt-1">Masukkan nama subdomain. Pastikan Public Root Domain sudah terdeteksi di menu Settings.</p>
             </div>
-            <div>
-              <label className="block text-[10px] uppercase text-[#52525b] mb-1.5 font-bold">Tunnel Name</label>
+          </div>
+
+          <div className="space-y-3 pt-2">
+            <label className="block text-[10px] uppercase text-[#52525b] mb-1.5 font-bold">Development Tools</label>
+            <label className="flex items-center gap-2 text-[11px] text-[#a1a1aa] cursor-pointer">
               <input
-                type="text"
-                value={config.tunnelName}
-                onChange={e => setConfig(prev => ({ ...prev, tunnelName: e.target.value }))}
-                placeholder="arts-demo"
-                className="w-full bg-[#18181b] border border-[#27272a] rounded p-2 text-xs focus:outline-none focus:border-orange-500 transition-colors"
+                type="checkbox"
+                checked={config.enableInspector || false}
+                onChange={e => setConfig(prev => ({ ...prev, enableInspector: e.target.checked }))}
+                disabled={config.protocol !== 'http'}
+                className="rounded border-[#27272a] bg-[#18181b] text-orange-500 focus:ring-orange-500 focus:ring-offset-0 focus:ring-offset-transparent disabled:opacity-50"
               />
-            </div>
+              <span className={config.protocol !== 'http' ? 'opacity-50' : ''}>Enable Web Inspector (HTTP only)</span>
+            </label>
+            <p className="text-[10px] text-[#52525b] mt-1">Intercepts HTTP traffic and shows request/response logs in the Inspector tab.</p>
           </div>
 
           <div className="space-y-3 pt-2">
@@ -162,8 +202,14 @@ export function ManualTunnel() {
           <div className="pt-6 flex gap-3">
             <button
               type="submit"
-              disabled={!config.localUrl || !config.tunnelName}
-              className="flex-1 bg-orange-500 hover:bg-orange-600 disabled:bg-[#27272a] disabled:text-[#52525b] text-black font-bold py-2 px-4 rounded text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-colors"
+              disabled={!config.localUrl || !config.tunnelName || isInstalled === false}
+              title={isInstalled === false ? "Cloudflared is missing" : ""}
+              className={cn(
+                "flex-1 font-bold py-2 px-4 rounded text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-colors",
+                isInstalled === false 
+                  ? "bg-[#27272a] text-[#52525b] cursor-not-allowed" 
+                  : "bg-orange-500 hover:bg-orange-600 disabled:bg-[#27272a] disabled:text-[#52525b] text-black"
+              )}
             >
               <Play className="w-3 h-3" />
               Start Tunnel

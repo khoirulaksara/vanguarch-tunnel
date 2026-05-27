@@ -13,11 +13,17 @@ Vanguarch Tunnel is a desktop application built with Tauri and React that simpli
 
 - **Local Project Discovery:** Scans workspace directories and automatically detects frameworks such as WordPress, Laravel, Next.js, and Vite.
 - **Tunnel Management:** Create, view, and route tunnels to a public domain for any discovered project.
+- **TCP, SSH, & RDP Tunneling:** Easily tunnel local databases, remote desktop connections, or SSH sessions using non-HTTP protocols without exposing router ports.
+- **Web Inspector (Ngrok-style):** Intercept and debug HTTP traffic directly from the app. View real-time request/response headers and JSON payloads.
+- **Quick Share:** Instantly host and share any local folder over a secure Cloudflare Tunnel using the embedded static web server.
+- **Real-Time Traffic Monitor:** Visualize incoming tunnel requests in real-time with an embedded micro-chart and counter.
+- **QR Code Generator:** Quickly test your running tunnels on mobile devices by scanning the generated QR codes.
 - **WordPress Helper:** Inject configurations into `wp-config.php` to resolve mixed content and HTTPS issues when routed over Cloudflare.
 - **Cloud Integration:** View and delete existing tunnels directly from your Cloudflare Zero Trust account.
 - **Live Logs:** Built-in terminal log viewer and port status monitoring.
 - **Auto Updater:** Built-in update checker for the `cloudflared` binary.
 - **Saved Presets:** Save tunnel configurations for quick access.
+- **System Tray Integration:** Run Vanguarch in the background with a convenient system tray menu.
 
 ## Previews
 

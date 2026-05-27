@@ -8,6 +8,7 @@ use tokio::sync::Mutex;
 /// Shared application state managed by Tauri.
 #[derive(Default)]
 pub struct AppState {
-    /// Menyimpan process cloudflared berdasarkan tunnel name / ID agar bisa multi-tunnel
     pub tunnel_processes: Mutex<HashMap<String, AsyncGroupChild>>,
+    pub share_servers: Mutex<HashMap<u16, tokio::sync::oneshot::Sender<()>>>,
+    pub inspector_servers: Mutex<HashMap<String, tokio::sync::oneshot::Sender<()>>>,
 }

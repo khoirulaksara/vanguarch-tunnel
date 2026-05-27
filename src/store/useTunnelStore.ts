@@ -72,7 +72,15 @@ export const useTunnelStore = create<TunnelStore>()(
       
       startTunnel: async (config) => {
         const tunnelName = config.tunnelName;
-        const command = `cloudflared tunnel --url ${config.localUrl} ${config.options.httpHostHeader && config.localVhost ? '--http-host-header ' + config.localVhost : ''} ${config.options.originServerName && config.localVhost ? '--origin-server-name ' + config.localVhost : ''} run ${config.tunnelName}`.replace(/\s+/g, ' ').trim();
+        
+        let formattedLocalUrl = config.localUrl;
+        if (config.protocol && config.protocol !== 'http') {
+          // ensure correct prefix for non-http protocols
+          const cleanUrl = config.localUrl.replace(/^https?:\/\//i, '').replace(/^tcp:\/\//i, '').replace(/^ssh:\/\//i, '').replace(/^rdp:\/\//i, '');
+          formattedLocalUrl = `${config.protocol}://${cleanUrl}`;
+        }
+        
+        const command = `cloudflared tunnel --url ${formattedLocalUrl} ${config.options.httpHostHeader && config.localVhost ? '--http-host-header ' + config.localVhost : ''} ${config.options.originServerName && config.localVhost ? '--origin-server-name ' + config.localVhost : ''} run ${config.tunnelName}`.replace(/\s+/g, ' ').trim();
         
         set((state) => ({
           activeProcesses: {
@@ -149,9 +157,32 @@ export const useTunnelStore = create<TunnelStore>()(
               }
             }
 
+            // If Inspector is enabled, start inspector server and override localUrl
+            let finalLocalUrl = formattedLocalUrl;
+            if (config.protocol === 'http' && config.enableInspector) {
+               try {
+                 const proxyPort: number = await invoke('start_inspector', { 
+                   targetUrl: formattedLocalUrl,
+                   tunnelName: config.tunnelName
+                 });
+                 finalLocalUrl = `http://127.0.0.1:${proxyPort}`;
+                 get().addLog(tunnelName, {
+                   timestamp: new Date().toISOString(),
+                   message: `Web Inspector enabled. Traffic routed through proxy on port ${proxyPort}`,
+                   type: 'info'
+                 });
+               } catch (e) {
+                 get().addLog(tunnelName, {
+                   timestamp: new Date().toISOString(),
+                   message: `Failed to start Web Inspector: ${e}`,
+                   type: 'error'
+                 });
+               }
+            }
+
             await invoke('start_tunnel', {
               cloudflaredPath,
-              localUrl: config.localUrl,
+              localUrl: finalLocalUrl,
               publicDomain: config.localVhost || config.publicDomain,
               tunnelName: config.tunnelName,
               httpHostHeader: config.options.httpHostHeader,
@@ -208,6 +239,10 @@ export const useTunnelStore = create<TunnelStore>()(
           if (invoke) {
             try {
              await invoke('stop_tunnel', { tunnelName });
+             // Stop inspector if it was running
+             if (activeProcess.config.enableInspector) {
+               await invoke('stop_inspector_for_tunnel', { tunnelName: activeProcess.config.tunnelName }).catch(() => {});
+             }
             } catch (e) {
               console.error(e);
             }
