@@ -84,16 +84,16 @@ pub async fn start_tunnel(
         }
     };
 
-    use command_group::AsyncCommandGroup;
     let mut child = make_command(&bin_path)
         .args(args)
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
-        .group_spawn()
+        .kill_on_drop(true)
+        .spawn()
         .map_err(|e| format!("Gagal menjalankan cloudflared: {}", e))?;
 
-    let stdout = child.inner().stdout.take().unwrap();
-    let stderr = child.inner().stderr.take().unwrap();
+    let stdout = child.stdout.take().unwrap();
+    let stderr = child.stderr.take().unwrap();
 
     // Stream Stdout
     let app_clone1 = app.clone();

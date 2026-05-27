@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { toast } from 'sonner';
-import { Folder, Share2, StopCircle, Cloud } from 'lucide-react';
+import { Folder, Share2, StopCircle, Cloud, Copy, Check } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
 import { open as openDialog } from '@tauri-apps/plugin-dialog';
 import { useSettingsStore } from '../store/useSettingsStore';
@@ -13,9 +13,21 @@ export function QuickShareView() {
   const [activePort, setActivePort] = useState<number | null>(null);
   const [activeTunnelId, setActiveTunnelId] = useState<string | null>(null);
   const [publicUrl, setPublicUrl] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const { cloudflaredPath, publicDomain } = useSettingsStore();
   const { startTunnel, stopTunnel, activeProcesses } = useTunnelStore();
+
+  const handleCopy = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      toast.success("URL copied to clipboard");
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      toast.error("Failed to copy URL");
+    }
+  };
 
   const handleBrowse = async () => {
     if (openDialog) {
@@ -167,7 +179,16 @@ export function QuickShareView() {
                   <a href={publicUrl} target="_blank" rel="noreferrer" className="font-mono text-xs text-orange-500 hover:text-orange-400 hover:underline truncate">
                     {publicUrl}
                   </a>
-                  <QRCodeDisplay url={publicUrl} />
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleCopy(publicUrl)}
+                      className="p-1.5 hover:bg-[#27272a] rounded text-[#52525b] hover:text-[#e4e4e7] transition-colors shrink-0"
+                      title="Copy Public URL"
+                    >
+                      {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                    </button>
+                    <QRCodeDisplay url={publicUrl} />
+                  </div>
                 </div>
               </div>
             ) : (
