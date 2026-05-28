@@ -95,12 +95,12 @@
         Vanguarch is a fast, predictable, and gorgeous desktop GUI wrapper for <code class="font-mono text-zinc-300 bg-zinc-800/50 px-1.5 py-0.5 rounded">cloudflared</code>. Expose ports, inspect webhooks, and monitor analytics with zero CLI headache.
       </p>
 
-      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto mb-16" id="download">
-        <a href="https://github.com/khoirulaksara/vanguarch-tunnel/releases/latest" class="w-full sm:w-auto px-8 py-4 bg-brand-500 text-white font-display font-bold text-sm uppercase tracking-wider rounded-xl hover:bg-brand-600 shadow-lg shadow-brand-500/25 transition-all text-center flex items-center justify-center gap-2">
-          <span>Download MSI Installer</span>
+      <div class="flex flex-col items-center justify-center gap-4 max-w-md mx-auto mb-16" id="download">
+        <a id="download-btn" href="https://github.com/khoirulaksara/vanguarch-tunnel/releases/latest" class="w-full sm:w-auto px-10 py-4 bg-brand-500 text-white font-display font-bold text-sm uppercase tracking-wider rounded-xl hover:bg-brand-600 shadow-lg shadow-brand-500/25 transition-all text-center flex items-center justify-center gap-2">
+          <span>Detecting OS...</span>
         </a>
-        <a href="https://github.com/khoirulaksara/vanguarch-tunnel/releases/latest" class="w-full sm:w-auto px-8 py-4 bg-zinc-900 border border-zinc-800 text-zinc-300 font-display font-bold text-sm uppercase tracking-wider rounded-xl hover:bg-zinc-800 hover:text-white transition-all text-center">
-          Download EXE Installer
+        <a href="https://github.com/khoirulaksara/vanguarch-tunnel/releases/latest" class="text-zinc-500 hover:text-zinc-300 text-xs transition-colors underline underline-offset-4">
+          All releases & platforms
         </a>
       </div>
       
@@ -291,5 +291,59 @@
     </div>
   </footer>
 
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const btn = document.getElementById("download-btn");
+      const userAgent = window.navigator.userAgent.toLowerCase();
+      let os = "windows";
+      let osLabel = "Windows";
+      
+      if (userAgent.indexOf("win") !== -1) {
+        os = "windows";
+        osLabel = "Windows";
+      } else if (userAgent.indexOf("mac") !== -1) {
+        os = "macos";
+        osLabel = "macOS";
+      } else if (userAgent.indexOf("linux") !== -1) {
+        os = "linux";
+        osLabel = "Linux";
+      } else {
+        os = "other";
+        osLabel = "Desktop";
+      }
+      
+      btn.querySelector("span").textContent = "Download for " + osLabel;
+      
+      // Dynamically fetch latest release assets from GitHub API
+      fetch("https://api.github.com/repos/khoirulaksara/vanguarch-tunnel/releases/latest")
+        .then(response => {
+          if (!response.ok) throw new Error("API limit or network error");
+          return response.json();
+        })
+        .then(data => {
+          if (data && data.assets && data.assets.length > 0) {
+            let matchedAsset = null;
+            
+            if (os === "windows") {
+              // Prefer msi, fallback to exe
+              matchedAsset = data.assets.find(a => a.name.endsWith(".msi")) || data.assets.find(a => a.name.endsWith("-setup.exe") || a.name.endsWith(".exe"));
+            } else if (os === "macos") {
+              matchedAsset = data.assets.find(a => a.name.endsWith(".dmg")) || data.assets.find(a => a.name.endsWith(".tar.gz"));
+            } else if (os === "linux") {
+              matchedAsset = data.assets.find(a => a.name.endsWith(".deb")) || data.assets.find(a => a.name.endsWith(".AppImage"));
+            }
+            
+            if (matchedAsset && matchedAsset.browser_download_url) {
+              btn.href = matchedAsset.browser_download_url;
+              const extension = matchedAsset.name.split(".").pop().toUpperCase();
+              btn.querySelector("span").textContent = "Download for " + osLabel + " (" + extension + ")";
+            }
+          }
+        })
+        .catch(err => {
+          console.warn("Failed to fetch latest GitHub release assets, using fallback link.", err);
+        });
+    });
+  </script>
 </body>
 </html>
