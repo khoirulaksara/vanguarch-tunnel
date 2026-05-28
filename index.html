@@ -1,80 +1,210 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" class="scroll-smooth">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vanguarch Tunnel — Premium Desktop GUI for Cloudflared</title>
-  <!-- SEO Meta Tags -->
-  <meta name="description" content="A stable, predictable, and beautiful UI wrapper for cloudflared. Manage Cloudflare Tunnels, inspect HTTP requests, and analyze local project traffic with ease.">
-  <meta name="keywords" content="cloudflare tunnel, cloudflared, argo tunnel, ngrok alternative, web inspector, local development, dashboard">
-  
-  <!-- Fonts & Tailwind -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700;800;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Motion One library via CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/motion@11.11.13/dist/motion.js"></script>
-  
-  <script>
-    document.documentElement.classList.add('js-enabled');
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-            display: ['Outfit', 'sans-serif'],
-            mono: ['Fira Code', 'monospace'],
-          },
-          colors: {
-            brand: {
-              50: '#fff7ed',
-              100: '#ffedd5',
-              500: '#f97316',
-              600: '#ea580c',
-              700: '#c2410c',
-              900: '#7c2d12',
-            }
-          }
-        }
-      }
-    }
-  </script>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Vanguarch Tunnel — Premium Desktop GUI for Cloudflared</title>
+        <!-- SEO Meta Tags -->
+        <meta
+            name="description"
+            content="A stable, predictable, and beautiful UI wrapper for cloudflared. Manage Cloudflare Tunnels, inspect HTTP requests, and analyze local project traffic with ease."
+        />
+        <meta
+            name="keywords"
+            content="cloudflare tunnel, cloudflared, argo tunnel, ngrok alternative, web inspector, local development, dashboard"
+        />
 
-  <style>
-    body {
-      background-color: #030303;
-      color: #fafafa;
-      position: relative;
-    }
-    
-    /* Next.js-inspired Grid Background overlay */
-    .grid-bg {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      background-image: 
-        radial-gradient(circle at 50% -10%, rgba(249, 115, 22, 0.15) 0%, transparent 55%),
-        linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
-      background-size: 100% 100%, 40px 40px, 40px 40px;
-      pointer-events: none;
-      z-index: -10;
-    }
-    
-    .glow-effect {
-      position: relative;
-    }
-    .glow-effect::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 50% 50%, rgba(249, 115, 22, 0.08) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: -1;
-    }
-    
+        <!-- Fonts & Tailwind -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700;800;900&family=Fira+Code:wght@400;500&display=swap"
+            rel="stylesheet"
+        />
+        <script src="https://cdn.tailwindcss.com"></script>
+        <!-- Motion One library via CDN -->
+        <script src="https://cdn.jsdelivr.net/npm/motion@11.11.13/dist/motion.js"></script>
+
+        <script>
+            document.documentElement.classList.add("js-enabled");
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            sans: ["Inter", "sans-serif"],
+                            display: ["Outfit", "sans-serif"],
+                            mono: ["Fira Code", "monospace"],
+                        },
+                        colors: {
+                            brand: {
+                                50: "#fff7ed",
+                                100: "#ffedd5",
+                                500: "#f97316",
+                                600: "#ea580c",
+                                700: "#c2410c",
+                                900: "#7c2d12",
+                            },
+                        },
+                    },
+                },
+            };
+        </script>
+
+        <style>
+            body {
+                background-color: #030303;
+                color: #fafafa;
+                position: relative;
+            }
+
+            /* Next.js-inspired Grid Background overlay */
+            .grid-bg {
+                position: absolute;
+                inset: 0;
+                width: 100%;
+                height: 100%;
+                background-image:
+                    radial-gradient(
+                        circle at 50% -10%,
+                        rgba(249, 115, 22, 0.15) 0%,
+                        transparent 55%
+                    ),
+                    linear-gradient(
+                        rgba(255, 255, 255, 0.015) 1px,
+                        transparent 1px
+                    ),
+                    linear-gradient(
+                        90deg,
+                        rgba(255, 255, 255, 0.015) 1px,
+                        transparent 1px
+                    );
+                background-size:
+                    100% 100%,
+                    40px 40px,
+                    40px 40px;
+                pointer-events: none;
+                z-index: -10;
+            }
+
+            /* Mouse-following spotlight glow */
+            .cursor-glow {
+                position: fixed;
+                width: 600px;
+                height: 600px;
+                border-radius: 50%;
+                background: radial-gradient(
+                    circle,
+                    rgba(249, 115, 22, 0.06) 0%,
+                    transparent 70%
+                );
+                pointer-events: none;
+                z-index: -5;
+                transform: translate(-50%, -50%);
+                transition: opacity 0.3s ease;
+                opacity: 0;
+            }
+            .cursor-glow.active {
+                opacity: 1;
+            }
+
+            /* Scroll progress bar */
+            .scroll-progress {
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 2px;
+                background: linear-gradient(90deg, #f97316, #fbbf24, #f97316);
+                background-size: 200% 100%;
+                animation: progress-shimmer 2s linear infinite;
+                z-index: 100;
+                transform-origin: left;
+                transform: scaleX(0);
+            }
+            @keyframes progress-shimmer {
+                0% {
+                    background-position: 200% 0;
+                }
+                100% {
+                    background-position: -200% 0;
+                }
+            }
+
+            /* Gradient shimmer text animation */
+            @keyframes text-shimmer {
+                0% {
+                    background-position: 0% 50%;
+                }
+                50% {
+                    background-position: 100% 50%;
+                }
+                100% {
+                    background-position: 0% 50%;
+                }
+            }
+            .text-shimmer {
+                background-size: 200% auto;
+                animation: text-shimmer 4s ease-in-out infinite;
+            }
+
+            /* Marquee auto-scroll for screenshot strip */
+            .marquee-track {
+                display: flex;
+                gap: 20px;
+                animation: marquee-scroll 40s linear infinite;
+            }
+            .marquee-track:hover {
+                animation-play-state: paused;
+            }
+            @keyframes marquee-scroll {
+                0% {
+                    transform: translateX(0);
+                }
+                100% {
+                    transform: translateX(-50%);
+                }
+            }
+
+            /* Staggered checklist item animation */
+            .checklist-item {
+                opacity: 0;
+                transform: translateX(-15px);
+            }
+            .checklist-item.visible {
+                opacity: 1;
+                transform: translateX(0);
+                transition:
+                    opacity 0.5s ease,
+                    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+
+            /* Header hide/show on scroll */
+            .header-hidden {
+                transform: translateY(-100%);
+            }
+            header {
+                transition:
+                    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                    background-color 0.3s ease,
+                    border-color 0.3s ease;
+            }
+
+            /* Glow effect */
+            .glow-effect {
+                position: relative;
+            }
+            .glow-effect::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: radial-gradient(
+                    circle at 50% 50%,
+                    rgba(249, 115, 22, 0.08) 0%,
+                    transparent 70%
+                );
+                pointer-events: none;
+                z-index: -1;
+            }
+
     /* Avoid Flash of Unstyled Content by hiding elements initially if JS is active */
     .js-enabled #hero-title,
     .js-enabled #hero-desc,
@@ -83,816 +213,2029 @@
     .js-enabled #hero-pipeline,
     .js-enabled .feature-card,
     .js-enabled .inspector-text,
-    .js-enabled .inspector-mockup {
+    .js-enabled .inspector-mockup,
+    .js-enabled .checklist-item {
       opacity: 0;
     }
-    
-    /* GPU accelerated transition for feature cards hover */
-    .feature-card {
-      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease;
-    }
-    .feature-card:hover {
-      transform: translateY(-4px) scale(1.015);
-      border-color: rgba(249, 115, 22, 0.4) !important;
-      box-shadow: 0 12px 30px -10px rgba(249, 115, 22, 0.12);
-    }
 
-    /* 3D Perspective Tilted Screenshot Cards */
-    .perspective-1000 {
-      perspective: 1000px;
-    }
-    .tilted-card {
-      transform: rotateY(-12deg) rotateX(8deg) rotateZ(-1.5deg);
-      box-shadow: -15px 15px 40px rgba(0, 0, 0, 0.7), 0 0 30px rgba(249, 115, 22, 0.03);
-      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s ease;
-    }
-    .tilted-card:hover {
-      transform: rotateY(-3deg) rotateX(2deg) rotateZ(0deg) scale(1.03);
-      box-shadow: -5px 5px 20px rgba(0, 0, 0, 0.85), 0 0 40px rgba(249, 115, 22, 0.08);
-    }
+            /* GPU accelerated transition for feature cards hover */
+            .feature-card {
+                transition:
+                    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                    border-color 0.3s ease,
+                    box-shadow 0.3s ease;
+            }
+            .feature-card:hover {
+                transform: translateY(-4px) scale(1.015);
+                border-color: rgba(249, 115, 22, 0.4) !important;
+                box-shadow: 0 12px 30px -10px rgba(249, 115, 22, 0.12);
+            }
 
-    /* Glowing flow line keyframes */
-    @keyframes flow-dash {
-      to { stroke-dashoffset: -200; }
-    }
-    .animate-flow-line {
-      animation: flow-dash 3s linear infinite;
-    }
-    /* Particle dot along path */
-    @keyframes particle-move {
-      0%   { offset-distance: 0%;   opacity: 0; }
-      5%   { opacity: 1; }
-      95%  { opacity: 1; }
-      100% { offset-distance: 100%; opacity: 0; }
-    }
-    .particle {
-      position: absolute;
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #f97316;
-      box-shadow: 0 0 8px 3px rgba(249, 115, 22, 0.7);
-      animation: particle-move linear infinite;
-      offset-rotate: 0deg;
-      pointer-events: none;
-    }
-    /* Node pulse ring */
-    @keyframes ping-ring {
-      0%   { transform: scale(1); opacity: 0.6; }
-      100% { transform: scale(1.9); opacity: 0; }
-    }
-    .node-ping {
-      animation: ping-ring 2s cubic-bezier(0, 0, 0.2, 1) infinite;
-    }
-  </style>
-</head>
-<body class="font-sans antialiased overflow-x-hidden selection:bg-brand-500/30 selection:text-brand-100">
-  <div class="grid-bg"></div>
+            /* 3D Perspective Tilted Screenshot Cards */
+            .perspective-1000 {
+                perspective: 1000px;
+            }
+            .tilted-card {
+                transform: rotateY(-12deg) rotateX(8deg) rotateZ(-1.5deg);
+                box-shadow:
+                    -15px 15px 40px rgba(0, 0, 0, 0.7),
+                    0 0 30px rgba(249, 115, 22, 0.03);
+                transition:
+                    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                    box-shadow 0.6s ease;
+            }
+            .tilted-card:hover {
+                transform: rotateY(-3deg) rotateX(2deg) rotateZ(0deg)
+                    scale(1.03);
+                box-shadow:
+                    -5px 5px 20px rgba(0, 0, 0, 0.85),
+                    0 0 40px rgba(249, 115, 22, 0.08);
+            }
 
-  <!-- Header -->
-  <header class="sticky top-0 z-40 bg-[#030303]/90 backdrop-blur-xl border-b border-zinc-900">
-    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <img src="logo.png" alt="Vanguarch Logo" class="w-8 h-8 object-contain">
-        <span class="font-display font-extrabold text-lg tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-zinc-400">Vanguarch</span>
-      </div>
-      <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-400">
-        <a href="#features" class="hover:text-brand-500 transition-colors">Features</a>
-        <a href="#inspector" class="hover:text-brand-500 transition-colors">Web Inspector</a>
-        <a href="#getting-started" class="hover:text-brand-500 transition-colors">Get Started</a>
-      </nav>
-      <div class="flex items-center gap-4">
-        <a href="https://github.com/khoirulaksara/vanguarch-tunnel" target="_blank" rel="noopener noreferrer" class="text-zinc-400 hover:text-white transition-colors">
-          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.464-1.11-1.464-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.579.688.481C19.137 20.162 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
-        </a>
-        <a href="#download" class="px-4 py-2 bg-white text-black font-display font-semibold text-xs uppercase tracking-wider rounded-lg hover:bg-zinc-200 transition-all">Download</a>
-      </div>
-    </div>
-  </header>
+            /* Glowing flow line keyframes */
+            @keyframes flow-dash {
+                to {
+                    stroke-dashoffset: -200;
+                }
+            }
+            .animate-flow-line {
+                animation: flow-dash 3s linear infinite;
+            }
+            /* Particle dot along path */
+            @keyframes particle-move {
+                0% {
+                    offset-distance: 0%;
+                    opacity: 0;
+                }
+                5% {
+                    opacity: 1;
+                }
+                95% {
+                    opacity: 1;
+                }
+                100% {
+                    offset-distance: 100%;
+                    opacity: 0;
+                }
+            }
+            .particle {
+                position: absolute;
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+                background: #f97316;
+                box-shadow: 0 0 8px 3px rgba(249, 115, 22, 0.7);
+                animation: particle-move linear infinite;
+                offset-rotate: 0deg;
+                pointer-events: none;
+            }
+            /* Node pulse ring */
+            @keyframes ping-ring {
+                0% {
+                    transform: scale(1);
+                    opacity: 0.6;
+                }
+                100% {
+                    transform: scale(1.9);
+                    opacity: 0;
+                }
+            }
+            .node-ping {
+                animation: ping-ring 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+            }
 
-  <!-- Hero Section -->
-  <section class="relative pt-20 pb-24 overflow-hidden glow-effect">
-    <div class="max-w-6xl mx-auto px-6 text-center">
-      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-500 text-xs font-semibold mb-8 tracking-wide">
-        <span class="w-2 h-2 bg-brand-500 rounded-full animate-pulse"></span>
-        Introducing Version 2.4.0 — Codename Archangel
-      </div>
-      
-      <h1 id="hero-title" class="font-display font-black text-5xl md:text-7xl tracking-tight max-w-4xl mx-auto leading-[1.05] mb-6">
-        Expose your local servers to the world with <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-500 to-amber-400">unparalleled elegance</span>
-      </h1>
-      
-      <p id="hero-desc" class="text-zinc-400 text-lg md:text-xl max-w-2xl mx-auto font-light leading-relaxed mb-12">
-        Vanguarch is a fast, predictable, and gorgeous desktop GUI wrapper for <code class="font-mono text-zinc-300 bg-zinc-800/50 px-1.5 py-0.5 rounded">cloudflared</code>. Expose ports, inspect webhooks, and monitor analytics with zero CLI headache.
-      </p>
+            /* Badge pulse ring */
+            @keyframes badge-ring {
+                0% {
+                    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4);
+                }
+                70% {
+                    box-shadow: 0 0 0 8px rgba(249, 115, 22, 0);
+                }
+                100% {
+                    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0);
+                }
+            }
+            .badge-pulse {
+                animation: badge-ring 2s ease-out infinite;
+            }
+        </style>
+    </head>
+    <body
+        class="font-sans antialiased overflow-x-hidden selection:bg-brand-500/30 selection:text-brand-100"
+    >
+        <div class="grid-bg"></div>
+        <div class="cursor-glow" id="cursor-glow"></div>
+        <div class="scroll-progress" id="scroll-progress"></div>
 
-      <div id="hero-downloads" class="flex flex-col items-center justify-center gap-4 max-w-md mx-auto mb-16">
-        <a id="download-btn" href="https://github.com/khoirulaksara/vanguarch-tunnel/releases/latest" class="w-full sm:w-auto px-10 py-4 bg-brand-500 text-white font-display font-bold text-sm uppercase tracking-wider rounded-xl hover:bg-brand-600 shadow-lg shadow-brand-500/25 transition-all text-center flex items-center justify-center gap-2">
-          <span>Detecting OS...</span>
-        </a>
-        <a href="https://github.com/khoirulaksara/vanguarch-tunnel/releases/latest" class="text-zinc-500 hover:text-zinc-300 text-xs transition-colors underline underline-offset-4">
-          All releases & platforms
-        </a>
-      </div>
-      
-      <!-- Line-Powered SVG Connection Pipeline -->
-      <div id="hero-pipeline" class="relative max-w-5xl mx-auto my-16">
-        <!-- Label -->
-        <div class="text-center mb-6">
-          <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-500 text-[11px] font-medium">
-            <span class="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse"></span>
-            How it works
-          </span>
-        </div>
-
-        <!-- Pipeline Canvas Container -->
-        <div class="relative bg-zinc-950/30 border border-zinc-900/60 rounded-2xl p-8 backdrop-blur-sm overflow-hidden">
-          <!-- SVG Layer - paths + animated particles -->
-          <svg id="pipeline-svg" class="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
-            <defs>
-              <linearGradient id="pipe-grad-1" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="rgba(249,115,22,0)" />
-                <stop offset="40%" stop-color="rgba(249,115,22,0.6)" />
-                <stop offset="100%" stop-color="rgba(251,191,36,0.3)" />
-              </linearGradient>
-              <linearGradient id="pipe-grad-2" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="rgba(251,191,36,0.3)" />
-                <stop offset="60%" stop-color="rgba(249,115,22,0.6)" />
-                <stop offset="100%" stop-color="rgba(249,115,22,0)" />
-              </linearGradient>
-              <filter id="glow">
-                <feGaussianBlur stdDeviation="3" result="blur" />
-                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-              </filter>
-            </defs>
-
-            <!-- Base dim connection lines (drawn by JS) -->
-            <g id="pipe-base-lines"></g>
-            <!-- Animated glow lines (drawn by JS) -->
-            <g id="pipe-glow-lines"></g>
-            <!-- Moving particles (drawn by JS) -->
-            <g id="pipe-particles"></g>
-          </svg>
-
-          <!-- Nodes Grid -->
-          <div id="pipeline-nodes" class="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-6">
-
-            <!-- Node 1: Local Port -->
-            <div class="pipeline-node flex flex-col items-center" data-node="0">
-              <div class="relative">
-                <div class="node-ping absolute inset-0 rounded-full bg-orange-500/30"></div>
-                <div class="relative w-14 h-14 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center font-mono text-brand-500 text-sm font-bold shadow-lg shadow-orange-500/5">
-                  :3000
+        <!-- Header -->
+        <header
+            id="main-header"
+            class="sticky top-0 z-40 bg-[#030303]/90 backdrop-blur-xl border-b border-zinc-900"
+        >
+            <div
+                class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between"
+            >
+                <div class="flex items-center gap-3">
+                    <img
+                        src="logo.png"
+                        alt="Vanguarch Logo"
+                        class="w-8 h-8 object-contain"
+                    />
+                    <span
+                        class="font-display font-extrabold text-lg tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-zinc-400"
+                        >Vanguarch</span
+                    >
                 </div>
-              </div>
-              <span class="text-xs text-zinc-300 font-semibold mt-3">Local Server</span>
-              <span class="text-[10px] text-zinc-600 font-mono mt-0.5">localhost:3000</span>
-            </div>
-
-            <!-- Node 2: Vanguarch GUI -->
-            <div class="pipeline-node flex flex-col items-center" data-node="1">
-              <div class="relative">
-                <div class="node-ping absolute inset-0 rounded-full bg-orange-500/20" style="animation-delay:0.5s"></div>
-                <div class="relative w-14 h-14 rounded-2xl bg-zinc-900 border-2 border-orange-500/40 flex items-center justify-center shadow-lg shadow-orange-500/15 ring-1 ring-orange-500/10">
-                  <img src="logo.png" alt="Vanguarch" class="w-7 h-7 object-contain">
+                <nav
+                    class="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-400"
+                >
+                    <a
+                        href="#features"
+                        class="hover:text-brand-500 transition-colors"
+                        >Features</a
+                    >
+                    <a
+                        href="#inspector"
+                        class="hover:text-brand-500 transition-colors"
+                        >Web Inspector</a
+                    >
+                    <a
+                        href="#getting-started"
+                        class="hover:text-brand-500 transition-colors"
+                        >Get Started</a
+                    >
+                </nav>
+                <div class="flex items-center gap-4">
+                    <a
+                        href="https://github.com/khoirulaksara/vanguarch-tunnel"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="text-zinc-400 hover:text-white transition-colors"
+                    >
+                        <svg
+                            class="w-5 h-5"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                fill-rule="evenodd"
+                                clip-rule="evenodd"
+                                d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.464-1.11-1.464-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.579.688.481C19.137 20.162 22 16.418 22 12c0-5.523-4.477-10-10-10z"
+                            />
+                        </svg>
+                    </a>
+                    <a
+                        href="#download"
+                        class="px-4 py-2 bg-white text-black font-display font-semibold text-xs uppercase tracking-wider rounded-lg hover:bg-zinc-200 transition-all"
+                        >Download</a
+                    >
                 </div>
-              </div>
-              <span class="text-xs text-white font-bold mt-3">Vanguarch</span>
-              <span class="text-[10px] text-brand-500 font-mono mt-0.5">GUI Wrapper</span>
             </div>
+        </header>
 
-            <!-- Node 3: Cloudflare Edge -->
-            <div class="pipeline-node flex flex-col items-center" data-node="2">
-              <div class="relative">
-                <div class="node-ping absolute inset-0 rounded-full bg-blue-500/20" style="animation-delay:1s"></div>
-                <div class="relative w-14 h-14 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-2xl shadow-lg">
-                  ☁️
+        <!-- Hero Section -->
+        <section class="relative pt-20 pb-24 overflow-hidden glow-effect">
+            <div class="max-w-6xl mx-auto px-6 text-center">
+                <div
+                    class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-500 text-xs font-semibold mb-8 tracking-wide badge-pulse"
+                >
+                    <span
+                        class="w-2 h-2 bg-brand-500 rounded-full animate-pulse"
+                    ></span>
+                    Introducing Version 2.4.0 — Codename Archangel
                 </div>
-              </div>
-              <span class="text-xs text-zinc-300 font-semibold mt-3">Cloudflare Edge</span>
-              <span class="text-[10px] text-zinc-600 font-mono mt-0.5">Argo Routing</span>
-            </div>
 
-            <!-- Node 4: Public Domain -->
-            <div class="pipeline-node flex flex-col items-center" data-node="3">
-              <div class="relative">
-                <div class="node-ping absolute inset-0 rounded-full bg-green-500/20" style="animation-delay:1.5s"></div>
-                <div class="relative w-14 h-14 rounded-2xl bg-zinc-900 border border-green-500/30 flex items-center justify-center text-2xl shadow-lg shadow-green-500/5">
-                  🌐
+                <h1
+                    id="hero-title"
+                    class="font-display font-black text-5xl md:text-7xl tracking-tight max-w-4xl mx-auto leading-[1.05] mb-6"
+                >
+                    Expose your local servers to the world with
+                    <span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-brand-500 via-amber-300 to-brand-500 text-shimmer"
+                        >unparalleled elegance</span
+                    >
+                </h1>
+
+                <p
+                    id="hero-desc"
+                    class="text-zinc-400 text-lg md:text-xl max-w-2xl mx-auto font-light leading-relaxed mb-12"
+                >
+                    Vanguarch is a fast, predictable, and gorgeous desktop GUI
+                    wrapper for
+                    <code
+                        class="font-mono text-zinc-300 bg-zinc-800/50 px-1.5 py-0.5 rounded"
+                        >cloudflared</code
+                    >. Expose ports, inspect webhooks, and monitor analytics
+                    with zero CLI headache.
+                </p>
+
+                <div
+                    id="hero-downloads"
+                    class="flex flex-col items-center justify-center gap-4 max-w-md mx-auto mb-16"
+                >
+                    <a
+                        id="download-btn"
+                        href="https://github.com/khoirulaksara/vanguarch-tunnel/releases/latest"
+                        class="w-full sm:w-auto px-10 py-4 bg-brand-500 text-white font-display font-bold text-sm uppercase tracking-wider rounded-xl hover:bg-brand-600 shadow-lg shadow-brand-500/25 transition-all text-center flex items-center justify-center gap-2"
+                    >
+                        <span>Detecting OS...</span>
+                    </a>
+                    <a
+                        href="https://github.com/khoirulaksara/vanguarch-tunnel/releases/latest"
+                        class="text-zinc-500 hover:text-zinc-300 text-xs transition-colors underline underline-offset-4"
+                    >
+                        All releases & platforms
+                    </a>
                 </div>
-              </div>
-              <span class="text-xs text-zinc-300 font-semibold mt-3">Public URL</span>
-              <span class="text-[10px] text-green-500/70 font-mono mt-0.5">yourapp.com</span>
+
+                <!-- Line-Powered SVG Connection Pipeline -->
+                <div
+                    id="hero-pipeline"
+                    class="relative max-w-5xl mx-auto my-16"
+                >
+                    <!-- Label -->
+                    <div class="text-center mb-6">
+                        <span
+                            class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-500 text-[11px] font-medium"
+                        >
+                            <span
+                                class="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse"
+                            ></span>
+                            How it works
+                        </span>
+                    </div>
+
+                    <!-- Pipeline Canvas Container -->
+                    <div
+                        class="relative bg-zinc-950/30 border border-zinc-900/60 rounded-2xl p-8 backdrop-blur-sm overflow-hidden"
+                    >
+                        <!-- SVG Layer - paths + animated particles -->
+                        <svg
+                            id="pipeline-svg"
+                            class="absolute inset-0 w-full h-full"
+                            xmlns="http://www.w3.org/2000/svg"
+                            preserveAspectRatio="xMidYMid meet"
+                        >
+                            <defs>
+                                <linearGradient
+                                    id="pipe-grad-1"
+                                    x1="0%"
+                                    y1="0%"
+                                    x2="100%"
+                                    y2="0%"
+                                >
+                                    <stop
+                                        offset="0%"
+                                        stop-color="rgba(249,115,22,0)"
+                                    />
+                                    <stop
+                                        offset="40%"
+                                        stop-color="rgba(249,115,22,0.6)"
+                                    />
+                                    <stop
+                                        offset="100%"
+                                        stop-color="rgba(251,191,36,0.3)"
+                                    />
+                                </linearGradient>
+                                <linearGradient
+                                    id="pipe-grad-2"
+                                    x1="0%"
+                                    y1="0%"
+                                    x2="100%"
+                                    y2="0%"
+                                >
+                                    <stop
+                                        offset="0%"
+                                        stop-color="rgba(251,191,36,0.3)"
+                                    />
+                                    <stop
+                                        offset="60%"
+                                        stop-color="rgba(249,115,22,0.6)"
+                                    />
+                                    <stop
+                                        offset="100%"
+                                        stop-color="rgba(249,115,22,0)"
+                                    />
+                                </linearGradient>
+                                <linearGradient
+                                    id="pipe-grad-local"
+                                    x1="0%"
+                                    y1="0%"
+                                    x2="100%"
+                                    y2="0%"
+                                >
+                                    <stop
+                                        offset="0%"
+                                        stop-color="rgba(249,115,22,0.2)"
+                                    />
+                                    <stop
+                                        offset="50%"
+                                        stop-color="rgba(249,115,22,0.7)"
+                                    />
+                                    <stop
+                                        offset="100%"
+                                        stop-color="rgba(249,115,22,0.2)"
+                                    />
+                                </linearGradient>
+                                <filter id="glow">
+                                    <feGaussianBlur
+                                        stdDeviation="3"
+                                        result="blur"
+                                    />
+                                    <feMerge>
+                                        <feMergeNode in="blur" />
+                                        <feMergeNode in="SourceGraphic" />
+                                    </feMerge>
+                                </filter>
+                            </defs>
+
+                            <!-- Base dim connection lines (drawn by JS) -->
+                            <g id="pipe-base-lines"></g>
+                            <!-- Animated glow lines (drawn by JS) -->
+                            <g id="pipe-glow-lines"></g>
+                            <!-- Moving particles (drawn by JS) -->
+                            <g id="pipe-particles"></g>
+                        </svg>
+
+                        <!-- Nodes Grid -->
+                        <div
+                            id="pipeline-nodes"
+                            class="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-6"
+                        >
+                            <!-- Node 1: Local Port -->
+                            <div
+                                class="pipeline-node flex flex-col items-center"
+                                data-node="0"
+                            >
+                                <div class="relative">
+                                    <div
+                                        class="node-ping absolute inset-0 rounded-full bg-orange-500/30"
+                                    ></div>
+                                    <div
+                                        class="relative w-14 h-14 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center font-mono text-brand-500 text-sm font-bold shadow-lg shadow-orange-500/5"
+                                    >
+                                        :3000
+                                    </div>
+                                </div>
+                                <span
+                                    class="text-xs text-zinc-300 font-semibold mt-3"
+                                    >Local Server</span
+                                >
+                                <span
+                                    class="text-[10px] text-zinc-600 font-mono mt-0.5"
+                                    >localhost:3000</span
+                                >
+                            </div>
+
+                            <!-- Node 2: Vanguarch GUI -->
+                            <div
+                                class="pipeline-node flex flex-col items-center"
+                                data-node="1"
+                            >
+                                <div class="relative">
+                                    <div
+                                        class="node-ping absolute inset-0 rounded-full bg-orange-500/20"
+                                        style="animation-delay: 0.5s"
+                                    ></div>
+                                    <div
+                                        class="relative w-14 h-14 rounded-2xl bg-zinc-900 border-2 border-orange-500/40 flex items-center justify-center shadow-lg shadow-orange-500/15 ring-1 ring-orange-500/10"
+                                    >
+                                        <img
+                                            src="logo.png"
+                                            alt="Vanguarch"
+                                            class="w-7 h-7 object-contain"
+                                        />
+                                    </div>
+                                </div>
+                                <span class="text-xs text-white font-bold mt-3"
+                                    >Vanguarch</span
+                                >
+                                <span
+                                    class="text-[10px] text-brand-500 font-mono mt-0.5"
+                                    >GUI Wrapper</span
+                                >
+                            </div>
+
+                            <!-- Node 3: Cloudflare Edge -->
+                            <div
+                                class="pipeline-node flex flex-col items-center"
+                                data-node="2"
+                            >
+                                <div class="relative">
+                                    <div
+                                        class="node-ping absolute inset-0 rounded-full bg-blue-500/20"
+                                        style="animation-delay: 1s"
+                                    ></div>
+                                    <div
+                                        class="relative w-14 h-14 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-2xl shadow-lg"
+                                    >
+                                        <svg class="w-7 h-7 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.25 15a4.5 4.5 0 004.5 4.5H18a3.75 3.75 0 001.332-7.257 3 3 0 00-3.758-3.848 5.25 5.25 0 00-10.233 2.33A4.502 4.502 0 002.25 15z"/></svg>
+                                    </div>
+                                </div>
+                                <span
+                                    class="text-xs text-zinc-300 font-semibold mt-3"
+                                    >Cloudflare Edge</span
+                                >
+                                <span
+                                    class="text-[10px] text-zinc-600 font-mono mt-0.5"
+                                    >Argo Routing</span
+                                >
+                            </div>
+
+                            <!-- Node 4: Public Domain -->
+                            <div
+                                class="pipeline-node flex flex-col items-center"
+                                data-node="3"
+                            >
+                                <div class="relative">
+                                    <div
+                                        class="node-ping absolute inset-0 rounded-full bg-green-500/20"
+                                        style="animation-delay: 1.5s"
+                                    ></div>
+                                    <div
+                                        class="relative w-14 h-14 rounded-2xl bg-zinc-900 border border-green-500/30 flex items-center justify-center text-2xl shadow-lg shadow-green-500/5"
+                                    >
+                                        <svg class="w-7 h-7 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418"/></svg>
+                                    </div>
+                                </div>
+                                <span
+                                    class="text-xs text-zinc-300 font-semibold mt-3"
+                                    >Public URL</span
+                                >
+                                <span
+                                    class="text-[10px] text-green-500/70 font-mono mt-0.5"
+                                    >yourapp.com</span
+                                >
+                            </div>
+                        </div>
+                        <!-- /nodes grid -->
+                    </div>
+                    <!-- /pipeline canvas -->
+                </div>
+
+                <!-- Interactive App Mockup / Feature Showcase -->
+                <div
+                    id="hero-mockup"
+                    class="relative max-w-6xl mx-auto rounded-2xl border border-zinc-800 bg-zinc-950/80 p-3 shadow-2xl shadow-brand-500/5 text-left"
+                >
+                    <div
+                        class="absolute inset-0 bg-gradient-to-b from-brand-500/10 to-transparent blur-2xl opacity-30 -z-10 rounded-2xl"
+                    ></div>
+
+                    <!-- Desktop Window Titlebar -->
+                    <div
+                        class="flex items-center justify-between border-b border-zinc-800/80 pb-3 mb-4 px-3 select-none"
+                    >
+                        <div class="flex items-center gap-2">
+                            <div
+                                class="w-3 h-3 rounded-full bg-red-500/80 hover:bg-red-500 transition-colors cursor-pointer"
+                            ></div>
+                            <div
+                                class="w-3 h-3 rounded-full bg-yellow-500/80 hover:bg-yellow-500 transition-colors cursor-pointer"
+                            ></div>
+                            <div
+                                class="w-3 h-3 rounded-full bg-green-500/80 hover:bg-green-500 transition-colors cursor-pointer"
+                            ></div>
+                            <span
+                                class="text-xs text-zinc-500 font-mono ml-4 select-none"
+                                >vanguarch-tunnel-gui</span
+                            >
+                        </div>
+                        <div
+                            class="flex items-center gap-1.5 px-3 py-1 bg-zinc-900 border border-zinc-800/60 rounded-lg text-[11px] text-zinc-400 font-mono select-none w-48 justify-center"
+                        >
+                            <span
+                                class="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse"
+                            ></span>
+                            <span>127.0.0.1:4040</span>
+                        </div>
+                        <div class="w-16"></div>
+                        <!-- spacer -->
+                    </div>
+
+                    <!-- Interactive Grid Layout -->
+                    <div
+                        class="grid grid-cols-1 lg:grid-cols-4 gap-6 p-2 min-h-[480px]"
+                    >
+                        <!-- Sidebar selector (lg: col-span-1, mobile: scrolling list) -->
+                        <div
+                            id="screenshot-tabs"
+                            class="lg:col-span-1 flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-y-auto lg:overflow-x-visible pb-3 lg:pb-0 pr-0 lg:pr-3 lg:max-h-[500px] scrollbar-thin scrollbar-thumb-zinc-800"
+                        >
+                            <button
+                                data-screenshot="public/Screenshot 2026-05-28 170430.png"
+                                data-title="Splash Screen"
+                                data-desc="The application's modern dark-cyberpunk styled startup loading animation and verification splash."
+                                class="tab-btn w-full text-left px-3.5 py-3.5 rounded-xl border border-transparent hover:bg-zinc-900/40 transition-all flex items-center gap-3 shrink-0 lg:shrink select-none"
+                            >
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                </div>
+                                <div class="truncate">
+                                    <div
+                                        class="font-display font-semibold text-zinc-300 text-xs"
+                                    >
+                                        Splash Screen
+                                    </div>
+                                    <div
+                                        class="text-[10px] text-zinc-500 truncate"
+                                    >
+                                        Application startup loading
+                                    </div>
+                                </div>
+                            </button>
+
+                            <button
+                                data-screenshot="public/Screenshot 2026-05-28 170434.png"
+                                data-title="Interactive Dashboard"
+                                data-desc="Overview of active tunnels, real-time request rates, latency health status, and quick control buttons."
+                                class="tab-btn active w-full text-left px-3.5 py-3.5 rounded-xl border border-zinc-800 bg-zinc-900/60 transition-all flex items-center gap-3 shrink-0 lg:shrink select-none"
+                            >
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-orange-500/10 text-brand-500 flex items-center justify-center shrink-0 text-sm"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                                </div>
+                                <div class="truncate">
+                                    <div
+                                        class="font-display font-semibold text-white text-xs"
+                                    >
+                                        Dashboard
+                                    </div>
+                                    <div
+                                        class="text-[10px] text-zinc-400 truncate"
+                                    >
+                                        Active tunnels & overview
+                                    </div>
+                                </div>
+                            </button>
+
+                            <button
+                                data-screenshot="public/Screenshot 2026-05-28 170437.png"
+                                data-title="Manual Tunnel Setup"
+                                data-desc="Expose local ports, configure custom domains, protocol schemes, and inject custom headers manually."
+                                class="tab-btn w-full text-left px-3.5 py-3.5 rounded-xl border border-transparent hover:bg-zinc-900/40 transition-all flex items-center gap-3 shrink-0 lg:shrink select-none"
+                            >
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                </div>
+                                <div class="truncate">
+                                    <div
+                                        class="font-display font-semibold text-zinc-300 text-xs"
+                                    >
+                                        Manual Tunnel
+                                    </div>
+                                    <div
+                                        class="text-[10px] text-zinc-500 truncate"
+                                    >
+                                        Configure local ports
+                                    </div>
+                                </div>
+                            </button>
+
+                            <button
+                                data-screenshot="public/Screenshot 2026-05-28 170440.png"
+                                data-title="Saved Tunnel Presets"
+                                data-desc="Save complex local-to-public mapping configs to run multiple tunnels concurrently with one-click."
+                                class="tab-btn w-full text-left px-3.5 py-3.5 rounded-xl border border-transparent hover:bg-zinc-900/40 transition-all flex items-center gap-3 shrink-0 lg:shrink select-none"
+                            >
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+                                </div>
+                                <div class="truncate">
+                                    <div
+                                        class="font-display font-semibold text-zinc-300 text-xs"
+                                    >
+                                        Tunnel Presets
+                                    </div>
+                                    <div
+                                        class="text-[10px] text-zinc-500 truncate"
+                                    >
+                                        Quick save and restore
+                                    </div>
+                                </div>
+                            </button>
+
+                            <button
+                                data-screenshot="public/Screenshot 2026-05-28 170442.png"
+                                data-title="Projects Auto-Discovery"
+                                data-desc="Scans workspace folders to discover active framework servers like Vite, Next.js, WordPress, and Laravel."
+                                class="tab-btn w-full text-left px-3.5 py-3.5 rounded-xl border border-transparent hover:bg-zinc-900/40 transition-all flex items-center gap-3 shrink-0 lg:shrink select-none"
+                            >
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                                </div>
+                                <div class="truncate">
+                                    <div
+                                        class="font-display font-semibold text-zinc-300 text-xs"
+                                    >
+                                        Auto Discovery
+                                    </div>
+                                    <div
+                                        class="text-[10px] text-zinc-500 truncate"
+                                    >
+                                        Scan local framework ports
+                                    </div>
+                                </div>
+                            </button>
+
+                            <button
+                                data-screenshot="public/Screenshot 2026-05-28 170445.png"
+                                data-title="Cloud Tunnels Manager"
+                                data-desc="Login to Cloudflare API to manage, start, and host persistent cloud-routed tunnels directly within the desktop UI."
+                                class="tab-btn w-full text-left px-3.5 py-3.5 rounded-xl border border-transparent hover:bg-zinc-900/40 transition-all flex items-center gap-3 shrink-0 lg:shrink select-none"
+                            >
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.25 15a4.5 4.5 0 004.5 4.5H18a3.75 3.75 0 001.332-7.257 3 3 0 00-3.758-3.848 5.25 5.25 0 00-10.233 2.33A4.502 4.502 0 002.25 15z"/></svg>
+                                </div>
+                                <div class="truncate">
+                                    <div
+                                        class="font-display font-semibold text-zinc-300 text-xs"
+                                    >
+                                        Cloud Tunnels
+                                    </div>
+                                    <div
+                                        class="text-[10px] text-zinc-500 truncate"
+                                    >
+                                        Cloudflare API credentials
+                                    </div>
+                                </div>
+                            </button>
+
+                            <button
+                                data-screenshot="public/Screenshot 2026-05-28 170448.png"
+                                data-title="Quick Folder Sharing"
+                                data-desc="Spin up an instant filesharing web server on a random port, and expose it instantly over a secure tunnel."
+                                class="tab-btn w-full text-left px-3.5 py-3.5 rounded-xl border border-transparent hover:bg-zinc-900/40 transition-all flex items-center gap-3 shrink-0 lg:shrink select-none"
+                            >
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/></svg>
+                                </div>
+                                <div class="truncate">
+                                    <div
+                                        class="font-display font-semibold text-zinc-300 text-xs"
+                                    >
+                                        Folder Sharing
+                                    </div>
+                                    <div
+                                        class="text-[10px] text-zinc-500 truncate"
+                                    >
+                                        Static web server host
+                                    </div>
+                                </div>
+                            </button>
+
+                            <button
+                                data-screenshot="public/Screenshot 2026-05-28 170450.png"
+                                data-title="Web Request Inspector"
+                                data-desc="Ngrok-style proxy capturing incoming webhook payloads, path headers, and request body with 1-click replay."
+                                class="tab-btn w-full text-left px-3.5 py-3.5 rounded-xl border border-transparent hover:bg-zinc-900/40 transition-all flex items-center gap-3 shrink-0 lg:shrink select-none"
+                            >
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                </div>
+                                <div class="truncate">
+                                    <div
+                                        class="font-display font-semibold text-zinc-300 text-xs"
+                                    >
+                                        Web Inspector
+                                    </div>
+                                    <div
+                                        class="text-[10px] text-zinc-500 truncate"
+                                    >
+                                        Inspect webhook payloads
+                                    </div>
+                                </div>
+                            </button>
+
+                            <button
+                                data-screenshot="public/Screenshot 2026-05-28 170453.png"
+                                data-title="Real-time Traffic Analytics"
+                                data-desc="Analyze request/response success status, throughput rates, and top paths using responsive, modern charts."
+                                class="tab-btn w-full text-left px-3.5 py-3.5 rounded-xl border border-transparent hover:bg-zinc-900/40 transition-all flex items-center gap-3 shrink-0 lg:shrink select-none"
+                            >
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                                </div>
+                                <div class="truncate">
+                                    <div
+                                        class="font-display font-semibold text-zinc-300 text-xs"
+                                    >
+                                        Analytics Graphs
+                                    </div>
+                                    <div
+                                        class="text-[10px] text-zinc-500 truncate"
+                                    >
+                                        Trafik and response metrics
+                                    </div>
+                                </div>
+                            </button>
+
+                            <button
+                                data-screenshot="public/Screenshot 2026-05-28 170456.png"
+                                data-title="Session History"
+                                data-desc="View historical tunnel uptime, public domain history, duration parameters, and timestamp data."
+                                class="tab-btn w-full text-left px-3.5 py-3.5 rounded-xl border border-transparent hover:bg-zinc-900/40 transition-all flex items-center gap-3 shrink-0 lg:shrink select-none"
+                            >
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                </div>
+                                <div class="truncate">
+                                    <div
+                                        class="font-display font-semibold text-zinc-300 text-xs"
+                                    >
+                                        Session History
+                                    </div>
+                                    <div
+                                        class="text-[10px] text-zinc-500 truncate"
+                                    >
+                                        Tunnel session log history
+                                    </div>
+                                </div>
+                            </button>
+
+                            <button
+                                data-screenshot="public/Screenshot 2026-05-28 170459.png"
+                                data-title="App Settings"
+                                data-desc="Manage local paths, configure CLI credentials, and edit system tray preferences."
+                                class="tab-btn w-full text-left px-3.5 py-3.5 rounded-xl border border-transparent hover:bg-zinc-900/40 transition-all flex items-center gap-3 shrink-0 lg:shrink select-none"
+                            >
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                </div>
+                                <div class="truncate">
+                                    <div
+                                        class="font-display font-semibold text-zinc-300 text-xs"
+                                    >
+                                        Settings
+                                    </div>
+                                    <div
+                                        class="text-[10px] text-zinc-500 truncate"
+                                    >
+                                        Manage paths & behaviors
+                                    </div>
+                                </div>
+                            </button>
+
+                            <button
+                                data-screenshot="public/Screenshot 2026-05-28 170502.png"
+                                data-title="About Application"
+                                data-desc="View software version information, active contributors, licensing terms, and repository credits."
+                                class="tab-btn w-full text-left px-3.5 py-3.5 rounded-xl border border-transparent hover:bg-zinc-900/40 transition-all flex items-center gap-3 shrink-0 lg:shrink select-none"
+                            >
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                </div>
+                                <div class="truncate">
+                                    <div
+                                        class="font-display font-semibold text-zinc-300 text-xs"
+                                    >
+                                        About App
+                                    </div>
+                                    <div
+                                        class="text-[10px] text-zinc-500 truncate"
+                                    >
+                                        Software details & MIT info
+                                    </div>
+                                </div>
+                            </button>
+                        </div>
+
+                        <!-- Active screenshot image frame -->
+                        <div
+                            class="lg:col-span-3 relative rounded-xl overflow-hidden border border-zinc-800 bg-[#09090b] aspect-[16/10] group cursor-zoom-in"
+                        >
+                            <!-- Loading indicator background -->
+                            <div
+                                class="absolute inset-0 flex items-center justify-center bg-zinc-950 -z-20"
+                            >
+                                <span
+                                    class="w-6 h-6 border-2 border-brand-500 border-t-transparent rounded-full animate-spin"
+                                ></span>
+                            </div>
+
+                            <img
+                                id="active-screenshot"
+                                src="public/Screenshot 2026-05-28 170434.png"
+                                alt="Active Feature Screenshot"
+                                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.015]"
+                            />
+
+                            <!-- Overlay Info & Action Hint -->
+                            <div
+                                class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-zinc-950 via-zinc-950/85 to-transparent p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+                            >
+                                <div>
+                                    <h4
+                                        id="active-tab-title"
+                                        class="font-display font-bold text-white text-base"
+                                    >
+                                        Interactive Dashboard
+                                    </h4>
+                                    <p
+                                        id="active-tab-desc"
+                                        class="text-xs text-zinc-400 mt-0.5"
+                                    >
+                                        Overview of active tunnels, real-time
+                                        request rates, latency health status,
+                                        and quick control buttons.
+                                    </p>
+                                </div>
+                                <div
+                                    class="self-start sm:self-center px-3 py-1.5 bg-brand-500/10 border border-brand-500/20 rounded-lg text-brand-500 text-xs font-semibold flex items-center gap-1.5 shrink-0 select-none"
+                                >
+                                    <svg
+                                        class="w-3.5 h-3.5"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m4-3H6"
+                                        />
+                                    </svg>
+                                    Click to Zoom
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+        </section>
 
-          </div><!-- /nodes grid -->
-        </div><!-- /pipeline canvas -->
-      </div>
-      
-      <!-- Interactive App Mockup / Feature Showcase -->
-      <div id="hero-mockup" class="relative max-w-6xl mx-auto rounded-2xl border border-zinc-800 bg-zinc-950/80 p-3 shadow-2xl shadow-brand-500/5 text-left">
-        <div class="absolute inset-0 bg-gradient-to-b from-brand-500/10 to-transparent blur-2xl opacity-30 -z-10 rounded-2xl"></div>
-        
-        <!-- Desktop Window Titlebar -->
-        <div class="flex items-center justify-between border-b border-zinc-800/80 pb-3 mb-4 px-3 select-none">
-          <div class="flex items-center gap-2">
-            <div class="w-3 h-3 rounded-full bg-red-500/80 hover:bg-red-500 transition-colors cursor-pointer"></div>
-            <div class="w-3 h-3 rounded-full bg-yellow-500/80 hover:bg-yellow-500 transition-colors cursor-pointer"></div>
-            <div class="w-3 h-3 rounded-full bg-green-500/80 hover:bg-green-500 transition-colors cursor-pointer"></div>
-            <span class="text-xs text-zinc-500 font-mono ml-4 select-none">vanguarch-tunnel-gui</span>
-          </div>
-          <div class="flex items-center gap-1.5 px-3 py-1 bg-zinc-900 border border-zinc-800/60 rounded-lg text-[11px] text-zinc-400 font-mono select-none w-48 justify-center">
-            <span class="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse"></span>
-            <span>127.0.0.1:4040</span>
-          </div>
-          <div class="w-16"></div> <!-- spacer -->
-        </div>
-
-        <!-- Interactive Grid Layout -->
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 p-2 min-h-[480px]">
-          <!-- Sidebar selector (lg: col-span-1, mobile: scrolling list) -->
-          <div id="screenshot-tabs" class="lg:col-span-1 flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-y-auto lg:overflow-x-visible pb-3 lg:pb-0 pr-0 lg:pr-3 lg:max-h-[500px] scrollbar-thin scrollbar-thumb-zinc-800">
-            
-            <button data-screenshot="public/Screenshot 2026-05-28 170430.png" data-title="Splash Screen" data-desc="The application's modern dark-cyberpunk styled startup loading animation and verification splash." class="tab-btn w-full text-left px-3.5 py-3.5 rounded-xl border border-transparent hover:bg-zinc-900/40 transition-all flex items-center gap-3 shrink-0 lg:shrink select-none">
-              <div class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm">
-                🚀
-              </div>
-              <div class="truncate">
-                <div class="font-display font-semibold text-zinc-300 text-xs">Splash Screen</div>
-                <div class="text-[10px] text-zinc-500 truncate">Application startup loading</div>
-              </div>
-            </button>
-
-            <button data-screenshot="public/Screenshot 2026-05-28 170434.png" data-title="Interactive Dashboard" data-desc="Overview of active tunnels, real-time request rates, latency health status, and quick control buttons." class="tab-btn active w-full text-left px-3.5 py-3.5 rounded-xl border border-zinc-800 bg-zinc-900/60 transition-all flex items-center gap-3 shrink-0 lg:shrink select-none">
-              <div class="w-8 h-8 rounded-lg bg-orange-500/10 text-brand-500 flex items-center justify-center shrink-0 text-sm">
-                📊
-              </div>
-              <div class="truncate">
-                <div class="font-display font-semibold text-white text-xs">Dashboard</div>
-                <div class="text-[10px] text-zinc-400 truncate">Active tunnels & overview</div>
-              </div>
-            </button>
-
-            <button data-screenshot="public/Screenshot 2026-05-28 170437.png" data-title="Manual Tunnel Setup" data-desc="Expose local ports, configure custom domains, protocol schemes, and inject custom headers manually." class="tab-btn w-full text-left px-3.5 py-3.5 rounded-xl border border-transparent hover:bg-zinc-900/40 transition-all flex items-center gap-3 shrink-0 lg:shrink select-none">
-              <div class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm">
-                🔌
-              </div>
-              <div class="truncate">
-                <div class="font-display font-semibold text-zinc-300 text-xs">Manual Tunnel</div>
-                <div class="text-[10px] text-zinc-500 truncate">Configure local ports</div>
-              </div>
-            </button>
-
-            <button data-screenshot="public/Screenshot 2026-05-28 170440.png" data-title="Saved Tunnel Presets" data-desc="Save complex local-to-public mapping configs to run multiple tunnels concurrently with one-click." class="tab-btn w-full text-left px-3.5 py-3.5 rounded-xl border border-transparent hover:bg-zinc-900/40 transition-all flex items-center gap-3 shrink-0 lg:shrink select-none">
-              <div class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm">
-                🔖
-              </div>
-              <div class="truncate">
-                <div class="font-display font-semibold text-zinc-300 text-xs">Tunnel Presets</div>
-                <div class="text-[10px] text-zinc-500 truncate">Quick save and restore</div>
-              </div>
-            </button>
-
-            <button data-screenshot="public/Screenshot 2026-05-28 170442.png" data-title="Projects Auto-Discovery" data-desc="Scans workspace folders to discover active framework servers like Vite, Next.js, WordPress, and Laravel." class="tab-btn w-full text-left px-3.5 py-3.5 rounded-xl border border-transparent hover:bg-zinc-900/40 transition-all flex items-center gap-3 shrink-0 lg:shrink select-none">
-              <div class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm">
-                📂
-              </div>
-              <div class="truncate">
-                <div class="font-display font-semibold text-zinc-300 text-xs">Auto Discovery</div>
-                <div class="text-[10px] text-zinc-500 truncate">Scan local framework ports</div>
-              </div>
-            </button>
-
-            <button data-screenshot="public/Screenshot 2026-05-28 170445.png" data-title="Cloud Tunnels Manager" data-desc="Login to Cloudflare API to manage, start, and host persistent cloud-routed tunnels directly within the desktop UI." class="tab-btn w-full text-left px-3.5 py-3.5 rounded-xl border border-transparent hover:bg-zinc-900/40 transition-all flex items-center gap-3 shrink-0 lg:shrink select-none">
-              <div class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm">
-                ☁️
-              </div>
-              <div class="truncate">
-                <div class="font-display font-semibold text-zinc-300 text-xs">Cloud Tunnels</div>
-                <div class="text-[10px] text-zinc-500 truncate">Cloudflare API credentials</div>
-              </div>
-            </button>
-
-            <button data-screenshot="public/Screenshot 2026-05-28 170448.png" data-title="Quick Folder Sharing" data-desc="Spin up an instant filesharing web server on a random port, and expose it instantly over a secure tunnel." class="tab-btn w-full text-left px-3.5 py-3.5 rounded-xl border border-transparent hover:bg-zinc-900/40 transition-all flex items-center gap-3 shrink-0 lg:shrink select-none">
-              <div class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm">
-                ⚡
-              </div>
-              <div class="truncate">
-                <div class="font-display font-semibold text-zinc-300 text-xs">Folder Sharing</div>
-                <div class="text-[10px] text-zinc-500 truncate">Static web server host</div>
-              </div>
-            </button>
-
-            <button data-screenshot="public/Screenshot 2026-05-28 170450.png" data-title="Web Request Inspector" data-desc="Ngrok-style proxy capturing incoming webhook payloads, path headers, and request body with 1-click replay." class="tab-btn w-full text-left px-3.5 py-3.5 rounded-xl border border-transparent hover:bg-zinc-900/40 transition-all flex items-center gap-3 shrink-0 lg:shrink select-none">
-              <div class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm">
-                🔍
-              </div>
-              <div class="truncate">
-                <div class="font-display font-semibold text-zinc-300 text-xs">Web Inspector</div>
-                <div class="text-[10px] text-zinc-500 truncate">Inspect webhook payloads</div>
-              </div>
-            </button>
-
-            <button data-screenshot="public/Screenshot 2026-05-28 170453.png" data-title="Real-time Traffic Analytics" data-desc="Analyze request/response success status, throughput rates, and top paths using responsive, modern charts." class="tab-btn w-full text-left px-3.5 py-3.5 rounded-xl border border-transparent hover:bg-zinc-900/40 transition-all flex items-center gap-3 shrink-0 lg:shrink select-none">
-              <div class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm">
-                📈
-              </div>
-              <div class="truncate">
-                <div class="font-display font-semibold text-zinc-300 text-xs">Analytics Graphs</div>
-                <div class="text-[10px] text-zinc-500 truncate">Trafik and response metrics</div>
-              </div>
-            </button>
-
-            <button data-screenshot="public/Screenshot 2026-05-28 170456.png" data-title="Session History" data-desc="View historical tunnel uptime, public domain history, duration parameters, and timestamp data." class="tab-btn w-full text-left px-3.5 py-3.5 rounded-xl border border-transparent hover:bg-zinc-900/40 transition-all flex items-center gap-3 shrink-0 lg:shrink select-none">
-              <div class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm">
-                📜
-              </div>
-              <div class="truncate">
-                <div class="font-display font-semibold text-zinc-300 text-xs">Session History</div>
-                <div class="text-[10px] text-zinc-500 truncate">Tunnel session log history</div>
-              </div>
-            </button>
-
-            <button data-screenshot="public/Screenshot 2026-05-28 170459.png" data-title="App Settings" data-desc="Manage local paths, configure CLI credentials, and edit system tray preferences." class="tab-btn w-full text-left px-3.5 py-3.5 rounded-xl border border-transparent hover:bg-zinc-900/40 transition-all flex items-center gap-3 shrink-0 lg:shrink select-none">
-              <div class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm">
-                ⚙️
-              </div>
-              <div class="truncate">
-                <div class="font-display font-semibold text-zinc-300 text-xs">Settings</div>
-                <div class="text-[10px] text-zinc-500 truncate">Manage paths & behaviors</div>
-              </div>
-            </button>
-
-            <button data-screenshot="public/Screenshot 2026-05-28 170502.png" data-title="About Application" data-desc="View software version information, active contributors, licensing terms, and repository credits." class="tab-btn w-full text-left px-3.5 py-3.5 rounded-xl border border-transparent hover:bg-zinc-900/40 transition-all flex items-center gap-3 shrink-0 lg:shrink select-none">
-              <div class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm">
-                ℹ️
-              </div>
-              <div class="truncate">
-                <div class="font-display font-semibold text-zinc-300 text-xs">About App</div>
-                <div class="text-[10px] text-zinc-500 truncate">Software details & MIT info</div>
-              </div>
-            </button>
-            
-          </div>
-
-          <!-- Active screenshot image frame -->
-          <div class="lg:col-span-3 relative rounded-xl overflow-hidden border border-zinc-800 bg-[#09090b] aspect-[16/10] group cursor-zoom-in">
-            <!-- Loading indicator background -->
-            <div class="absolute inset-0 flex items-center justify-center bg-zinc-950 -z-20">
-              <span class="w-6 h-6 border-2 border-brand-500 border-t-transparent rounded-full animate-spin"></span>
-            </div>
-            
-            <img id="active-screenshot" src="public/Screenshot 2026-05-28 170434.png" alt="Active Feature Screenshot" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.015]">
-            
-            <!-- Overlay Info & Action Hint -->
-            <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-zinc-950 via-zinc-950/85 to-transparent p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div>
-                <h4 id="active-tab-title" class="font-display font-bold text-white text-base">Interactive Dashboard</h4>
-                <p id="active-tab-desc" class="text-xs text-zinc-400 mt-0.5">Overview of active tunnels, real-time request rates, latency health status, and quick control buttons.</p>
-              </div>
-              <div class="self-start sm:self-center px-3 py-1.5 bg-brand-500/10 border border-brand-500/20 rounded-lg text-brand-500 text-xs font-semibold flex items-center gap-1.5 shrink-0 select-none">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m4-3H6"/></svg>
-                Click to Zoom
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Features Grid -->
-  <section id="features" class="py-24 border-t border-zinc-900 bg-zinc-950/20">
-    <div class="max-w-6xl mx-auto px-6">
+        <!-- Features Grid -->
+        <section
+            id="features"
+            class="py-24 border-t border-zinc-900/50 bg-zinc-950/20"
+        >
+            <div class="max-w-6xl mx-auto px-6">
       <div class="text-center max-w-3xl mx-auto mb-20">
         <h2 class="font-display font-extrabold text-3xl md:text-5xl tracking-tight text-white mb-4">Everything you need for local tunneling</h2>
         <p class="text-zinc-500 text-base">Packed with developer-first utilities that make tunneling smooth, reliable, and observable.</p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <!-- Feature 1 -->
-        <div class="feature-card bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-6 transition-all group">
-          <div class="w-10 h-10 rounded-lg bg-brand-500/10 text-brand-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-          </div>
-          <h3 class="font-display font-bold text-lg text-white mb-2">1-Click Control</h3>
-          <p class="text-zinc-400 text-sm leading-relaxed">Start, stop, and restart tunnels instantly. Presets let you save configurations for different microservices and load them with one click.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Feature 1 -->
+                    <div
+                        class="feature-card bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-6 transition-all group"
+                    >
+                        <div
+                            class="w-10 h-10 rounded-lg bg-brand-500/10 text-brand-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"
+                        >
+                            <svg
+                                class="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M13 10V3L4 14h7v7l9-11h-7z"
+                                />
+                            </svg>
+                        </div>
+                        <h3
+                            class="font-display font-bold text-lg text-white mb-2"
+                        >
+                            1-Click Control
+                        </h3>
+                        <p class="text-zinc-400 text-sm leading-relaxed">
+                            Start, stop, and restart tunnels instantly. Presets
+                            let you save configurations for different
+                            microservices and load them with one click.
+                        </p>
+                    </div>
+
+                    <!-- Feature 2 -->
+                    <div
+                        class="feature-card bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-6 transition-all group"
+                    >
+                        <div
+                            class="w-10 h-10 rounded-lg bg-brand-500/10 text-brand-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"
+                        >
+                            <svg
+                                class="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                                />
+                            </svg>
+                        </div>
+                        <h3
+                            class="font-display font-bold text-lg text-white mb-2"
+                        >
+                            Detailed Analytics
+                        </h3>
+                        <p class="text-zinc-400 text-sm leading-relaxed">
+                            Keep track of HTTP request logs, success/error
+                            distributions, bandwidth rates, and top endpoints
+                            with real-time interactive charts.
+                        </p>
+                    </div>
+
+                    <!-- Feature 3 -->
+                    <div
+                        class="feature-card bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-6 transition-all group"
+                    >
+                        <div
+                            class="w-10 h-10 rounded-lg bg-brand-500/10 text-brand-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"
+                        >
+                            <svg
+                                class="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                                />
+                            </svg>
+                        </div>
+                        <h3
+                            class="font-display font-bold text-lg text-white mb-2"
+                        >
+                            Smart Health Alerts
+                        </h3>
+                        <p class="text-zinc-400 text-sm leading-relaxed">
+                            Get system tray alerts and OS notifications whenever
+                            a tunnel connects, goes offline, or recovers from
+                            outages. Background checks auto-monitor status.
+                        </p>
+                    </div>
+
+                    <!-- Feature 4 -->
+                    <div
+                        class="feature-card bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-6 transition-all group"
+                    >
+                        <div
+                            class="w-10 h-10 rounded-lg bg-brand-500/10 text-brand-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"
+                        >
+                            <svg
+                                class="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"
+                                />
+                            </svg>
+                        </div>
+                        <h3
+                            class="font-display font-bold text-lg text-white mb-2"
+                        >
+                            Projects Auto-Discovery
+                        </h3>
+                        <p class="text-zinc-400 text-sm leading-relaxed">
+                            Let Vanguarch scan your workspace directories and
+                            automatically discover local framework servers
+                            (Vite, WordPress, Laravel, Next.js).
+                        </p>
+                    </div>
+
+                    <!-- Feature 5 -->
+                    <div
+                        class="feature-card bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-6 transition-all group"
+                    >
+                        <div
+                            class="w-10 h-10 rounded-lg bg-brand-500/10 text-brand-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"
+                        >
+                            <svg
+                                class="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M8.684 10.742L19.885 5.142A.5.5 0 0120.5 5.5v13a.5.5 0 01-.615.485L8.684 13.258A1 1 0 018 12v-1.258a1 1 0 01.684-.516zM4 9h2v6H4V9z"
+                                />
+                            </svg>
+                        </div>
+                        <h3
+                            class="font-display font-bold text-lg text-white mb-2"
+                        >
+                            Quick Share Server
+                        </h3>
+                        <p class="text-zinc-400 text-sm leading-relaxed">
+                            Need to share a static folder or directory? Boot up
+                            Vanguarch's integrated file sharing web server and
+                            share files over a tunnel in seconds.
+                        </p>
+                    </div>
+
+                    <!-- Feature 6 -->
+                    <div
+                        class="feature-card bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-6 transition-all group"
+                    >
+                        <div
+                            class="w-10 h-10 rounded-lg bg-brand-500/10 text-brand-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"
+                        >
+                            <svg
+                                class="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                                />
+                            </svg>
+                        </div>
+                        <h3
+                            class="font-display font-bold text-lg text-white mb-2"
+                        >
+                            Robust Process Health
+                        </h3>
+                        <p class="text-zinc-400 text-sm leading-relaxed">
+                            Built-in process watchdog kills orphaned
+                            `cloudflared` instances using system-level calls
+                            (WMIC/pkill) to avoid silent port conflicts.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Web Inspector Spotlight -->
+        <section id="inspector" class="py-24 glow-effect">
+            <div
+                class="max-w-6xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
+            >
+                <div class="inspector-text space-y-6">
+                    <div
+                        class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-brand-500 text-xs font-bold uppercase tracking-wider"
+                    >
+                        Ngrok-style Inspector
+                    </div>
+                    <h2
+                        class="font-display font-black text-4xl md:text-5xl tracking-tight text-white leading-[1.1]"
+                    >
+                        Intercept & Replay Webhooks in Real-time
+                    </h2>
+                    <p class="text-zinc-400 text-base leading-relaxed">
+                        Enable the <strong>Web Inspector Proxy</strong> to
+                        capture incoming HTTP requests. Drill down into query
+                        parameters, body payloads, and headers for both request
+                        and response.
+                    </p>
+                    <ul class="space-y-3 text-zinc-400 text-sm">
+                        <li class="checklist-item flex items-center gap-3">
+                            <svg
+                                class="w-4 h-4 text-brand-500 shrink-0"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M5 13l4 4L19 7"
+                                />
+                            </svg>
+                            1-Click Replay: Resend requests to local backend to
+                            test fixes.
+                        </li>
+                        <li class="checklist-item flex items-center gap-3">
+                            <svg
+                                class="w-4 h-4 text-brand-500 shrink-0"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M5 13l4 4L19 7"
+                                />
+                            </svg>
+                            Edit & Replay: Modify paths, headers, and request
+                            body before replay.
+                        </li>
+                        <li class="checklist-item flex items-center gap-3">
+                            <svg
+                                class="w-4 h-4 text-brand-500 shrink-0"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M5 13l4 4L19 7"
+                                />
+                            </svg>
+                            Auto JSON formatting and copy widgets.
+                        </li>
+                    </ul>
+                </div>
+                <!-- Real Web Inspector Screenshot 3D Tilted Showcase -->
+                <div
+                    class="inspector-mockup perspective-1000 flex items-center justify-center lg:justify-end"
+                >
+                    <div
+                        class="tilted-card max-w-md bg-zinc-950 border border-zinc-800 rounded-xl p-2 shadow-2xl relative overflow-hidden group/card cursor-zoom-in"
+                    >
+                        <!-- macOS Window Titlebar -->
+                        <div
+                            class="flex items-center gap-1.5 border-b border-zinc-800/80 pb-2 mb-2 px-2 select-none"
+                        >
+                            <div
+                                class="w-2.5 h-2.5 rounded-full bg-red-500/60"
+                            ></div>
+                            <div
+                                class="w-2.5 h-2.5 rounded-full bg-yellow-500/60"
+                            ></div>
+                            <div
+                                class="w-2.5 h-2.5 rounded-full bg-green-500/60"
+                            ></div>
+                            <span
+                                class="text-[10px] text-zinc-500 font-mono ml-2"
+                                >Request Inspector</span
+                            >
+                        </div>
+                        <!-- Actual Screenshot Image -->
+                        <img
+                            src="public/Screenshot 2026-05-28 170450.png"
+                            alt="Web Inspector Request Capture"
+                            class="rounded-lg border border-zinc-800 w-full object-cover"
+                        />
+                        <!-- Glass glow border -->
+                        <div
+                            class="absolute inset-0 border border-white/5 rounded-xl pointer-events-none"
+                        ></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Getting Started / Quick Command -->
+        <section
+            id="getting-started"
+            class="py-24 border-t border-zinc-900/50 bg-zinc-950/40"
+        >
+            <div class="gs-inner max-w-4xl mx-auto px-6 text-center">
+                <h2
+                    class="font-display font-extrabold text-3xl md:text-5xl tracking-tight text-white mb-4"
+                >
+                    Launch in seconds
+                </h2>
+                <p
+                    class="text-zinc-400 text-sm md:text-base max-w-lg mx-auto mb-10 leading-relaxed"
+                >
+                    Vanguarch detects your existing `cloudflared` installation
+                    or downloads the latest version automatically from GitHub.
+                </p>
+
+                <!-- Command box -->
+                <div
+                    class="bg-zinc-950 border border-zinc-800 rounded-xl p-4 max-w-lg mx-auto font-mono text-xs flex items-center justify-between text-zinc-300 shadow-xl mb-12"
+                >
+                    <span class="text-zinc-600 select-none">$</span>
+                    <code class="flex-1 text-left pl-3 truncate"
+                        >git clone
+                        https://github.com/khoirulaksara/vanguarch-tunnel.git</code
+                    >
+                    <button
+                        onclick="
+                            navigator.clipboard.writeText(
+                                'git clone https://github.com/khoirulaksara/vanguarch-tunnel.git',
+                            );
+                            alert('Copied to clipboard!');
+                        "
+                        class="p-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded text-[10px] uppercase font-bold text-zinc-400 hover:text-white transition-colors shrink-0"
+                    >
+                        Copy
+                    </button>
+                </div>
+
+                <div
+                    class="text-zinc-500 text-[10px] uppercase tracking-widest font-bold"
+                >
+                    Supported Platforms
+                </div>
+                <div
+                    class="flex items-center justify-center gap-6 mt-4 text-xs text-zinc-400 font-medium"
+                >
+                    <span>Windows (MSI & EXE Setup)</span>
+                    <span class="w-1.5 h-1.5 bg-zinc-800 rounded-full"></span>
+                    <span>macOS (Silicon + Intel)</span>
+                    <span class="w-1.5 h-1.5 bg-zinc-800 rounded-full"></span>
+                    <span>Linux (Ubuntu)</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Floating Screenshot Strip -->
+        <section
+            class="py-20 overflow-hidden border-t border-zinc-900/50 relative"
+        >
+            <div
+                class="absolute inset-0 bg-gradient-to-b from-transparent via-orange-500/3 to-transparent pointer-events-none"
+            ></div>
+            <div class="max-w-6xl mx-auto px-6 mb-12 text-center">
+                <span
+                    class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400 text-xs font-medium mb-4"
+                >
+                    <span
+                        class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"
+                    ></span>
+                    All views available in v2.4.0 Archangel
+                </span>
+                <h2
+                    class="font-display font-black text-3xl md:text-4xl tracking-tight text-white"
+                >
+                    Every view, beautifully designed
+                </h2>
+                <p class="text-zinc-500 text-sm mt-3">
+                    From dashboard to analytics — Vanguarch has a premium dark
+                    UI for every workflow.
+                </p>
+            </div>
+            <!-- Scrolling strip of floating tilted thumbnails -->
+            <div class="overflow-hidden">
+                <div class="marquee-track px-6">
+                    <div class="perspective-1000 shrink-0">
+                        <div
+                            class="tilted-card w-72 bg-zinc-950 border border-zinc-800/80 rounded-xl p-1.5 shadow-2xl cursor-zoom-in strip-card"
+                            data-src="public/Screenshot 2026-05-28 170434.png"
+                            data-caption="Dashboard Overview"
+                        >
+                            <div class="flex gap-1 mb-1 px-1 pt-0.5">
+                                <div
+                                    class="w-2 h-2 rounded-full bg-red-500/50"
+                                ></div>
+                                <div
+                                    class="w-2 h-2 rounded-full bg-yellow-500/50"
+                                ></div>
+                                <div
+                                    class="w-2 h-2 rounded-full bg-green-500/50"
+                                ></div>
+                            </div>
+                            <img
+                                src="public/Screenshot 2026-05-28 170434.png"
+                                alt="Dashboard"
+                                class="rounded-lg w-full"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="perspective-1000 shrink-0 mt-8">
+                        <div
+                            class="tilted-card w-72 bg-zinc-950 border border-zinc-800/80 rounded-xl p-1.5 shadow-2xl cursor-zoom-in strip-card"
+                            data-src="public/Screenshot 2026-05-28 170437.png"
+                            data-caption="Manual Tunnel Setup"
+                        >
+                            <div class="flex gap-1 mb-1 px-1 pt-0.5">
+                                <div
+                                    class="w-2 h-2 rounded-full bg-red-500/50"
+                                ></div>
+                                <div
+                                    class="w-2 h-2 rounded-full bg-yellow-500/50"
+                                ></div>
+                                <div
+                                    class="w-2 h-2 rounded-full bg-green-500/50"
+                                ></div>
+                            </div>
+                            <img
+                                src="public/Screenshot 2026-05-28 170437.png"
+                                alt="Manual Tunnel"
+                                class="rounded-lg w-full"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="perspective-1000 shrink-0">
+                        <div
+                            class="tilted-card w-72 bg-zinc-950 border border-zinc-800/80 rounded-xl p-1.5 shadow-2xl cursor-zoom-in strip-card"
+                            data-src="public/Screenshot 2026-05-28 170442.png"
+                            data-caption="Projects Auto-Discovery"
+                        >
+                            <div class="flex gap-1 mb-1 px-1 pt-0.5">
+                                <div
+                                    class="w-2 h-2 rounded-full bg-red-500/50"
+                                ></div>
+                                <div
+                                    class="w-2 h-2 rounded-full bg-yellow-500/50"
+                                ></div>
+                                <div
+                                    class="w-2 h-2 rounded-full bg-green-500/50"
+                                ></div>
+                            </div>
+                            <img
+                                src="public/Screenshot 2026-05-28 170442.png"
+                                alt="Auto Discovery"
+                                class="rounded-lg w-full"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="perspective-1000 shrink-0 mt-8">
+                        <div
+                            class="tilted-card w-72 bg-zinc-950 border border-zinc-800/80 rounded-xl p-1.5 shadow-2xl cursor-zoom-in strip-card"
+                            data-src="public/Screenshot 2026-05-28 170445.png"
+                            data-caption="Cloud Tunnels Manager"
+                        >
+                            <div class="flex gap-1 mb-1 px-1 pt-0.5">
+                                <div
+                                    class="w-2 h-2 rounded-full bg-red-500/50"
+                                ></div>
+                                <div
+                                    class="w-2 h-2 rounded-full bg-yellow-500/50"
+                                ></div>
+                                <div
+                                    class="w-2 h-2 rounded-full bg-green-500/50"
+                                ></div>
+                            </div>
+                            <img
+                                src="public/Screenshot 2026-05-28 170445.png"
+                                alt="Cloud Tunnels"
+                                class="rounded-lg w-full"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="perspective-1000 shrink-0">
+                        <div
+                            class="tilted-card w-72 bg-zinc-950 border border-zinc-800/80 rounded-xl p-1.5 shadow-2xl cursor-zoom-in strip-card"
+                            data-src="public/Screenshot 2026-05-28 170453.png"
+                            data-caption="Traffic Analytics"
+                        >
+                            <div class="flex gap-1 mb-1 px-1 pt-0.5">
+                                <div
+                                    class="w-2 h-2 rounded-full bg-red-500/50"
+                                ></div>
+                                <div
+                                    class="w-2 h-2 rounded-full bg-yellow-500/50"
+                                ></div>
+                                <div
+                                    class="w-2 h-2 rounded-full bg-green-500/50"
+                                ></div>
+                            </div>
+                            <img
+                                src="public/Screenshot 2026-05-28 170453.png"
+                                alt="Analytics"
+                                class="rounded-lg w-full"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="perspective-1000 shrink-0 mt-8">
+                        <div
+                            class="tilted-card w-72 bg-zinc-950 border border-zinc-800/80 rounded-xl p-1.5 shadow-2xl cursor-zoom-in strip-card"
+                            data-src="public/Screenshot 2026-05-28 170502.png"
+                            data-caption="About App"
+                        >
+                            <div class="flex gap-1 mb-1 px-1 pt-0.5">
+                                <div
+                                    class="w-2 h-2 rounded-full bg-red-500/50"
+                                ></div>
+                                <div
+                                    class="w-2 h-2 rounded-full bg-yellow-500/50"
+                                ></div>
+                                <div
+                                    class="w-2 h-2 rounded-full bg-green-500/50"
+                                ></div>
+                            </div>
+                            <img
+                                src="public/Screenshot 2026-05-28 170502.png"
+                                alt="About"
+                                class="rounded-lg w-full"
+                            />
+                        </div>
+                    </div>
+
+                    <!-- Duplicate set for seamless loop -->
+                    <div class="perspective-1000 shrink-0">
+                        <div
+                            class="tilted-card w-72 bg-zinc-950 border border-zinc-800/80 rounded-xl p-1.5 shadow-2xl cursor-zoom-in strip-card"
+                            data-src="public/Screenshot 2026-05-28 170434.png"
+                            data-caption="Dashboard Overview"
+                        >
+                            <div class="flex gap-1 mb-1 px-1 pt-0.5">
+                                <div
+                                    class="w-2 h-2 rounded-full bg-red-500/50"
+                                ></div>
+                                <div
+                                    class="w-2 h-2 rounded-full bg-yellow-500/50"
+                                ></div>
+                                <div
+                                    class="w-2 h-2 rounded-full bg-green-500/50"
+                                ></div>
+                            </div>
+                            <img
+                                src="public/Screenshot 2026-05-28 170434.png"
+                                alt="Dashboard"
+                                class="rounded-lg w-full"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="perspective-1000 shrink-0 mt-8">
+                        <div
+                            class="tilted-card w-72 bg-zinc-950 border border-zinc-800/80 rounded-xl p-1.5 shadow-2xl cursor-zoom-in strip-card"
+                            data-src="public/Screenshot 2026-05-28 170437.png"
+                            data-caption="Manual Tunnel Setup"
+                        >
+                            <div class="flex gap-1 mb-1 px-1 pt-0.5">
+                                <div
+                                    class="w-2 h-2 rounded-full bg-red-500/50"
+                                ></div>
+                                <div
+                                    class="w-2 h-2 rounded-full bg-yellow-500/50"
+                                ></div>
+                                <div
+                                    class="w-2 h-2 rounded-full bg-green-500/50"
+                                ></div>
+                            </div>
+                            <img
+                                src="public/Screenshot 2026-05-28 170437.png"
+                                alt="Manual Tunnel"
+                                class="rounded-lg w-full"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="perspective-1000 shrink-0">
+                        <div
+                            class="tilted-card w-72 bg-zinc-950 border border-zinc-800/80 rounded-xl p-1.5 shadow-2xl cursor-zoom-in strip-card"
+                            data-src="public/Screenshot 2026-05-28 170442.png"
+                            data-caption="Projects Auto-Discovery"
+                        >
+                            <div class="flex gap-1 mb-1 px-1 pt-0.5">
+                                <div
+                                    class="w-2 h-2 rounded-full bg-red-500/50"
+                                ></div>
+                                <div
+                                    class="w-2 h-2 rounded-full bg-yellow-500/50"
+                                ></div>
+                                <div
+                                    class="w-2 h-2 rounded-full bg-green-500/50"
+                                ></div>
+                            </div>
+                            <img
+                                src="public/Screenshot 2026-05-28 170442.png"
+                                alt="Auto Discovery"
+                                class="rounded-lg w-full"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="perspective-1000 shrink-0 mt-8">
+                        <div
+                            class="tilted-card w-72 bg-zinc-950 border border-zinc-800/80 rounded-xl p-1.5 shadow-2xl cursor-zoom-in strip-card"
+                            data-src="public/Screenshot 2026-05-28 170445.png"
+                            data-caption="Cloud Tunnels Manager"
+                        >
+                            <div class="flex gap-1 mb-1 px-1 pt-0.5">
+                                <div
+                                    class="w-2 h-2 rounded-full bg-red-500/50"
+                                ></div>
+                                <div
+                                    class="w-2 h-2 rounded-full bg-yellow-500/50"
+                                ></div>
+                                <div
+                                    class="w-2 h-2 rounded-full bg-green-500/50"
+                                ></div>
+                            </div>
+                            <img
+                                src="public/Screenshot 2026-05-28 170445.png"
+                                alt="Cloud Tunnels"
+                                class="rounded-lg w-full"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="perspective-1000 shrink-0">
+                        <div
+                            class="tilted-card w-72 bg-zinc-950 border border-zinc-800/80 rounded-xl p-1.5 shadow-2xl cursor-zoom-in strip-card"
+                            data-src="public/Screenshot 2026-05-28 170453.png"
+                            data-caption="Traffic Analytics"
+                        >
+                            <div class="flex gap-1 mb-1 px-1 pt-0.5">
+                                <div
+                                    class="w-2 h-2 rounded-full bg-red-500/50"
+                                ></div>
+                                <div
+                                    class="w-2 h-2 rounded-full bg-yellow-500/50"
+                                ></div>
+                                <div
+                                    class="w-2 h-2 rounded-full bg-green-500/50"
+                                ></div>
+                            </div>
+                            <img
+                                src="public/Screenshot 2026-05-28 170453.png"
+                                alt="Analytics"
+                                class="rounded-lg w-full"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="perspective-1000 shrink-0 mt-8">
+                        <div
+                            class="tilted-card w-72 bg-zinc-950 border border-zinc-800/80 rounded-xl p-1.5 shadow-2xl cursor-zoom-in strip-card"
+                            data-src="public/Screenshot 2026-05-28 170502.png"
+                            data-caption="About App"
+                        >
+                            <div class="flex gap-1 mb-1 px-1 pt-0.5">
+                                <div
+                                    class="w-2 h-2 rounded-full bg-red-500/50"
+                                ></div>
+                                <div
+                                    class="w-2 h-2 rounded-full bg-yellow-500/50"
+                                ></div>
+                                <div
+                                    class="w-2 h-2 rounded-full bg-green-500/50"
+                                ></div>
+                            </div>
+                            <img
+                                src="public/Screenshot 2026-05-28 170502.png"
+                                alt="About"
+                                class="rounded-lg w-full"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer
+            class="border-t border-zinc-900/50 bg-[#030303] py-12 text-center text-sm text-zinc-600"
+        >
+            <div
+                class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4"
+            >
+                <div class="flex items-center gap-2">
+                    <img
+                        src="logo.png"
+                        alt="Vanguarch Logo"
+                        class="w-6 h-6 object-contain"
+                    />
+                    <span class="font-display font-semibold text-zinc-400"
+                        >Vanguarch</span
+                    >
+                </div>
+                <div>
+                    Copyright &copy; 2026 VanguArchangel. All rights reserved.
+                    Licensed under MIT.
+                </div>
+            </div>
+        </footer>
+
+        <!-- Lightbox Modal -->
+        <div
+            id="lightbox"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/92 backdrop-blur-xl opacity-0 pointer-events-none"
+        >
+            <button
+                id="lightbox-close"
+                class="absolute top-5 right-5 text-zinc-400 hover:text-white transition-colors p-2.5 bg-zinc-900/70 hover:bg-zinc-800 rounded-full border border-zinc-800"
+            >
+                <svg
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12"
+                    />
+                </svg>
+            </button>
+            <div
+                class="lightbox-inner max-w-[90vw] max-h-[88vh] relative overflow-hidden rounded-2xl border border-zinc-800/60 shadow-2xl bg-zinc-950 p-2"
+            >
+                <img
+                    id="lightbox-img"
+                    src=""
+                    alt="Enlarged screenshot"
+                    class="w-full h-full object-contain max-h-[84vh] rounded-xl"
+                />
+                <div
+                    id="lightbox-caption"
+                    class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-zinc-950/98 via-zinc-950/70 to-transparent p-5 text-center text-sm text-zinc-300 font-semibold font-display rounded-b-xl"
+                ></div>
+            </div>
         </div>
 
-        <!-- Feature 2 -->
-        <div class="feature-card bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-6 transition-all group">
-          <div class="w-10 h-10 rounded-lg bg-brand-500/10 text-brand-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-          </div>
-          <h3 class="font-display font-bold text-lg text-white mb-2">Detailed Analytics</h3>
-          <p class="text-zinc-400 text-sm leading-relaxed">Keep track of HTTP request logs, success/error distributions, bandwidth rates, and top endpoints with real-time interactive charts.</p>
-        </div>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                // 1. OS Download Button Detection
+                const btn = document.getElementById("download-btn");
+                const userAgent = window.navigator.userAgent.toLowerCase();
+                let os = "windows";
+                let osLabel = "Windows";
 
-        <!-- Feature 3 -->
-        <div class="feature-card bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-6 transition-all group">
-          <div class="w-10 h-10 rounded-lg bg-brand-500/10 text-brand-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-          </div>
-          <h3 class="font-display font-bold text-lg text-white mb-2">Smart Health Alerts</h3>
-          <p class="text-zinc-400 text-sm leading-relaxed">Get system tray alerts and OS notifications whenever a tunnel connects, goes offline, or recovers from outages. Background checks auto-monitor status.</p>
-        </div>
+                if (userAgent.indexOf("win") !== -1) {
+                    os = "windows";
+                    osLabel = "Windows";
+                } else if (userAgent.indexOf("mac") !== -1) {
+                    os = "macos";
+                    osLabel = "macOS";
+                } else if (userAgent.indexOf("linux") !== -1) {
+                    os = "linux";
+                    osLabel = "Linux";
+                } else {
+                    os = "other";
+                    osLabel = "Desktop";
+                }
 
-        <!-- Feature 4 -->
-        <div class="feature-card bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-6 transition-all group">
-          <div class="w-10 h-10 rounded-lg bg-brand-500/10 text-brand-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"/></svg>
-          </div>
-          <h3 class="font-display font-bold text-lg text-white mb-2">Projects Auto-Discovery</h3>
-          <p class="text-zinc-400 text-sm leading-relaxed">Let Vanguarch scan your workspace directories and automatically discover local framework servers (Vite, WordPress, Laravel, Next.js).</p>
-        </div>
+                btn.querySelector("span").textContent =
+                    "Download for " + osLabel;
 
-        <!-- Feature 5 -->
-        <div class="feature-card bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-6 transition-all group">
-          <div class="w-10 h-10 rounded-lg bg-brand-500/10 text-brand-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 10.742L19.885 5.142A.5.5 0 0120.5 5.5v13a.5.5 0 01-.615.485L8.684 13.258A1 1 0 018 12v-1.258a1 1 0 01.684-.516zM4 9h2v6H4V9z"/></svg>
-          </div>
-          <h3 class="font-display font-bold text-lg text-white mb-2">Quick Share Server</h3>
-          <p class="text-zinc-400 text-sm leading-relaxed">Need to share a static folder or directory? Boot up Vanguarch's integrated file sharing web server and share files over a tunnel in seconds.</p>
-        </div>
+                // Dynamically fetch latest release assets from GitHub API
+                fetch(
+                    "https://api.github.com/repos/khoirulaksara/vanguarch-tunnel/releases/latest",
+                )
+                    .then((response) => {
+                        if (!response.ok)
+                            throw new Error("API limit or network error");
+                        return response.json();
+                    })
+                    .then((data) => {
+                        if (data && data.assets && data.assets.length > 0) {
+                            let matchedAsset = null;
 
-        <!-- Feature 6 -->
-        <div class="feature-card bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-6 transition-all group">
-          <div class="w-10 h-10 rounded-lg bg-brand-500/10 text-brand-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-          </div>
-          <h3 class="font-display font-bold text-lg text-white mb-2">Robust Process Health</h3>
-          <p class="text-zinc-400 text-sm leading-relaxed">Built-in process watchdog kills orphaned `cloudflared` instances using system-level calls (WMIC/pkill) to avoid silent port conflicts.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+                            if (os === "windows") {
+                                matchedAsset =
+                                    data.assets.find((a) =>
+                                        a.name.endsWith(".msi"),
+                                    ) ||
+                                    data.assets.find(
+                                        (a) =>
+                                            a.name.endsWith("-setup.exe") ||
+                                            a.name.endsWith(".exe"),
+                                    );
+                            } else if (os === "macos") {
+                                matchedAsset =
+                                    data.assets.find((a) =>
+                                        a.name.endsWith(".dmg"),
+                                    ) ||
+                                    data.assets.find((a) =>
+                                        a.name.endsWith(".tar.gz"),
+                                    );
+                            } else if (os === "linux") {
+                                matchedAsset =
+                                    data.assets.find((a) =>
+                                        a.name.endsWith(".deb"),
+                                    ) ||
+                                    data.assets.find((a) =>
+                                        a.name.endsWith(".AppImage"),
+                                    );
+                            }
 
-  <!-- Web Inspector Spotlight -->
-  <section id="inspector" class="py-24 glow-effect">
-    <div class="max-w-6xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-      <div class="inspector-text space-y-6">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-brand-500 text-xs font-bold uppercase tracking-wider">
-          Ngrok-style Inspector
-        </div>
-        <h2 class="font-display font-black text-4xl md:text-5xl tracking-tight text-white leading-[1.1]">
-          Intercept & Replay Webhooks in Real-time
-        </h2>
-        <p class="text-zinc-400 text-base leading-relaxed">
-          Enable the **Web Inspector Proxy** to capture incoming HTTP requests. Drill down into query parameters, body payloads, and headers for both request and response.
-        </p>
-        <ul class="space-y-3 text-zinc-400 text-sm">
-          <li class="flex items-center gap-3">
-            <svg class="w-4 h-4 text-brand-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-            1-Click Replay: Resend requests to local backend to test fixes.
-          </li>
-          <li class="flex items-center gap-3">
-            <svg class="w-4 h-4 text-brand-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-            Edit & Replay: Modify paths, headers, and request body before replay.
-          </li>
-          <li class="flex items-center gap-3">
-            <svg class="w-4 h-4 text-brand-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-            Auto JSON formatting and copy widgets.
-          </li>
-        </ul>
-      </div>
-      <!-- Real Web Inspector Screenshot 3D Tilted Showcase -->
-      <div class="inspector-mockup perspective-1000 flex items-center justify-center lg:justify-end">
-        <div class="tilted-card max-w-md bg-zinc-950 border border-zinc-800 rounded-xl p-2 shadow-2xl relative overflow-hidden group/card cursor-zoom-in">
-          <!-- macOS Window Titlebar -->
-          <div class="flex items-center gap-1.5 border-b border-zinc-800/80 pb-2 mb-2 px-2 select-none">
-            <div class="w-2.5 h-2.5 rounded-full bg-red-500/60"></div>
-            <div class="w-2.5 h-2.5 rounded-full bg-yellow-500/60"></div>
-            <div class="w-2.5 h-2.5 rounded-full bg-green-500/60"></div>
-            <span class="text-[10px] text-zinc-500 font-mono ml-2">Request Inspector</span>
-          </div>
-          <!-- Actual Screenshot Image -->
-          <img src="public/Screenshot 2026-05-28 170450.png" alt="Web Inspector Request Capture" class="rounded-lg border border-zinc-800 w-full object-cover">
-          <!-- Glass glow border -->
-          <div class="absolute inset-0 border border-white/5 rounded-xl pointer-events-none"></div>
-        </div>
-      </div>
-    </div>
-  </section>
+                            if (
+                                matchedAsset &&
+                                matchedAsset.browser_download_url
+                            ) {
+                                btn.href = matchedAsset.browser_download_url;
+                                const extension = matchedAsset.name
+                                    .split(".")
+                                    .pop()
+                                    .toUpperCase();
+                                btn.querySelector("span").textContent =
+                                    "Download for " +
+                                    osLabel +
+                                    " (" +
+                                    extension +
+                                    ")";
+                            }
+                        }
+                    })
+                    .catch((err) => {
+                        console.warn(
+                            "Failed to fetch latest GitHub release assets, using fallback link.",
+                            err,
+                        );
+                    });
 
-  <!-- Getting Started / Quick Command -->
-  <section id="getting-started" class="py-24 border-t border-zinc-900 bg-zinc-950/40">
-    <div class="max-w-4xl mx-auto px-6 text-center">
-      <h2 class="font-display font-extrabold text-3xl md:text-5xl tracking-tight text-white mb-4">Launch in seconds</h2>
-      <p class="text-zinc-400 text-sm md:text-base max-w-lg mx-auto mb-10 leading-relaxed">Vanguarch detects your existing `cloudflared` installation or downloads the latest version automatically from GitHub.</p>
-      
-      <!-- Command box -->
-      <div class="bg-zinc-950 border border-zinc-800 rounded-xl p-4 max-w-lg mx-auto font-mono text-xs flex items-center justify-between text-zinc-300 shadow-xl mb-12">
-        <span class="text-zinc-600 select-none">$</span>
-        <code class="flex-1 text-left pl-3 truncate">git clone https://github.com/khoirulaksara/vanguarch-tunnel.git</code>
-        <button onclick="navigator.clipboard.writeText('git clone https://github.com/khoirulaksara/vanguarch-tunnel.git'); alert('Copied to clipboard!')" class="p-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded text-[10px] uppercase font-bold text-zinc-400 hover:text-white transition-colors shrink-0">Copy</button>
-      </div>
+                // 2. Motion One Animations Setup
+                const { animate, inView } = window.Motion || {};
 
-      <div class="text-zinc-500 text-[10px] uppercase tracking-widest font-bold">Supported Platforms</div>
-      <div class="flex items-center justify-center gap-6 mt-4 text-xs text-zinc-400 font-medium">
-        <span>Windows (MSI & EXE Setup)</span>
-        <span class="w-1.5 h-1.5 bg-zinc-800 rounded-full"></span>
-        <span>macOS (Silicon + Intel)</span>
-        <span class="w-1.5 h-1.5 bg-zinc-800 rounded-full"></span>
-        <span>Linux (Ubuntu)</span>
-      </div>
-    </div>
-  </section>
+                if (animate && inView) {
+                    // Page Load Hero animations — staggered cascade
+                    animate(
+                        "#hero-title",
+                        { opacity: [0, 1], y: [40, 0] },
+                        { duration: 0.9, easing: [0.16, 1, 0.3, 1] },
+                    );
+                    animate(
+                        "#hero-desc",
+                        { opacity: [0, 1], y: [25, 0] },
+                        {
+                            duration: 0.9,
+                            delay: 0.12,
+                            easing: [0.16, 1, 0.3, 1],
+                        },
+                    );
+                    animate(
+                        "#hero-downloads",
+                        { opacity: [0, 1], y: [15, 0] },
+                        {
+                            duration: 0.8,
+                            delay: 0.22,
+                            easing: [0.16, 1, 0.3, 1],
+                        },
+                    );
+                    animate(
+                        "#hero-pipeline",
+                        { opacity: [0, 1], scale: [0.96, 1] },
+                        {
+                            duration: 1.0,
+                            delay: 0.32,
+                            easing: [0.16, 1, 0.3, 1],
+                        },
+                    );
+                    animate(
+                        "#hero-mockup",
+                        { opacity: [0, 1], y: [30, 0], scale: [0.97, 1] },
+                        {
+                            duration: 1.1,
+                            delay: 0.48,
+                            easing: [0.16, 1, 0.3, 1],
+                        },
+                    );
 
-  <!-- Floating Screenshot Strip -->
-  <section class="py-20 overflow-hidden border-t border-zinc-900/50 relative">
-    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-orange-500/3 to-transparent pointer-events-none"></div>
-    <div class="max-w-6xl mx-auto px-6 mb-12 text-center">
-      <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400 text-xs font-medium mb-4">
-        <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-        All views available in v2.4.0 Archangel
-      </span>
-      <h2 class="font-display font-black text-3xl md:text-4xl tracking-tight text-white">Every view, beautifully designed</h2>
-      <p class="text-zinc-500 text-sm mt-3">From dashboard to analytics — Vanguarch has a premium dark UI for every workflow.</p>
-    </div>
-    <!-- Scrolling strip of floating tilted thumbnails -->
-    <div class="flex gap-5 overflow-x-auto pb-6 px-6 max-w-full" style="scrollbar-width: none;">
+                    // Scroll InView Feature Cards — staggered
+                    inView("#features", (info) => {
+                        const cards =
+                            info.target.querySelectorAll(".feature-card");
+                        cards.forEach((card, index) => {
+                            animate(
+                                card,
+                                { opacity: [0, 1], y: [35, 0] },
+                                {
+                                    duration: 0.6,
+                                    delay: index * 0.07,
+                                    easing: [0.16, 1, 0.3, 1],
+                                },
+                            );
+                        });
+                    });
 
-      <div class="perspective-1000 shrink-0">
-        <div class="tilted-card w-72 bg-zinc-950 border border-zinc-800/80 rounded-xl p-1.5 shadow-2xl cursor-zoom-in strip-card"
-             data-src="public/Screenshot 2026-05-28 170434.png" data-caption="Dashboard Overview">
-          <div class="flex gap-1 mb-1 px-1 pt-0.5"><div class="w-2 h-2 rounded-full bg-red-500/50"></div><div class="w-2 h-2 rounded-full bg-yellow-500/50"></div><div class="w-2 h-2 rounded-full bg-green-500/50"></div></div>
-          <img src="public/Screenshot 2026-05-28 170434.png" alt="Dashboard" class="rounded-lg w-full">
-        </div>
-      </div>
+                    // Scroll InView Web Inspector — slide in from sides
+                    inView("#inspector", (info) => {
+                        const textCol =
+                            info.target.querySelector(".inspector-text");
+                        const mockupCol =
+                            info.target.querySelector(".inspector-mockup");
+                        if (textCol)
+                            animate(
+                                textCol,
+                                { opacity: [0, 1], x: [-35, 0] },
+                                { duration: 0.75, easing: [0.16, 1, 0.3, 1] },
+                            );
+                        if (mockupCol)
+                            animate(
+                                mockupCol,
+                                { opacity: [0, 1], x: [35, 0] },
+                                { duration: 0.75, easing: [0.16, 1, 0.3, 1] },
+                            );
+                    });
 
-      <div class="perspective-1000 shrink-0 mt-8">
-        <div class="tilted-card w-72 bg-zinc-950 border border-zinc-800/80 rounded-xl p-1.5 shadow-2xl cursor-zoom-in strip-card"
-             data-src="public/Screenshot 2026-05-28 170437.png" data-caption="Manual Tunnel Setup">
-          <div class="flex gap-1 mb-1 px-1 pt-0.5"><div class="w-2 h-2 rounded-full bg-red-500/50"></div><div class="w-2 h-2 rounded-full bg-yellow-500/50"></div><div class="w-2 h-2 rounded-full bg-green-500/50"></div></div>
-          <img src="public/Screenshot 2026-05-28 170437.png" alt="Manual Tunnel" class="rounded-lg w-full">
-        </div>
-      </div>
-
-      <div class="perspective-1000 shrink-0">
-        <div class="tilted-card w-72 bg-zinc-950 border border-zinc-800/80 rounded-xl p-1.5 shadow-2xl cursor-zoom-in strip-card"
-             data-src="public/Screenshot 2026-05-28 170442.png" data-caption="Projects Auto-Discovery">
-          <div class="flex gap-1 mb-1 px-1 pt-0.5"><div class="w-2 h-2 rounded-full bg-red-500/50"></div><div class="w-2 h-2 rounded-full bg-yellow-500/50"></div><div class="w-2 h-2 rounded-full bg-green-500/50"></div></div>
-          <img src="public/Screenshot 2026-05-28 170442.png" alt="Auto Discovery" class="rounded-lg w-full">
-        </div>
-      </div>
-
-      <div class="perspective-1000 shrink-0 mt-8">
-        <div class="tilted-card w-72 bg-zinc-950 border border-zinc-800/80 rounded-xl p-1.5 shadow-2xl cursor-zoom-in strip-card"
-             data-src="public/Screenshot 2026-05-28 170445.png" data-caption="Cloud Tunnels Manager">
-          <div class="flex gap-1 mb-1 px-1 pt-0.5"><div class="w-2 h-2 rounded-full bg-red-500/50"></div><div class="w-2 h-2 rounded-full bg-yellow-500/50"></div><div class="w-2 h-2 rounded-full bg-green-500/50"></div></div>
-          <img src="public/Screenshot 2026-05-28 170445.png" alt="Cloud Tunnels" class="rounded-lg w-full">
-        </div>
-      </div>
-
-      <div class="perspective-1000 shrink-0">
-        <div class="tilted-card w-72 bg-zinc-950 border border-zinc-800/80 rounded-xl p-1.5 shadow-2xl cursor-zoom-in strip-card"
-             data-src="public/Screenshot 2026-05-28 170453.png" data-caption="Traffic Analytics">
-          <div class="flex gap-1 mb-1 px-1 pt-0.5"><div class="w-2 h-2 rounded-full bg-red-500/50"></div><div class="w-2 h-2 rounded-full bg-yellow-500/50"></div><div class="w-2 h-2 rounded-full bg-green-500/50"></div></div>
-          <img src="public/Screenshot 2026-05-28 170453.png" alt="Analytics" class="rounded-lg w-full">
-        </div>
-      </div>
-
-      <div class="perspective-1000 shrink-0 mt-8">
-        <div class="tilted-card w-72 bg-zinc-950 border border-zinc-800/80 rounded-xl p-1.5 shadow-2xl cursor-zoom-in strip-card"
-             data-src="public/Screenshot 2026-05-28 170502.png" data-caption="About App">
-          <div class="flex gap-1 mb-1 px-1 pt-0.5"><div class="w-2 h-2 rounded-full bg-red-500/50"></div><div class="w-2 h-2 rounded-full bg-yellow-500/50"></div><div class="w-2 h-2 rounded-full bg-green-500/50"></div></div>
-          <img src="public/Screenshot 2026-05-28 170502.png" alt="About" class="rounded-lg w-full">
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer class="border-t border-zinc-900/50 bg-[#030303] py-12 text-center text-sm text-zinc-600">
-    <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
-      <div class="flex items-center gap-2">
-        <img src="logo.png" alt="Vanguarch Logo" class="w-6 h-6 object-contain">
-        <span class="font-display font-semibold text-zinc-400">Vanguarch</span>
-      </div>
-      <div>
-        Copyright &copy; 2026 VanguArchangel. All rights reserved. Licensed under MIT.
-      </div>
-    </div>
-  </footer>
-
-  <!-- Lightbox Modal -->
-  <div id="lightbox" class="fixed inset-0 z-50 flex items-center justify-center bg-black/92 backdrop-blur-xl opacity-0 pointer-events-none">
-    <button id="lightbox-close" class="absolute top-5 right-5 text-zinc-400 hover:text-white transition-colors p-2.5 bg-zinc-900/70 hover:bg-zinc-800 rounded-full border border-zinc-800">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-    </button>
-    <div class="lightbox-inner max-w-[90vw] max-h-[88vh] relative overflow-hidden rounded-2xl border border-zinc-800/60 shadow-2xl bg-zinc-950 p-2">
-      <img id="lightbox-img" src="" alt="Enlarged screenshot" class="w-full h-full object-contain max-h-[84vh] rounded-xl">
-      <div id="lightbox-caption" class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-zinc-950/98 via-zinc-950/70 to-transparent p-5 text-center text-sm text-zinc-300 font-semibold font-display rounded-b-xl"></div>
-    </div>
-  </div>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      // 1. OS Download Button Detection
-      const btn = document.getElementById("download-btn");
-      const userAgent = window.navigator.userAgent.toLowerCase();
-      let os = "windows";
-      let osLabel = "Windows";
-      
-      if (userAgent.indexOf("win") !== -1) {
-        os = "windows";
-        osLabel = "Windows";
-      } else if (userAgent.indexOf("mac") !== -1) {
-        os = "macos";
-        osLabel = "macOS";
-      } else if (userAgent.indexOf("linux") !== -1) {
-        os = "linux";
-        osLabel = "Linux";
-      } else {
-        os = "other";
-        osLabel = "Desktop";
-      }
-      
-      btn.querySelector("span").textContent = "Download for " + osLabel;
-      
-      // Dynamically fetch latest release assets from GitHub API
-      fetch("https://api.github.com/repos/khoirulaksara/vanguarch-tunnel/releases/latest")
-        .then(response => {
-          if (!response.ok) throw new Error("API limit or network error");
-          return response.json();
-        })
-        .then(data => {
-          if (data && data.assets && data.assets.length > 0) {
-            let matchedAsset = null;
-            
-            if (os === "windows") {
-              matchedAsset = data.assets.find(a => a.name.endsWith(".msi")) || data.assets.find(a => a.name.endsWith("-setup.exe") || a.name.endsWith(".exe"));
-            } else if (os === "macos") {
-              matchedAsset = data.assets.find(a => a.name.endsWith(".dmg")) || data.assets.find(a => a.name.endsWith(".tar.gz"));
-            } else if (os === "linux") {
-              matchedAsset = data.assets.find(a => a.name.endsWith(".deb")) || data.assets.find(a => a.name.endsWith(".AppImage"));
-            }
-            
-            if (matchedAsset && matchedAsset.browser_download_url) {
-              btn.href = matchedAsset.browser_download_url;
-              const extension = matchedAsset.name.split(".").pop().toUpperCase();
-              btn.querySelector("span").textContent = "Download for " + osLabel + " (" + extension + ")";
-            }
-          }
-        })
-        .catch(err => {
-          console.warn("Failed to fetch latest GitHub release assets, using fallback link.", err);
-        });
-
-      // 2. Motion One Animations Setup
-      const { animate, inView } = window.Motion || {};
-      
-      if (animate && inView) {
-        // Page Load Hero animations — staggered cascade
-        animate("#hero-title",    { opacity: [0, 1], y: [40, 0] }, { duration: 0.9, easing: [0.16, 1, 0.3, 1] });
-        animate("#hero-desc",     { opacity: [0, 1], y: [25, 0] }, { duration: 0.9, delay: 0.12, easing: [0.16, 1, 0.3, 1] });
-        animate("#hero-downloads",{ opacity: [0, 1], y: [15, 0] }, { duration: 0.8, delay: 0.22, easing: [0.16, 1, 0.3, 1] });
-        animate("#hero-pipeline", { opacity: [0, 1], scale: [0.96, 1] }, { duration: 1.0, delay: 0.32, easing: [0.16, 1, 0.3, 1] });
-        animate("#hero-mockup",   { opacity: [0, 1], y: [30, 0], scale: [0.97, 1] }, { duration: 1.1, delay: 0.48, easing: [0.16, 1, 0.3, 1] });
-
-        // Scroll InView Feature Cards — staggered
-        inView("#features", (info) => {
-          const cards = info.target.querySelectorAll(".feature-card");
-          cards.forEach((card, index) => {
-            animate(card, { opacity: [0, 1], y: [35, 0] }, { duration: 0.6, delay: index * 0.07, easing: [0.16, 1, 0.3, 1] });
-          });
-        });
-
-        // Scroll InView Web Inspector — slide in from sides
-        inView("#inspector", (info) => {
-          const textCol = info.target.querySelector(".inspector-text");
-          const mockupCol = info.target.querySelector(".inspector-mockup");
-          if (textCol) animate(textCol, { opacity: [0, 1], x: [-35, 0] }, { duration: 0.75, easing: [0.16, 1, 0.3, 1] });
-          if (mockupCol) animate(mockupCol, { opacity: [0, 1], x: [35, 0] }, { duration: 0.75, easing: [0.16, 1, 0.3, 1] });
-        });
-
-        // Scroll InView Getting Started
-        inView("#getting-started", (info) => {
-          const inner = info.target.querySelector(".gs-inner");
-          if (inner) animate(inner, { opacity: [0, 1], y: [30, 0] }, { duration: 0.7, easing: [0.16, 1, 0.3, 1] });
-        });
+                    // Scroll InView Getting Started
+                    inView("#getting-started", (info) => {
+                        const inner = info.target.querySelector(".gs-inner");
+                        if (inner)
+                            animate(
+                                inner,
+                                { opacity: [0, 1], y: [30, 0] },
+                                { duration: 0.7, easing: [0.16, 1, 0.3, 1] },
+                            );
+                    });
       } else {
         // Fallback: reveal everything immediately if Motion failed
-        document.querySelectorAll("#hero-title, #hero-desc, #hero-downloads, #hero-pipeline, #hero-mockup, .feature-card, .inspector-text, .inspector-mockup").forEach(el => {
+        document.querySelectorAll("#hero-title, #hero-desc, #hero-downloads, #hero-pipeline, #hero-mockup, .feature-card, .inspector-text, .inspector-mockup, .checklist-item").forEach(el => {
           el.style.opacity = "1";
         });
+        document.querySelectorAll(".checklist-item").forEach(el => el.classList.add("visible"));
       }
 
-      // 3. Interactive Mockup Tabs Switching
-      const tabs = document.querySelectorAll(".tab-btn");
-      const activeImg = document.getElementById("active-screenshot");
-      const activeTitle = document.getElementById("active-tab-title");
-      const activeDesc = document.getElementById("active-tab-desc");
+                // 3. Interactive Mockup Tabs Switching
+                const tabs = document.querySelectorAll(".tab-btn");
+                const activeImg = document.getElementById("active-screenshot");
+                const activeTitle = document.getElementById("active-tab-title");
+                const activeDesc = document.getElementById("active-tab-desc");
 
-      tabs.forEach(tab => {
-        tab.addEventListener("click", () => {
-          if (tab.classList.contains("active")) return;
+                tabs.forEach((tab) => {
+                    tab.addEventListener("click", () => {
+                        if (tab.classList.contains("active")) return;
 
-          // Remove active styles from all tabs
-          tabs.forEach(t => {
-            t.classList.remove("active", "border-zinc-800", "bg-zinc-900/60");
-            t.classList.add("border-transparent");
-            const icon = t.querySelector(".w-8");
-            icon.classList.remove("bg-orange-500/10", "text-brand-500");
-            icon.classList.add("bg-zinc-800", "text-zinc-400");
-            const text = t.querySelector(".font-display");
-            text.classList.remove("text-white");
-            text.classList.add("text-zinc-300");
-          });
+                        // Remove active styles from all tabs
+                        tabs.forEach((t) => {
+                            t.classList.remove(
+                                "active",
+                                "border-zinc-800",
+                                "bg-zinc-900/60",
+                            );
+                            t.classList.add("border-transparent");
+                            const icon = t.querySelector(".w-8");
+                            icon.classList.remove(
+                                "bg-orange-500/10",
+                                "text-brand-500",
+                            );
+                            icon.classList.add("bg-zinc-800", "text-zinc-400");
+                            const text = t.querySelector(".font-display");
+                            text.classList.remove("text-white");
+                            text.classList.add("text-zinc-300");
+                        });
 
-          // Set active styles on clicked tab
-          tab.classList.add("active", "border-zinc-800", "bg-zinc-900/60");
-          tab.classList.remove("border-transparent");
-          const icon = tab.querySelector(".w-8");
-          icon.classList.remove("bg-zinc-800", "text-zinc-400");
-          icon.classList.add("bg-orange-500/10", "text-brand-500");
-          const text = tab.querySelector(".font-display");
-          text.classList.remove("text-zinc-300");
-          text.classList.add("text-white");
+                        // Set active styles on clicked tab
+                        tab.classList.add(
+                            "active",
+                            "border-zinc-800",
+                            "bg-zinc-900/60",
+                        );
+                        tab.classList.remove("border-transparent");
+                        const icon = tab.querySelector(".w-8");
+                        icon.classList.remove("bg-zinc-800", "text-zinc-400");
+                        icon.classList.add(
+                            "bg-orange-500/10",
+                            "text-brand-500",
+                        );
+                        const text = tab.querySelector(".font-display");
+                        text.classList.remove("text-zinc-300");
+                        text.classList.add("text-white");
 
-          const targetSrc   = tab.getAttribute("data-screenshot");
-          const targetTitle = tab.getAttribute("data-title");
-          const targetDesc  = tab.getAttribute("data-desc");
+                        const targetSrc = tab.getAttribute("data-screenshot");
+                        const targetTitle = tab.getAttribute("data-title");
+                        const targetDesc = tab.getAttribute("data-desc");
 
-          if (animate) {
-            animate(activeImg, { opacity: 0, scale: 0.985 }, { duration: 0.15 });
-            setTimeout(() => {
-              activeImg.src = targetSrc;
-              activeTitle.textContent = targetTitle;
-              activeDesc.textContent  = targetDesc;
-              animate(activeImg, { opacity: 1, scale: 1 }, { duration: 0.25, easing: "ease-out" });
-            }, 150);
-          } else {
-            activeImg.src = targetSrc;
-            activeTitle.textContent = targetTitle;
-            activeDesc.textContent  = targetDesc;
-          }
-        });
-      });
+                        if (animate) {
+                            animate(
+                                activeImg,
+                                { opacity: 0, scale: 0.985 },
+                                { duration: 0.15 },
+                            );
+                            setTimeout(() => {
+                                activeImg.src = targetSrc;
+                                activeTitle.textContent = targetTitle;
+                                activeDesc.textContent = targetDesc;
+                                animate(
+                                    activeImg,
+                                    { opacity: 1, scale: 1 },
+                                    { duration: 0.25, easing: "ease-out" },
+                                );
+                            }, 150);
+                        } else {
+                            activeImg.src = targetSrc;
+                            activeTitle.textContent = targetTitle;
+                            activeDesc.textContent = targetDesc;
+                        }
+                    });
+                });
 
-      // 4. Lightbox — supports main mockup, inspector card, and screenshot strip
-      const lightbox = document.getElementById("lightbox");
-      const lightboxImg = document.getElementById("lightbox-img");
-      const lightboxCaption = document.getElementById("lightbox-caption");
-      const closeBtn = document.getElementById("lightbox-close");
+                // 4. Lightbox — supports main mockup, inspector card, and screenshot strip
+                const lightbox = document.getElementById("lightbox");
+                const lightboxImg = document.getElementById("lightbox-img");
+                const lightboxCaption =
+                    document.getElementById("lightbox-caption");
+                const closeBtn = document.getElementById("lightbox-close");
 
-      function openLightboxWith(src, caption) {
-        lightboxImg.src = src;
-        lightboxCaption.textContent = caption;
-        lightbox.classList.remove("pointer-events-none");
-        lightbox.style.opacity = "1";
-        if (animate) {
-          animate(lightbox, { opacity: [0, 1] }, { duration: 0.25 });
-          const inner = lightbox.querySelector(".lightbox-inner");
-          if (inner) animate(inner, { scale: [0.93, 1], opacity: [0, 1] }, { duration: 0.3, easing: [0.16, 1, 0.3, 1] });
-        }
-      }
+                function openLightboxWith(src, caption) {
+                    lightboxImg.src = src;
+                    lightboxCaption.textContent = caption;
+                    lightbox.classList.remove("pointer-events-none");
+                    lightbox.style.opacity = "1";
+                    if (animate) {
+                        animate(
+                            lightbox,
+                            { opacity: [0, 1] },
+                            { duration: 0.25 },
+                        );
+                        const inner = lightbox.querySelector(".lightbox-inner");
+                        if (inner)
+                            animate(
+                                inner,
+                                { scale: [0.93, 1], opacity: [0, 1] },
+                                { duration: 0.3, easing: [0.16, 1, 0.3, 1] },
+                            );
+                    }
+                }
 
-      function closeLightbox() {
-        if (animate) {
-          animate(lightbox, { opacity: [1, 0] }, { duration: 0.2 });
-          const inner = lightbox.querySelector(".lightbox-inner");
-          if (inner) animate(inner, { scale: [1, 0.93], opacity: [1, 0] }, { duration: 0.2, easing: "ease-in" });
-          setTimeout(() => lightbox.classList.add("pointer-events-none"), 220);
-        } else {
-          lightbox.style.opacity = "0";
-          lightbox.classList.add("pointer-events-none");
-        }
-      }
+                function closeLightbox() {
+                    if (animate) {
+                        animate(
+                            lightbox,
+                            { opacity: [1, 0] },
+                            { duration: 0.2 },
+                        );
+                        const inner = lightbox.querySelector(".lightbox-inner");
+                        if (inner)
+                            animate(
+                                inner,
+                                { scale: [1, 0.93], opacity: [1, 0] },
+                                { duration: 0.2, easing: "ease-in" },
+                            );
+                        setTimeout(
+                            () => lightbox.classList.add("pointer-events-none"),
+                            220,
+                        );
+                    } else {
+                        lightbox.style.opacity = "0";
+                        lightbox.classList.add("pointer-events-none");
+                    }
+                }
 
-      // Main mockup frame
-      const activeImgFrame = activeImg.parentElement;
-      activeImgFrame.addEventListener("click", () => {
-        openLightboxWith(activeImg.src, activeTitle.textContent + " — " + activeDesc.textContent);
-      });
+                // Main mockup frame
+                const activeImgFrame = activeImg.parentElement;
+                activeImgFrame.addEventListener("click", () => {
+                    openLightboxWith(
+                        activeImg.src,
+                        activeTitle.textContent +
+                            " — " +
+                            activeDesc.textContent,
+                    );
+                });
 
-      // Inspector tilted card (first .tilted-card in #inspector)
-      const inspectorCard = document.querySelector("#inspector .tilted-card");
-      if (inspectorCard) {
-        inspectorCard.addEventListener("click", () => {
-          const img = inspectorCard.querySelector("img");
-          openLightboxWith(img.src, "Web Request Inspector — Ngrok-style proxy capturing payloads with 1-click replay.");
-        });
-      }
+                // Inspector tilted card (first .tilted-card in #inspector)
+                const inspectorCard = document.querySelector(
+                    "#inspector .tilted-card",
+                );
+                if (inspectorCard) {
+                    inspectorCard.addEventListener("click", () => {
+                        const img = inspectorCard.querySelector("img");
+                        openLightboxWith(
+                            img.src,
+                            "Web Request Inspector — Ngrok-style proxy capturing payloads with 1-click replay.",
+                        );
+                    });
+                }
 
-      // Screenshot strip cards — all .strip-card elements
-      document.querySelectorAll(".strip-card").forEach(card => {
-        card.addEventListener("click", () => {
-          const src     = card.getAttribute("data-src");
-          const caption = card.getAttribute("data-caption");
-          openLightboxWith(src, caption);
-        });
-      });
+                // Screenshot strip cards — all .strip-card elements
+                document.querySelectorAll(".strip-card").forEach((card) => {
+                    card.addEventListener("click", () => {
+                        const src = card.getAttribute("data-src");
+                        const caption = card.getAttribute("data-caption");
+                        openLightboxWith(src, caption);
+                    });
+                });
 
-      closeBtn.addEventListener("click", closeLightbox);
-      lightbox.addEventListener("click", (e) => { if (e.target === lightbox) closeLightbox(); });
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && !lightbox.classList.contains("pointer-events-none")) closeLightbox();
-      });
+                closeBtn.addEventListener("click", closeLightbox);
+                lightbox.addEventListener("click", (e) => {
+                    if (e.target === lightbox) closeLightbox();
+                });
+                document.addEventListener("keydown", (e) => {
+                    if (
+                        e.key === "Escape" &&
+                        !lightbox.classList.contains("pointer-events-none")
+                    )
+                        closeLightbox();
+                });
 
       // 5. SVG Particle Pipeline Animation
-      // Waits for layout then draws animated connecting lines between nodes
       function initPipeline() {
         const svg    = document.getElementById("pipeline-svg");
         const nodesEl = document.querySelectorAll(".pipeline-node");
@@ -901,12 +2244,15 @@
         const container = svg.parentElement;
         const cRect     = container.getBoundingClientRect();
 
-        // Get center points of each node relative to the container
-        const centers = Array.from(nodesEl).map(n => {
-          const r = n.getBoundingClientRect();
+        const nodeData = Array.from(nodesEl).map(n => {
+          const iconBox = n.querySelector('.relative');
+          const r = iconBox ? iconBox.getBoundingClientRect() : n.getBoundingClientRect();
           return {
-            x: r.left - cRect.left + r.width / 2,
-            y: r.top  - cRect.top  + r.height / 2,
+            cx: r.left - cRect.left + r.width / 2,
+            cy: r.top  - cRect.top  + r.height / 2,
+            left: r.left - cRect.left,
+            right: r.right - cRect.left,
+            width: r.width,
           };
         });
 
@@ -916,62 +2262,63 @@
         if (!baseGroup || !glowGroup || !partGroup) return;
 
         const NS = "http://www.w3.org/2000/svg";
+        const lineY = nodeData[0].cy;
 
-        // Draw lines between consecutive node centers
-        for (let i = 0; i < centers.length - 1; i++) {
-          const a = centers[i], b = centers[i + 1];
+        const segments = [
+          { from: nodeData[0].right, to: nodeData[1].left, label: "local", dash: "4 6", color: "rgba(249,115,22,0.5)", gradId: "pipe-grad-local", particleColor: "#f97316", particleR: 4 },
+          { from: nodeData[1].right, to: nodeData[2].left, label: "tunnel", dash: "12 30", color: "rgba(249,115,22,0.5)", gradId: "pipe-grad-1", particleColor: "#f97316", particleR: 4 },
+          { from: nodeData[2].right, to: nodeData[3].left, label: "public", dash: "12 30", color: "rgba(34,197,94,0.4)", gradId: "pipe-grad-2", particleColor: "#22c55e", particleR: 3 },
+        ];
 
-          // Base dim line
+        segments.forEach((seg, i) => {
           const baseLine = document.createElementNS(NS, "line");
-          baseLine.setAttribute("x1", a.x); baseLine.setAttribute("y1", a.y);
-          baseLine.setAttribute("x2", b.x); baseLine.setAttribute("y2", b.y);
-          baseLine.setAttribute("stroke", "rgba(63,63,70,0.35)");
-          baseLine.setAttribute("stroke-width", "1.5");
+          baseLine.setAttribute("x1", seg.from); baseLine.setAttribute("y1", lineY);
+          baseLine.setAttribute("x2", seg.to); baseLine.setAttribute("y2", lineY);
+          baseLine.setAttribute("stroke", seg.color);
+          baseLine.setAttribute("stroke-width", i === 0 ? "1.5" : "1.5");
           baseLine.setAttribute("stroke-linecap", "round");
+          if (i === 0) {
+            baseLine.setAttribute("stroke-dasharray", seg.dash);
+          }
           baseGroup.appendChild(baseLine);
 
-          // Animated glowing dashed line
           const glowLine = document.createElementNS(NS, "line");
-          glowLine.setAttribute("x1", a.x); glowLine.setAttribute("y1", a.y);
-          glowLine.setAttribute("x2", b.x); glowLine.setAttribute("y2", b.y);
-          glowLine.setAttribute("stroke", "url(#pipe-grad-1)");
+          glowLine.setAttribute("x1", seg.from); glowLine.setAttribute("y1", lineY);
+          glowLine.setAttribute("x2", seg.to); glowLine.setAttribute("y2", lineY);
+          glowLine.setAttribute("stroke", `url(#${seg.gradId})`);
           glowLine.setAttribute("stroke-width", "2.5");
           glowLine.setAttribute("stroke-linecap", "round");
-          glowLine.setAttribute("stroke-dasharray", "12 30");
+          glowLine.setAttribute("stroke-dasharray", seg.dash);
           glowLine.setAttribute("filter", "url(#glow)");
-          const glowAnim = document.createElementNS(NS, "animateTransform");
-          // Use animateTransform on dashoffset instead: simple dash offset animation
           const dashAnim = document.createElementNS(NS, "animate");
           dashAnim.setAttribute("attributeName", "stroke-dashoffset");
           dashAnim.setAttribute("from", "0");
-          dashAnim.setAttribute("to", "-84");
-          dashAnim.setAttribute("dur", (2.5 + i * 0.4) + "s");
+          dashAnim.setAttribute("to", i === 0 ? "-20" : "-84");
+          dashAnim.setAttribute("dur", (i === 0 ? "1.5" : "2.5") + "s");
           dashAnim.setAttribute("repeatCount", "indefinite");
           glowLine.appendChild(dashAnim);
           glowGroup.appendChild(glowLine);
 
-          // 2 staggered particle dots per segment
+          const dur = 2.5 + i * 0.5;
           [0, 0.5].forEach((offset, pi) => {
             const circ = document.createElementNS(NS, "circle");
-            circ.setAttribute("r", "4");
-            circ.setAttribute("fill", pi === 0 ? "#f97316" : "#fbbf24");
+            circ.setAttribute("r", seg.particleR);
+            circ.setAttribute("fill", pi === 0 ? seg.particleColor : (i === 0 ? "#fbbf24" : "#86efac"));
             circ.setAttribute("filter", "url(#glow)");
 
-            // Animate cx and cy along the line
-            const dur = (3.0 + i * 0.35) + "s";
-            const delay = (offset * (3.0 + i * 0.35)) + "s";
+            const delay = (offset * dur) + "s";
 
             const animX = document.createElementNS(NS, "animate");
             animX.setAttribute("attributeName", "cx");
-            animX.setAttribute("from", a.x); animX.setAttribute("to", b.x);
-            animX.setAttribute("dur", dur);
+            animX.setAttribute("from", seg.from); animX.setAttribute("to", seg.to);
+            animX.setAttribute("dur", dur + "s");
             animX.setAttribute("begin", delay);
             animX.setAttribute("repeatCount", "indefinite");
 
             const animY = document.createElementNS(NS, "animate");
             animY.setAttribute("attributeName", "cy");
-            animY.setAttribute("from", a.y); animY.setAttribute("to", b.y);
-            animY.setAttribute("dur", dur);
+            animY.setAttribute("from", lineY); animY.setAttribute("to", lineY);
+            animY.setAttribute("dur", dur + "s");
             animY.setAttribute("begin", delay);
             animY.setAttribute("repeatCount", "indefinite");
 
@@ -979,23 +2326,113 @@
             animO.setAttribute("attributeName", "opacity");
             animO.setAttribute("values", "0;1;1;0");
             animO.setAttribute("keyTimes", "0;0.08;0.92;1");
-            animO.setAttribute("dur", dur);
+            animO.setAttribute("dur", dur + "s");
             animO.setAttribute("begin", delay);
             animO.setAttribute("repeatCount", "indefinite");
 
-            circ.setAttribute("cx", a.x);
-            circ.setAttribute("cy", a.y);
+            circ.setAttribute("cx", seg.from);
+            circ.setAttribute("cy", lineY);
             circ.appendChild(animX);
             circ.appendChild(animY);
             circ.appendChild(animO);
             partGroup.appendChild(circ);
           });
-        }
+        });
       }
 
-      // Run after a paint frame to ensure layout is settled
       requestAnimationFrame(() => setTimeout(initPipeline, 100));
+
+      // 6. Scroll Progress Bar
+      const scrollProgress = document.getElementById("scroll-progress");
+      function updateScrollProgress() {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = docHeight > 0 ? scrollTop / docHeight : 0;
+        if (scrollProgress) scrollProgress.style.transform = `scaleX(${progress})`;
+      }
+
+      // 7. Header Hide/Show on Scroll
+      const header = document.getElementById("main-header");
+      let lastScrollY = 0;
+      let ticking = false;
+
+      function updateHeader() {
+        const currentY = window.scrollY;
+        if (currentY > lastScrollY && currentY > 80) {
+          header.classList.add("header-hidden");
+        } else {
+          header.classList.remove("header-hidden");
+        }
+        lastScrollY = currentY;
+        ticking = false;
+      }
+
+      // 8. Mouse-Following Cursor Glow
+      const cursorGlow = document.getElementById("cursor-glow");
+      let mouseX = 0, mouseY = 0;
+      let glowX = 0, glowY = 0;
+      let glowActive = false;
+      let glowTimeout;
+
+      function updateCursorGlow() {
+        const dx = mouseX - glowX;
+        const dy = mouseY - glowY;
+        glowX += dx * 0.08;
+        glowY += dy * 0.08;
+        if (cursorGlow) {
+          cursorGlow.style.left = glowX + "px";
+          cursorGlow.style.top = glowY + "px";
+        }
+        requestAnimationFrame(updateCursorGlow);
+      }
+
+      document.addEventListener("mousemove", (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        if (!glowActive) {
+          glowActive = true;
+          if (cursorGlow) cursorGlow.classList.add("active");
+        }
+        clearTimeout(glowTimeout);
+        glowTimeout = setTimeout(() => {
+          glowActive = false;
+          if (cursorGlow) cursorGlow.classList.remove("active");
+        }, 1500);
+      });
+
+      requestAnimationFrame(updateCursorGlow);
+
+      // 10. Staggered Checklist Animation
+      if (inView) {
+        inView(".inspector-text", (info) => {
+          const items = info.target.querySelectorAll(".checklist-item");
+          items.forEach((item, index) => {
+            setTimeout(() => {
+              item.classList.add("visible");
+              if (animate) {
+                animate(item, { opacity: [0, 1], x: [-15, 0] }, { duration: 0.5, easing: [0.16, 1, 0.3, 1] });
+              }
+            }, index * 120);
+          });
+        });
+      } else {
+        document.querySelectorAll(".checklist-item").forEach(el => el.classList.add("visible"));
+      }
+
+      // 12. Scroll Event Handler (throttled)
+      function onScroll() {
+        if (!ticking) {
+          requestAnimationFrame(() => {
+            updateScrollProgress();
+            updateHeader();
+          });
+          ticking = true;
+        }
+      }
+      window.addEventListener("scroll", onScroll, { passive: true });
+      updateScrollProgress();
+
     });
   </script>
-</body>
+    </body>
 </html>
