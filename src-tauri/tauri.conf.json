@@ -45,6 +45,10 @@
     "windows": {
       "nsis": {
         "installerIcon": "icons/icon.ico"
+      },
+      "wix": {
+        "bannerPath": "icons/wix_banner.bmp",
+        "dialogImagePath": "icons/wix_dialog.bmp"
       }
     }
   }
