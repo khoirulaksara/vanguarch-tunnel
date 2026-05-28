@@ -24,6 +24,8 @@
         <script src="https://cdn.tailwindcss.com"></script>
         <!-- Motion One library via CDN -->
         <script src="https://cdn.jsdelivr.net/npm/motion@11.11.13/dist/motion.js"></script>
+        <!-- Lucide Icons -->
+        <script src="https://unpkg.com/lucide@latest"></script>
 
         <script>
             document.documentElement.classList.add("js-enabled");
@@ -205,18 +207,18 @@
                 z-index: -1;
             }
 
-    /* Avoid Flash of Unstyled Content by hiding elements initially if JS is active */
-    .js-enabled #hero-title,
-    .js-enabled #hero-desc,
-    .js-enabled #hero-downloads,
-    .js-enabled #hero-mockup,
-    .js-enabled #hero-pipeline,
-    .js-enabled .feature-card,
-    .js-enabled .inspector-text,
-    .js-enabled .inspector-mockup,
-    .js-enabled .checklist-item {
-      opacity: 0;
-    }
+            /* Avoid Flash of Unstyled Content by hiding elements initially if JS is active */
+            .js-enabled #hero-title,
+            .js-enabled #hero-desc,
+            .js-enabled #hero-downloads,
+            .js-enabled #hero-mockup,
+            .js-enabled #hero-pipeline,
+            .js-enabled .feature-card,
+            .js-enabled .inspector-text,
+            .js-enabled .inspector-mockup,
+            .js-enabled .checklist-item {
+                opacity: 0;
+            }
 
             /* GPU accelerated transition for feature cards hover */
             .feature-card {
@@ -373,17 +375,7 @@
                         rel="noopener noreferrer"
                         class="text-zinc-400 hover:text-white transition-colors"
                     >
-                        <svg
-                            class="w-5 h-5"
-                            fill="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                fill-rule="evenodd"
-                                clip-rule="evenodd"
-                                d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.464-1.11-1.464-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.579.688.481C19.137 20.162 22 16.418 22 12c0-5.523-4.477-10-10-10z"
-                            />
-                        </svg>
+                        <i data-lucide="github" class="w-5 h-5"></i>
                     </a>
                     <a
                         href="#download"
@@ -439,6 +431,11 @@
                         href="https://github.com/khoirulaksara/vanguarch-tunnel/releases/latest"
                         class="w-full sm:w-auto px-10 py-4 bg-brand-500 text-white font-display font-bold text-sm uppercase tracking-wider rounded-xl hover:bg-brand-600 shadow-lg shadow-brand-500/25 transition-all text-center flex items-center justify-center gap-2"
                     >
+                        <i
+                            id="download-icon"
+                            data-lucide="download"
+                            class="w-4 h-4"
+                        ></i>
                         <span>Detecting OS...</span>
                     </a>
                     <a
@@ -630,7 +627,10 @@
                                     <div
                                         class="relative w-14 h-14 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-2xl shadow-lg"
                                     >
-                                        <svg class="w-7 h-7 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.25 15a4.5 4.5 0 004.5 4.5H18a3.75 3.75 0 001.332-7.257 3 3 0 00-3.758-3.848 5.25 5.25 0 00-10.233 2.33A4.502 4.502 0 002.25 15z"/></svg>
+                                        <i
+                                            data-lucide="cloud"
+                                            class="w-7 h-7 text-blue-400"
+                                        ></i>
                                     </div>
                                 </div>
                                 <span
@@ -656,7 +656,10 @@
                                     <div
                                         class="relative w-14 h-14 rounded-2xl bg-zinc-900 border border-green-500/30 flex items-center justify-center text-2xl shadow-lg shadow-green-500/5"
                                     >
-                                        <svg class="w-7 h-7 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418"/></svg>
+                                        <i
+                                            data-lucide="globe"
+                                            class="w-7 h-7 text-green-400"
+                                        ></i>
                                     </div>
                                 </div>
                                 <span
@@ -732,7 +735,7 @@
                                 <div
                                     class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm"
                                 >
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                    <i data-lucide="zap" class="w-4 h-4"></i>
                                 </div>
                                 <div class="truncate">
                                     <div
@@ -757,7 +760,10 @@
                                 <div
                                     class="w-8 h-8 rounded-lg bg-orange-500/10 text-brand-500 flex items-center justify-center shrink-0 text-sm"
                                 >
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                                    <i
+                                        data-lucide="layout-dashboard"
+                                        class="w-4 h-4"
+                                    ></i>
                                 </div>
                                 <div class="truncate">
                                     <div
@@ -782,7 +788,7 @@
                                 <div
                                     class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm"
                                 >
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                    <i data-lucide="plug" class="w-4 h-4"></i>
                                 </div>
                                 <div class="truncate">
                                     <div
@@ -807,7 +813,10 @@
                                 <div
                                     class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm"
                                 >
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+                                    <i
+                                        data-lucide="bookmark"
+                                        class="w-4 h-4"
+                                    ></i>
                                 </div>
                                 <div class="truncate">
                                     <div
@@ -832,7 +841,10 @@
                                 <div
                                     class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm"
                                 >
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                                    <i
+                                        data-lucide="folder-search"
+                                        class="w-4 h-4"
+                                    ></i>
                                 </div>
                                 <div class="truncate">
                                     <div
@@ -857,7 +869,7 @@
                                 <div
                                     class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm"
                                 >
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.25 15a4.5 4.5 0 004.5 4.5H18a3.75 3.75 0 001.332-7.257 3 3 0 00-3.758-3.848 5.25 5.25 0 00-10.233 2.33A4.502 4.502 0 002.25 15z"/></svg>
+                                    <i data-lucide="cloud" class="w-4 h-4"></i>
                                 </div>
                                 <div class="truncate">
                                     <div
@@ -882,7 +894,10 @@
                                 <div
                                     class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm"
                                 >
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/></svg>
+                                    <i
+                                        data-lucide="upload-cloud"
+                                        class="w-4 h-4"
+                                    ></i>
                                 </div>
                                 <div class="truncate">
                                     <div
@@ -907,7 +922,7 @@
                                 <div
                                     class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm"
                                 >
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                    <i data-lucide="search" class="w-4 h-4"></i>
                                 </div>
                                 <div class="truncate">
                                     <div
@@ -932,7 +947,10 @@
                                 <div
                                     class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm"
                                 >
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                                    <i
+                                        data-lucide="bar-chart-3"
+                                        class="w-4 h-4"
+                                    ></i>
                                 </div>
                                 <div class="truncate">
                                     <div
@@ -957,7 +975,7 @@
                                 <div
                                     class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm"
                                 >
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    <i data-lucide="clock" class="w-4 h-4"></i>
                                 </div>
                                 <div class="truncate">
                                     <div
@@ -982,7 +1000,10 @@
                                 <div
                                     class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm"
                                 >
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                    <i
+                                        data-lucide="settings"
+                                        class="w-4 h-4"
+                                    ></i>
                                 </div>
                                 <div class="truncate">
                                     <div
@@ -1007,7 +1028,7 @@
                                 <div
                                     class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm"
                                 >
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    <i data-lucide="info" class="w-4 h-4"></i>
                                 </div>
                                 <div class="truncate">
                                     <div
@@ -1067,19 +1088,7 @@
                                 <div
                                     class="self-start sm:self-center px-3 py-1.5 bg-brand-500/10 border border-brand-500/20 rounded-lg text-brand-500 text-xs font-semibold flex items-center gap-1.5 shrink-0 select-none"
                                 >
-                                    <svg
-                                        class="w-3.5 h-3.5"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m4-3H6"
-                                        />
-                                    </svg>
+                                    <i data-lucide="search" class="w-3.5 h-3.5"></i>
                                     Click to Zoom
                                 </div>
                             </div>
@@ -1095,10 +1104,17 @@
             class="py-24 border-t border-zinc-900/50 bg-zinc-950/20"
         >
             <div class="max-w-6xl mx-auto px-6">
-      <div class="text-center max-w-3xl mx-auto mb-20">
-        <h2 class="font-display font-extrabold text-3xl md:text-5xl tracking-tight text-white mb-4">Everything you need for local tunneling</h2>
-        <p class="text-zinc-500 text-base">Packed with developer-first utilities that make tunneling smooth, reliable, and observable.</p>
-      </div>
+                <div class="text-center max-w-3xl mx-auto mb-20">
+                    <h2
+                        class="font-display font-extrabold text-3xl md:text-5xl tracking-tight text-white mb-4"
+                    >
+                        Everything you need for local tunneling
+                    </h2>
+                    <p class="text-zinc-500 text-base">
+                        Packed with developer-first utilities that make
+                        tunneling smooth, reliable, and observable.
+                    </p>
+                </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <!-- Feature 1 -->
@@ -1108,19 +1124,7 @@
                         <div
                             class="w-10 h-10 rounded-lg bg-brand-500/10 text-brand-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"
                         >
-                            <svg
-                                class="w-5 h-5"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M13 10V3L4 14h7v7l9-11h-7z"
-                                />
-                            </svg>
+                            <i data-lucide="zap" class="w-5 h-5"></i>
                         </div>
                         <h3
                             class="font-display font-bold text-lg text-white mb-2"
@@ -1141,19 +1145,7 @@
                         <div
                             class="w-10 h-10 rounded-lg bg-brand-500/10 text-brand-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"
                         >
-                            <svg
-                                class="w-5 h-5"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                                />
-                            </svg>
+                            <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
                         </div>
                         <h3
                             class="font-display font-bold text-lg text-white mb-2"
@@ -1174,19 +1166,7 @@
                         <div
                             class="w-10 h-10 rounded-lg bg-brand-500/10 text-brand-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"
                         >
-                            <svg
-                                class="w-5 h-5"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                                />
-                            </svg>
+                            <i data-lucide="bell-ring" class="w-5 h-5"></i>
                         </div>
                         <h3
                             class="font-display font-bold text-lg text-white mb-2"
@@ -1207,19 +1187,7 @@
                         <div
                             class="w-10 h-10 rounded-lg bg-brand-500/10 text-brand-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"
                         >
-                            <svg
-                                class="w-5 h-5"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"
-                                />
-                            </svg>
+                            <i data-lucide="scan-search" class="w-5 h-5"></i>
                         </div>
                         <h3
                             class="font-display font-bold text-lg text-white mb-2"
@@ -1240,19 +1208,7 @@
                         <div
                             class="w-10 h-10 rounded-lg bg-brand-500/10 text-brand-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"
                         >
-                            <svg
-                                class="w-5 h-5"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M8.684 10.742L19.885 5.142A.5.5 0 0120.5 5.5v13a.5.5 0 01-.615.485L8.684 13.258A1 1 0 018 12v-1.258a1 1 0 01.684-.516zM4 9h2v6H4V9z"
-                                />
-                            </svg>
+                            <i data-lucide="share-2" class="w-5 h-5"></i>
                         </div>
                         <h3
                             class="font-display font-bold text-lg text-white mb-2"
@@ -1273,19 +1229,7 @@
                         <div
                             class="w-10 h-10 rounded-lg bg-brand-500/10 text-brand-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"
                         >
-                            <svg
-                                class="w-5 h-5"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                                />
-                            </svg>
+                            <i data-lucide="shield-check" class="w-5 h-5"></i>
                         </div>
                         <h3
                             class="font-display font-bold text-lg text-white mb-2"
@@ -1326,53 +1270,26 @@
                     </p>
                     <ul class="space-y-3 text-zinc-400 text-sm">
                         <li class="checklist-item flex items-center gap-3">
-                            <svg
+                            <i
+                                data-lucide="check"
                                 class="w-4 h-4 text-brand-500 shrink-0"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M5 13l4 4L19 7"
-                                />
-                            </svg>
+                            ></i>
                             1-Click Replay: Resend requests to local backend to
                             test fixes.
                         </li>
                         <li class="checklist-item flex items-center gap-3">
-                            <svg
+                            <i
+                                data-lucide="check"
                                 class="w-4 h-4 text-brand-500 shrink-0"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M5 13l4 4L19 7"
-                                />
-                            </svg>
+                            ></i>
                             Edit & Replay: Modify paths, headers, and request
                             body before replay.
                         </li>
                         <li class="checklist-item flex items-center gap-3">
-                            <svg
+                            <i
+                                data-lucide="check"
                                 class="w-4 h-4 text-brand-500 shrink-0"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M5 13l4 4L19 7"
-                                />
-                            </svg>
+                            ></i>
                             Auto JSON formatting and copy widgets.
                         </li>
                     </ul>
@@ -1465,11 +1382,29 @@
                 <div
                     class="flex items-center justify-center gap-6 mt-4 text-xs text-zinc-400 font-medium"
                 >
-                    <span>Windows (MSI & EXE Setup)</span>
+                    <span class="flex items-center gap-2">
+                        <i
+                            data-lucide="monitor"
+                            class="w-4 h-4 text-zinc-500"
+                        ></i>
+                        Windows (MSI & EXE Setup)
+                    </span>
                     <span class="w-1.5 h-1.5 bg-zinc-800 rounded-full"></span>
-                    <span>macOS (Silicon + Intel)</span>
+                    <span class="flex items-center gap-2">
+                        <i
+                            data-lucide="apple"
+                            class="w-4 h-4 text-zinc-500"
+                        ></i>
+                        macOS (Silicon + Intel)
+                    </span>
                     <span class="w-1.5 h-1.5 bg-zinc-800 rounded-full"></span>
-                    <span>Linux (Ubuntu)</span>
+                    <span class="flex items-center gap-2">
+                        <i
+                            data-lucide="terminal"
+                            class="w-4 h-4 text-zinc-500"
+                        ></i>
+                        Linux (Ubuntu)
+                    </span>
                 </div>
             </div>
         </section>
@@ -1840,19 +1775,8 @@
                 id="lightbox-close"
                 class="absolute top-5 right-5 text-zinc-400 hover:text-white transition-colors p-2.5 bg-zinc-900/70 hover:bg-zinc-800 rounded-full border border-zinc-800"
             >
-                <svg
-                    class="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M6 18L18 6M6 6l12 12"
-                    />
-                </svg>
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
             </button>
             <div
                 class="lightbox-inner max-w-[90vw] max-h-[88vh] relative overflow-hidden rounded-2xl border border-zinc-800/60 shadow-2xl bg-zinc-950 p-2"
@@ -1894,6 +1818,17 @@
 
                 btn.querySelector("span").textContent =
                     "Download for " + osLabel;
+
+                const iconEl = document.getElementById("download-icon");
+
+                if (os === "macos") {
+                    iconEl.setAttribute("data-lucide", "monitor");
+                } else if (os === "linux") {
+                    iconEl.setAttribute("data-lucide", "terminal");
+                } else {
+                    iconEl.setAttribute("data-lucide", "download");
+                }
+                lucide.createIcons();
 
                 // Dynamically fetch latest release assets from GitHub API
                 fetch(
@@ -2055,13 +1990,19 @@
                                 { duration: 0.7, easing: [0.16, 1, 0.3, 1] },
                             );
                     });
-      } else {
-        // Fallback: reveal everything immediately if Motion failed
-        document.querySelectorAll("#hero-title, #hero-desc, #hero-downloads, #hero-pipeline, #hero-mockup, .feature-card, .inspector-text, .inspector-mockup, .checklist-item").forEach(el => {
-          el.style.opacity = "1";
-        });
-        document.querySelectorAll(".checklist-item").forEach(el => el.classList.add("visible"));
-      }
+                } else {
+                    // Fallback: reveal everything immediately if Motion failed
+                    document
+                        .querySelectorAll(
+                            "#hero-title, #hero-desc, #hero-downloads, #hero-pipeline, #hero-mockup, .feature-card, .inspector-text, .inspector-mockup, .checklist-item",
+                        )
+                        .forEach((el) => {
+                            el.style.opacity = "1";
+                        });
+                    document
+                        .querySelectorAll(".checklist-item")
+                        .forEach((el) => el.classList.add("visible"));
+                }
 
                 // 3. Interactive Mockup Tabs Switching
                 const tabs = document.querySelectorAll(".tab-btn");
@@ -2235,204 +2176,287 @@
                         closeLightbox();
                 });
 
-      // 5. SVG Particle Pipeline Animation
-      function initPipeline() {
-        const svg    = document.getElementById("pipeline-svg");
-        const nodesEl = document.querySelectorAll(".pipeline-node");
-        if (!svg || nodesEl.length < 2) return;
+                // 5. SVG Particle Pipeline Animation
+                function initPipeline() {
+                    const svg = document.getElementById("pipeline-svg");
+                    const nodesEl = document.querySelectorAll(".pipeline-node");
+                    if (!svg || nodesEl.length < 2) return;
 
-        const container = svg.parentElement;
-        const cRect     = container.getBoundingClientRect();
+                    const container = svg.parentElement;
+                    const cRect = container.getBoundingClientRect();
 
-        const nodeData = Array.from(nodesEl).map(n => {
-          const iconBox = n.querySelector('.relative');
-          const r = iconBox ? iconBox.getBoundingClientRect() : n.getBoundingClientRect();
-          return {
-            cx: r.left - cRect.left + r.width / 2,
-            cy: r.top  - cRect.top  + r.height / 2,
-            left: r.left - cRect.left,
-            right: r.right - cRect.left,
-            width: r.width,
-          };
-        });
+                    const nodeData = Array.from(nodesEl).map((n) => {
+                        const iconBox = n.querySelector(".relative");
+                        const r = iconBox
+                            ? iconBox.getBoundingClientRect()
+                            : n.getBoundingClientRect();
+                        return {
+                            cx: r.left - cRect.left + r.width / 2,
+                            cy: r.top - cRect.top + r.height / 2,
+                            left: r.left - cRect.left,
+                            right: r.right - cRect.left,
+                            width: r.width,
+                        };
+                    });
 
-        const baseGroup = document.getElementById("pipe-base-lines");
-        const glowGroup = document.getElementById("pipe-glow-lines");
-        const partGroup = document.getElementById("pipe-particles");
-        if (!baseGroup || !glowGroup || !partGroup) return;
+                    const baseGroup =
+                        document.getElementById("pipe-base-lines");
+                    const glowGroup =
+                        document.getElementById("pipe-glow-lines");
+                    const partGroup = document.getElementById("pipe-particles");
+                    if (!baseGroup || !glowGroup || !partGroup) return;
 
-        const NS = "http://www.w3.org/2000/svg";
-        const lineY = nodeData[0].cy;
+                    const NS = "http://www.w3.org/2000/svg";
+                    const lineY = nodeData[0].cy;
 
-        const segments = [
-          { from: nodeData[0].right, to: nodeData[1].left, label: "local", dash: "4 6", color: "rgba(249,115,22,0.5)", gradId: "pipe-grad-local", particleColor: "#f97316", particleR: 4 },
-          { from: nodeData[1].right, to: nodeData[2].left, label: "tunnel", dash: "12 30", color: "rgba(249,115,22,0.5)", gradId: "pipe-grad-1", particleColor: "#f97316", particleR: 4 },
-          { from: nodeData[2].right, to: nodeData[3].left, label: "public", dash: "12 30", color: "rgba(34,197,94,0.4)", gradId: "pipe-grad-2", particleColor: "#22c55e", particleR: 3 },
-        ];
+                    const segments = [
+                        {
+                            from: nodeData[0].right,
+                            to: nodeData[1].left,
+                            label: "local",
+                            dash: "4 6",
+                            color: "rgba(249,115,22,0.5)",
+                            gradId: "pipe-grad-local",
+                            particleColor: "#f97316",
+                            particleR: 4,
+                        },
+                        {
+                            from: nodeData[1].right,
+                            to: nodeData[2].left,
+                            label: "tunnel",
+                            dash: "12 30",
+                            color: "rgba(249,115,22,0.5)",
+                            gradId: "pipe-grad-1",
+                            particleColor: "#f97316",
+                            particleR: 4,
+                        },
+                        {
+                            from: nodeData[2].right,
+                            to: nodeData[3].left,
+                            label: "public",
+                            dash: "12 30",
+                            color: "rgba(34,197,94,0.4)",
+                            gradId: "pipe-grad-2",
+                            particleColor: "#22c55e",
+                            particleR: 3,
+                        },
+                    ];
 
-        segments.forEach((seg, i) => {
-          const baseLine = document.createElementNS(NS, "line");
-          baseLine.setAttribute("x1", seg.from); baseLine.setAttribute("y1", lineY);
-          baseLine.setAttribute("x2", seg.to); baseLine.setAttribute("y2", lineY);
-          baseLine.setAttribute("stroke", seg.color);
-          baseLine.setAttribute("stroke-width", i === 0 ? "1.5" : "1.5");
-          baseLine.setAttribute("stroke-linecap", "round");
-          if (i === 0) {
-            baseLine.setAttribute("stroke-dasharray", seg.dash);
-          }
-          baseGroup.appendChild(baseLine);
+                    segments.forEach((seg, i) => {
+                        const baseLine = document.createElementNS(NS, "line");
+                        baseLine.setAttribute("x1", seg.from);
+                        baseLine.setAttribute("y1", lineY);
+                        baseLine.setAttribute("x2", seg.to);
+                        baseLine.setAttribute("y2", lineY);
+                        baseLine.setAttribute("stroke", seg.color);
+                        baseLine.setAttribute(
+                            "stroke-width",
+                            i === 0 ? "1.5" : "1.5",
+                        );
+                        baseLine.setAttribute("stroke-linecap", "round");
+                        if (i === 0) {
+                            baseLine.setAttribute("stroke-dasharray", seg.dash);
+                        }
+                        baseGroup.appendChild(baseLine);
 
-          const glowLine = document.createElementNS(NS, "line");
-          glowLine.setAttribute("x1", seg.from); glowLine.setAttribute("y1", lineY);
-          glowLine.setAttribute("x2", seg.to); glowLine.setAttribute("y2", lineY);
-          glowLine.setAttribute("stroke", `url(#${seg.gradId})`);
-          glowLine.setAttribute("stroke-width", "2.5");
-          glowLine.setAttribute("stroke-linecap", "round");
-          glowLine.setAttribute("stroke-dasharray", seg.dash);
-          glowLine.setAttribute("filter", "url(#glow)");
-          const dashAnim = document.createElementNS(NS, "animate");
-          dashAnim.setAttribute("attributeName", "stroke-dashoffset");
-          dashAnim.setAttribute("from", "0");
-          dashAnim.setAttribute("to", i === 0 ? "-20" : "-84");
-          dashAnim.setAttribute("dur", (i === 0 ? "1.5" : "2.5") + "s");
-          dashAnim.setAttribute("repeatCount", "indefinite");
-          glowLine.appendChild(dashAnim);
-          glowGroup.appendChild(glowLine);
+                        const glowLine = document.createElementNS(NS, "line");
+                        glowLine.setAttribute("x1", seg.from);
+                        glowLine.setAttribute("y1", lineY);
+                        glowLine.setAttribute("x2", seg.to);
+                        glowLine.setAttribute("y2", lineY);
+                        glowLine.setAttribute("stroke", `url(#${seg.gradId})`);
+                        glowLine.setAttribute("stroke-width", "2.5");
+                        glowLine.setAttribute("stroke-linecap", "round");
+                        glowLine.setAttribute("stroke-dasharray", seg.dash);
+                        glowLine.setAttribute("filter", "url(#glow)");
+                        const dashAnim = document.createElementNS(
+                            NS,
+                            "animate",
+                        );
+                        dashAnim.setAttribute(
+                            "attributeName",
+                            "stroke-dashoffset",
+                        );
+                        dashAnim.setAttribute("from", "0");
+                        dashAnim.setAttribute("to", i === 0 ? "-20" : "-84");
+                        dashAnim.setAttribute(
+                            "dur",
+                            (i === 0 ? "1.5" : "2.5") + "s",
+                        );
+                        dashAnim.setAttribute("repeatCount", "indefinite");
+                        glowLine.appendChild(dashAnim);
+                        glowGroup.appendChild(glowLine);
 
-          const dur = 2.5 + i * 0.5;
-          [0, 0.5].forEach((offset, pi) => {
-            const circ = document.createElementNS(NS, "circle");
-            circ.setAttribute("r", seg.particleR);
-            circ.setAttribute("fill", pi === 0 ? seg.particleColor : (i === 0 ? "#fbbf24" : "#86efac"));
-            circ.setAttribute("filter", "url(#glow)");
+                        const dur = 2.5 + i * 0.5;
+                        [0, 0.5].forEach((offset, pi) => {
+                            const circ = document.createElementNS(NS, "circle");
+                            circ.setAttribute("r", seg.particleR);
+                            circ.setAttribute(
+                                "fill",
+                                pi === 0
+                                    ? seg.particleColor
+                                    : i === 0
+                                      ? "#fbbf24"
+                                      : "#86efac",
+                            );
+                            circ.setAttribute("filter", "url(#glow)");
 
-            const delay = (offset * dur) + "s";
+                            const delay = offset * dur + "s";
 
-            const animX = document.createElementNS(NS, "animate");
-            animX.setAttribute("attributeName", "cx");
-            animX.setAttribute("from", seg.from); animX.setAttribute("to", seg.to);
-            animX.setAttribute("dur", dur + "s");
-            animX.setAttribute("begin", delay);
-            animX.setAttribute("repeatCount", "indefinite");
+                            const animX = document.createElementNS(
+                                NS,
+                                "animate",
+                            );
+                            animX.setAttribute("attributeName", "cx");
+                            animX.setAttribute("from", seg.from);
+                            animX.setAttribute("to", seg.to);
+                            animX.setAttribute("dur", dur + "s");
+                            animX.setAttribute("begin", delay);
+                            animX.setAttribute("repeatCount", "indefinite");
 
-            const animY = document.createElementNS(NS, "animate");
-            animY.setAttribute("attributeName", "cy");
-            animY.setAttribute("from", lineY); animY.setAttribute("to", lineY);
-            animY.setAttribute("dur", dur + "s");
-            animY.setAttribute("begin", delay);
-            animY.setAttribute("repeatCount", "indefinite");
+                            const animY = document.createElementNS(
+                                NS,
+                                "animate",
+                            );
+                            animY.setAttribute("attributeName", "cy");
+                            animY.setAttribute("from", lineY);
+                            animY.setAttribute("to", lineY);
+                            animY.setAttribute("dur", dur + "s");
+                            animY.setAttribute("begin", delay);
+                            animY.setAttribute("repeatCount", "indefinite");
 
-            const animO = document.createElementNS(NS, "animate");
-            animO.setAttribute("attributeName", "opacity");
-            animO.setAttribute("values", "0;1;1;0");
-            animO.setAttribute("keyTimes", "0;0.08;0.92;1");
-            animO.setAttribute("dur", dur + "s");
-            animO.setAttribute("begin", delay);
-            animO.setAttribute("repeatCount", "indefinite");
+                            const animO = document.createElementNS(
+                                NS,
+                                "animate",
+                            );
+                            animO.setAttribute("attributeName", "opacity");
+                            animO.setAttribute("values", "0;1;1;0");
+                            animO.setAttribute("keyTimes", "0;0.08;0.92;1");
+                            animO.setAttribute("dur", dur + "s");
+                            animO.setAttribute("begin", delay);
+                            animO.setAttribute("repeatCount", "indefinite");
 
-            circ.setAttribute("cx", seg.from);
-            circ.setAttribute("cy", lineY);
-            circ.appendChild(animX);
-            circ.appendChild(animY);
-            circ.appendChild(animO);
-            partGroup.appendChild(circ);
-          });
-        });
-      }
+                            circ.setAttribute("cx", seg.from);
+                            circ.setAttribute("cy", lineY);
+                            circ.appendChild(animX);
+                            circ.appendChild(animY);
+                            circ.appendChild(animO);
+                            partGroup.appendChild(circ);
+                        });
+                    });
+                }
 
-      requestAnimationFrame(() => setTimeout(initPipeline, 100));
+                requestAnimationFrame(() => setTimeout(initPipeline, 100));
 
-      // 6. Scroll Progress Bar
-      const scrollProgress = document.getElementById("scroll-progress");
-      function updateScrollProgress() {
-        const scrollTop = window.scrollY;
-        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-        const progress = docHeight > 0 ? scrollTop / docHeight : 0;
-        if (scrollProgress) scrollProgress.style.transform = `scaleX(${progress})`;
-      }
+                // 6. Scroll Progress Bar
+                const scrollProgress =
+                    document.getElementById("scroll-progress");
+                function updateScrollProgress() {
+                    const scrollTop = window.scrollY;
+                    const docHeight =
+                        document.documentElement.scrollHeight -
+                        window.innerHeight;
+                    const progress = docHeight > 0 ? scrollTop / docHeight : 0;
+                    if (scrollProgress)
+                        scrollProgress.style.transform = `scaleX(${progress})`;
+                }
 
-      // 7. Header Hide/Show on Scroll
-      const header = document.getElementById("main-header");
-      let lastScrollY = 0;
-      let ticking = false;
+                // 7. Header Hide/Show on Scroll
+                const header = document.getElementById("main-header");
+                let lastScrollY = 0;
+                let ticking = false;
 
-      function updateHeader() {
-        const currentY = window.scrollY;
-        if (currentY > lastScrollY && currentY > 80) {
-          header.classList.add("header-hidden");
-        } else {
-          header.classList.remove("header-hidden");
-        }
-        lastScrollY = currentY;
-        ticking = false;
-      }
+                function updateHeader() {
+                    const currentY = window.scrollY;
+                    if (currentY > lastScrollY && currentY > 80) {
+                        header.classList.add("header-hidden");
+                    } else {
+                        header.classList.remove("header-hidden");
+                    }
+                    lastScrollY = currentY;
+                    ticking = false;
+                }
 
-      // 8. Mouse-Following Cursor Glow
-      const cursorGlow = document.getElementById("cursor-glow");
-      let mouseX = 0, mouseY = 0;
-      let glowX = 0, glowY = 0;
-      let glowActive = false;
-      let glowTimeout;
+                // 8. Mouse-Following Cursor Glow
+                const cursorGlow = document.getElementById("cursor-glow");
+                let mouseX = 0,
+                    mouseY = 0;
+                let glowX = 0,
+                    glowY = 0;
+                let glowActive = false;
+                let glowTimeout;
 
-      function updateCursorGlow() {
-        const dx = mouseX - glowX;
-        const dy = mouseY - glowY;
-        glowX += dx * 0.08;
-        glowY += dy * 0.08;
-        if (cursorGlow) {
-          cursorGlow.style.left = glowX + "px";
-          cursorGlow.style.top = glowY + "px";
-        }
-        requestAnimationFrame(updateCursorGlow);
-      }
+                function updateCursorGlow() {
+                    const dx = mouseX - glowX;
+                    const dy = mouseY - glowY;
+                    glowX += dx * 0.08;
+                    glowY += dy * 0.08;
+                    if (cursorGlow) {
+                        cursorGlow.style.left = glowX + "px";
+                        cursorGlow.style.top = glowY + "px";
+                    }
+                    requestAnimationFrame(updateCursorGlow);
+                }
 
-      document.addEventListener("mousemove", (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-        if (!glowActive) {
-          glowActive = true;
-          if (cursorGlow) cursorGlow.classList.add("active");
-        }
-        clearTimeout(glowTimeout);
-        glowTimeout = setTimeout(() => {
-          glowActive = false;
-          if (cursorGlow) cursorGlow.classList.remove("active");
-        }, 1500);
-      });
+                document.addEventListener("mousemove", (e) => {
+                    mouseX = e.clientX;
+                    mouseY = e.clientY;
+                    if (!glowActive) {
+                        glowActive = true;
+                        if (cursorGlow) cursorGlow.classList.add("active");
+                    }
+                    clearTimeout(glowTimeout);
+                    glowTimeout = setTimeout(() => {
+                        glowActive = false;
+                        if (cursorGlow) cursorGlow.classList.remove("active");
+                    }, 1500);
+                });
 
-      requestAnimationFrame(updateCursorGlow);
+                requestAnimationFrame(updateCursorGlow);
 
-      // 10. Staggered Checklist Animation
-      if (inView) {
-        inView(".inspector-text", (info) => {
-          const items = info.target.querySelectorAll(".checklist-item");
-          items.forEach((item, index) => {
-            setTimeout(() => {
-              item.classList.add("visible");
-              if (animate) {
-                animate(item, { opacity: [0, 1], x: [-15, 0] }, { duration: 0.5, easing: [0.16, 1, 0.3, 1] });
-              }
-            }, index * 120);
-          });
-        });
-      } else {
-        document.querySelectorAll(".checklist-item").forEach(el => el.classList.add("visible"));
-      }
+                // 10. Staggered Checklist Animation
+                if (inView) {
+                    inView(".inspector-text", (info) => {
+                        const items =
+                            info.target.querySelectorAll(".checklist-item");
+                        items.forEach((item, index) => {
+                            setTimeout(() => {
+                                item.classList.add("visible");
+                                if (animate) {
+                                    animate(
+                                        item,
+                                        { opacity: [0, 1], x: [-15, 0] },
+                                        {
+                                            duration: 0.5,
+                                            easing: [0.16, 1, 0.3, 1],
+                                        },
+                                    );
+                                }
+                            }, index * 120);
+                        });
+                    });
+                } else {
+                    document
+                        .querySelectorAll(".checklist-item")
+                        .forEach((el) => el.classList.add("visible"));
+                }
 
-      // 12. Scroll Event Handler (throttled)
-      function onScroll() {
-        if (!ticking) {
-          requestAnimationFrame(() => {
-            updateScrollProgress();
-            updateHeader();
-          });
-          ticking = true;
-        }
-      }
-      window.addEventListener("scroll", onScroll, { passive: true });
-      updateScrollProgress();
+                // 12. Scroll Event Handler (throttled)
+                function onScroll() {
+                    if (!ticking) {
+                        requestAnimationFrame(() => {
+                            updateScrollProgress();
+                            updateHeader();
+                        });
+                        ticking = true;
+                    }
+                }
+                window.addEventListener("scroll", onScroll, { passive: true });
+                updateScrollProgress();
 
-    });
-  </script>
+                // Initialize Lucide Icons
+                lucide.createIcons();
+            });
+        </script>
     </body>
 </html>
