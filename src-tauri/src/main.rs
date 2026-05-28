@@ -5,12 +5,16 @@
 //! The entry point of the Vanguarch Tunnel application.
 //! Sets up the system tray, registers commands, and initializes Tauri.
 
+mod commands;
 mod state;
 mod utils;
-mod commands;
 
-use tauri::{Emitter, Manager, menu::{Menu, MenuItem}, tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent}};
 use state::AppState;
+use tauri::{
+    menu::{Menu, MenuItem},
+    tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
+    Emitter, Manager,
+};
 
 fn main() {
     tauri::Builder::default()
@@ -26,7 +30,7 @@ fn main() {
             let show_i = MenuItem::with_id(app, "show", "Show Window", true, None::<&str>)?;
             let quit_i = MenuItem::with_id(app, "quit", "Exit", true, None::<&str>)?;
             let menu = Menu::with_items(app, &[&show_i, &quit_i])?;
-            
+
             let _tray = TrayIconBuilder::new()
                 .icon(app.default_window_icon().unwrap().clone())
                 .tooltip("Vanguarch Tunnel")
@@ -68,9 +72,9 @@ fn main() {
             _ => {}
         })
         .invoke_handler(tauri::generate_handler![
-            commands::tunnel::start_tunnel, 
-            commands::tunnel::stop_tunnel, 
-            commands::project::scan_projects, 
+            commands::tunnel::start_tunnel,
+            commands::tunnel::stop_tunnel,
+            commands::project::scan_projects,
             commands::cloudflare::cloudflared_login,
             commands::cloudflare::logout_cloudflared,
             commands::cloudflare::get_cloudflared_domain,
@@ -84,13 +88,16 @@ fn main() {
             commands::system::force_exit,
             commands::system::check_ports,
             commands::system::open_url,
+            commands::system::get_username,
             commands::setup::check_cloudflared_status,
             commands::setup::download_cloudflared,
             commands::share::start_static_server,
             commands::share::stop_static_server,
             commands::inspector::start_inspector,
             commands::inspector::stop_inspector_for_tunnel,
-            commands::inspector::replay_request
+            commands::inspector::replay_request,
+            commands::system::ping_url,
+            commands::system::check_internet
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

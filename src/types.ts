@@ -29,6 +29,7 @@ export interface TunnelProcess {
   status: ProcessStatus;
   logs: TunnelLog[];
   command: string;
+  startedAt?: number;
   stoppedAt?: number;
 }
 
@@ -39,4 +40,14 @@ export interface DiscoveredProject {
   framework: 'WordPress' | 'Laravel' | 'Next.js' | 'Vite' | 'Unknown';
   suggestedUrl: string;
   wpHelperInstalled?: boolean;
+}
+
+export interface SessionRecord {
+  id: string;
+  name: string;
+  localUrl: string;
+  publicDomain: string;
+  startedAt: number;
+  stoppedAt: number;
+  durationMs: number;
 }

@@ -3,24 +3,25 @@ import { getVersion } from '@tauri-apps/api/app';
 import { invoke } from '@tauri-apps/api/core';
 import { Shield, Code2, Github, Mail, User, Rocket, Zap, Link, Globe2, Activity } from 'lucide-react';
 import { cn } from '../lib/utils';
+import packageJson from '../../package.json';
 
 export function AboutView() {
   const [appVersion, setAppVersion] = useState<string>('...');
   const [latestVersion, setLatestVersion] = useState<string | null>(null);
 
   useEffect(() => {
-    let currentVer = '2.3.0';
+    let currentVer = packageJson.version;
     if ((window as any).__TAURI_INTERNALS__) {
       getVersion().then(v => {
         setAppVersion(v);
         currentVer = v;
         checkUpdate(currentVer);
       }).catch(() => {
-        setAppVersion('2.3.0');
+        setAppVersion(packageJson.version);
         checkUpdate(currentVer);
       });
     } else {
-      setAppVersion('2.3.0 (Web)');
+      setAppVersion(`${packageJson.version} (Web)`);
       checkUpdate(currentVer);
     }
   }, []);

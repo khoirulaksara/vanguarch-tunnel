@@ -5,6 +5,7 @@ import { useSettingsStore } from '../store/useSettingsStore';
 import { useCloudflaredStatusStore } from '../store/useCloudflaredStatusStore';
 import { QRCodeDisplay } from './ui/QRCodeDisplay';
 import { TrafficMonitor } from './ui/TrafficMonitor';
+import { cn } from '../lib/utils';
 
 export function PresetList() {
   const { presets, startTunnel, stopTunnel, removePreset, activeProcesses } = useTunnelStore();

@@ -61,7 +61,6 @@ export function ManualTunnel() {
     }
 
     addPreset({
-      id: Date.now().toString(),
       name: config.tunnelName.toUpperCase(),
       localUrl: config.localUrl,
       localVhost: config.localVhost || '',
