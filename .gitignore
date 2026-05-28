@@ -10,7 +10,5 @@ src-tauri/target/
 src-tauri/Cargo.lock
 src-tauri/gen/
 
-# Local planning and analysis files
-hasil-analisa.md
-rencana.md
-impmentation.md
+# Local planning and documentation
+docs/
