@@ -113,12 +113,36 @@
 
     /* Glowing flow line keyframes */
     @keyframes flow-dash {
-      to {
-        stroke-dashoffset: -120;
-      }
+      to { stroke-dashoffset: -200; }
     }
     .animate-flow-line {
-      animation: flow-dash 4s linear infinite;
+      animation: flow-dash 3s linear infinite;
+    }
+    /* Particle dot along path */
+    @keyframes particle-move {
+      0%   { offset-distance: 0%;   opacity: 0; }
+      5%   { opacity: 1; }
+      95%  { opacity: 1; }
+      100% { offset-distance: 100%; opacity: 0; }
+    }
+    .particle {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #f97316;
+      box-shadow: 0 0 8px 3px rgba(249, 115, 22, 0.7);
+      animation: particle-move linear infinite;
+      offset-rotate: 0deg;
+      pointer-events: none;
+    }
+    /* Node pulse ring */
+    @keyframes ping-ring {
+      0%   { transform: scale(1); opacity: 0.6; }
+      100% { transform: scale(1.9); opacity: 0; }
+    }
+    .node-ping {
+      animation: ping-ring 2s cubic-bezier(0, 0, 0.2, 1) infinite;
     }
   </style>
 </head>
@@ -172,60 +196,97 @@
       </div>
       
       <!-- Line-Powered SVG Connection Pipeline -->
-      <div id="hero-pipeline" class="relative max-w-4xl mx-auto py-8 flex flex-col md:flex-row items-center justify-between gap-8 md:gap-4 overflow-hidden px-6 my-16 bg-zinc-950/20 border border-zinc-900/50 rounded-3xl backdrop-blur-md p-8 shadow-2xl">
-        <!-- Glowing Flow SVG Background for Desktop -->
-        <svg class="absolute hidden md:block inset-x-0 top-1/2 -translate-y-1/2 w-full h-8 z-0 pointer-events-none" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- Base connection line -->
-          <path d="M 50,4 H 750" stroke="rgba(63, 63, 70, 0.25)" stroke-width="1.5" stroke-linecap="round"/>
-          <!-- Glowing moving dash path -->
-          <path d="M 50,4 H 750" stroke="url(#flow-gradient)" stroke-width="2" stroke-linecap="round" stroke-dasharray="15, 45" class="animate-flow-line"/>
-          
-          <defs>
-            <linearGradient id="flow-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stop-color="#ea580c"/>
-              <stop offset="50%" stop-color="#fbbf24"/>
-              <stop offset="100%" stop-color="#ea580c"/>
-            </linearGradient>
-          </defs>
-        </svg>
-
-        <!-- Node 1: Local Port -->
-        <div class="relative z-10 flex flex-col items-center bg-zinc-950/80 border border-zinc-800/80 rounded-2xl p-4 w-44 hover:border-orange-500/20 transition-all select-none">
-          <div class="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800/50 flex items-center justify-center mb-2 font-mono text-orange-500 text-xs font-semibold">
-            3000
-          </div>
-          <span class="text-xs text-zinc-300 font-medium">Local server</span>
-          <span class="text-[10px] text-zinc-500 font-mono mt-0.5">localhost:3000</span>
-        </div>
-
-        <!-- Node 2: Vanguarch GUI -->
-        <div class="relative z-10 flex flex-col items-center bg-zinc-950/80 border border-orange-500/20 rounded-2xl p-4 w-44 hover:border-orange-500/40 transition-all select-none scale-105 shadow-xl shadow-brand-500/5 ring-1 ring-orange-500/10">
-          <div class="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800/50 flex items-center justify-center mb-2">
-            <img src="logo.png" alt="Vanguarch" class="w-6 h-6 object-contain">
-          </div>
-          <span class="text-xs text-white font-semibold">Vanguarch App</span>
-          <span class="text-[10px] text-brand-500 font-mono mt-0.5 animate-pulse flex items-center gap-1">
-            <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span> Active Tunnel
+      <div id="hero-pipeline" class="relative max-w-5xl mx-auto my-16">
+        <!-- Label -->
+        <div class="text-center mb-6">
+          <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-500 text-[11px] font-medium">
+            <span class="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse"></span>
+            How it works
           </span>
         </div>
 
-        <!-- Node 3: Cloudflare Edge -->
-        <div class="relative z-10 flex flex-col items-center bg-zinc-950/80 border border-zinc-800/80 rounded-2xl p-4 w-44 hover:border-orange-500/20 transition-all select-none">
-          <div class="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800/50 flex items-center justify-center mb-2 text-orange-500">
-            ☁️
-          </div>
-          <span class="text-xs text-zinc-300 font-medium">Cloudflare Edge</span>
-          <span class="text-[10px] text-zinc-500 font-mono mt-0.5">Argo Smart Routing</span>
-        </div>
+        <!-- Pipeline Canvas Container -->
+        <div class="relative bg-zinc-950/30 border border-zinc-900/60 rounded-2xl p-8 backdrop-blur-sm overflow-hidden">
+          <!-- SVG Layer - paths + animated particles -->
+          <svg id="pipeline-svg" class="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <linearGradient id="pipe-grad-1" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="rgba(249,115,22,0)" />
+                <stop offset="40%" stop-color="rgba(249,115,22,0.6)" />
+                <stop offset="100%" stop-color="rgba(251,191,36,0.3)" />
+              </linearGradient>
+              <linearGradient id="pipe-grad-2" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="rgba(251,191,36,0.3)" />
+                <stop offset="60%" stop-color="rgba(249,115,22,0.6)" />
+                <stop offset="100%" stop-color="rgba(249,115,22,0)" />
+              </linearGradient>
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="3" result="blur" />
+                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
 
-        <!-- Node 4: Public Domain -->
-        <div class="relative z-10 flex flex-col items-center bg-zinc-950/80 border border-zinc-800/80 rounded-2xl p-4 w-44 hover:border-orange-500/20 transition-all select-none">
-          <div class="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800/50 flex items-center justify-center mb-2 text-green-500 text-sm">
-            🌐
-          </div>
-          <span class="text-xs text-zinc-300 font-medium">Public URL</span>
-          <span class="text-[10px] text-green-500/70 font-mono mt-0.5 truncate max-w-[125px]">vanguarch.dev</span>
-        </div>
+            <!-- Base dim connection lines (drawn by JS) -->
+            <g id="pipe-base-lines"></g>
+            <!-- Animated glow lines (drawn by JS) -->
+            <g id="pipe-glow-lines"></g>
+            <!-- Moving particles (drawn by JS) -->
+            <g id="pipe-particles"></g>
+          </svg>
+
+          <!-- Nodes Grid -->
+          <div id="pipeline-nodes" class="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-6">
+
+            <!-- Node 1: Local Port -->
+            <div class="pipeline-node flex flex-col items-center" data-node="0">
+              <div class="relative">
+                <div class="node-ping absolute inset-0 rounded-full bg-orange-500/30"></div>
+                <div class="relative w-14 h-14 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center font-mono text-brand-500 text-sm font-bold shadow-lg shadow-orange-500/5">
+                  :3000
+                </div>
+              </div>
+              <span class="text-xs text-zinc-300 font-semibold mt-3">Local Server</span>
+              <span class="text-[10px] text-zinc-600 font-mono mt-0.5">localhost:3000</span>
+            </div>
+
+            <!-- Node 2: Vanguarch GUI -->
+            <div class="pipeline-node flex flex-col items-center" data-node="1">
+              <div class="relative">
+                <div class="node-ping absolute inset-0 rounded-full bg-orange-500/20" style="animation-delay:0.5s"></div>
+                <div class="relative w-14 h-14 rounded-2xl bg-zinc-900 border-2 border-orange-500/40 flex items-center justify-center shadow-lg shadow-orange-500/15 ring-1 ring-orange-500/10">
+                  <img src="logo.png" alt="Vanguarch" class="w-7 h-7 object-contain">
+                </div>
+              </div>
+              <span class="text-xs text-white font-bold mt-3">Vanguarch</span>
+              <span class="text-[10px] text-brand-500 font-mono mt-0.5">GUI Wrapper</span>
+            </div>
+
+            <!-- Node 3: Cloudflare Edge -->
+            <div class="pipeline-node flex flex-col items-center" data-node="2">
+              <div class="relative">
+                <div class="node-ping absolute inset-0 rounded-full bg-blue-500/20" style="animation-delay:1s"></div>
+                <div class="relative w-14 h-14 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-2xl shadow-lg">
+                  ☁️
+                </div>
+              </div>
+              <span class="text-xs text-zinc-300 font-semibold mt-3">Cloudflare Edge</span>
+              <span class="text-[10px] text-zinc-600 font-mono mt-0.5">Argo Routing</span>
+            </div>
+
+            <!-- Node 4: Public Domain -->
+            <div class="pipeline-node flex flex-col items-center" data-node="3">
+              <div class="relative">
+                <div class="node-ping absolute inset-0 rounded-full bg-green-500/20" style="animation-delay:1.5s"></div>
+                <div class="relative w-14 h-14 rounded-2xl bg-zinc-900 border border-green-500/30 flex items-center justify-center text-2xl shadow-lg shadow-green-500/5">
+                  🌐
+                </div>
+              </div>
+              <span class="text-xs text-zinc-300 font-semibold mt-3">Public URL</span>
+              <span class="text-[10px] text-green-500/70 font-mono mt-0.5">yourapp.com</span>
+            </div>
+
+          </div><!-- /nodes grid -->
+        </div><!-- /pipeline canvas -->
       </div>
       
       <!-- Interactive App Mockup / Feature Showcase -->
@@ -550,42 +611,55 @@
     </div>
     <!-- Scrolling strip of floating tilted thumbnails -->
     <div class="flex gap-5 overflow-x-auto pb-6 px-6 max-w-full" style="scrollbar-width: none;">
+
       <div class="perspective-1000 shrink-0">
-        <div class="tilted-card w-72 bg-zinc-950 border border-zinc-800/80 rounded-xl p-1.5 shadow-2xl cursor-zoom-in" onclick="document.getElementById('lightbox').classList.remove('pointer-events-none'); document.getElementById('lightbox-img').src='public/Screenshot 2026-05-28 170434.png'; document.getElementById('lightbox-caption').textContent='Dashboard Overview'; document.getElementById('lightbox').style.opacity='1';">
+        <div class="tilted-card w-72 bg-zinc-950 border border-zinc-800/80 rounded-xl p-1.5 shadow-2xl cursor-zoom-in strip-card"
+             data-src="public/Screenshot 2026-05-28 170434.png" data-caption="Dashboard Overview">
           <div class="flex gap-1 mb-1 px-1 pt-0.5"><div class="w-2 h-2 rounded-full bg-red-500/50"></div><div class="w-2 h-2 rounded-full bg-yellow-500/50"></div><div class="w-2 h-2 rounded-full bg-green-500/50"></div></div>
           <img src="public/Screenshot 2026-05-28 170434.png" alt="Dashboard" class="rounded-lg w-full">
         </div>
       </div>
+
       <div class="perspective-1000 shrink-0 mt-8">
-        <div class="tilted-card w-72 bg-zinc-950 border border-zinc-800/80 rounded-xl p-1.5 shadow-2xl cursor-zoom-in" onclick="document.getElementById('lightbox').classList.remove('pointer-events-none'); document.getElementById('lightbox-img').src='public/Screenshot 2026-05-28 170437.png'; document.getElementById('lightbox-caption').textContent='Manual Tunnel Setup'; document.getElementById('lightbox').style.opacity='1';">
+        <div class="tilted-card w-72 bg-zinc-950 border border-zinc-800/80 rounded-xl p-1.5 shadow-2xl cursor-zoom-in strip-card"
+             data-src="public/Screenshot 2026-05-28 170437.png" data-caption="Manual Tunnel Setup">
           <div class="flex gap-1 mb-1 px-1 pt-0.5"><div class="w-2 h-2 rounded-full bg-red-500/50"></div><div class="w-2 h-2 rounded-full bg-yellow-500/50"></div><div class="w-2 h-2 rounded-full bg-green-500/50"></div></div>
           <img src="public/Screenshot 2026-05-28 170437.png" alt="Manual Tunnel" class="rounded-lg w-full">
         </div>
       </div>
+
       <div class="perspective-1000 shrink-0">
-        <div class="tilted-card w-72 bg-zinc-950 border border-zinc-800/80 rounded-xl p-1.5 shadow-2xl cursor-zoom-in" onclick="document.getElementById('lightbox').classList.remove('pointer-events-none'); document.getElementById('lightbox-img').src='public/Screenshot 2026-05-28 170442.png'; document.getElementById('lightbox-caption').textContent='Projects Auto-Discovery'; document.getElementById('lightbox').style.opacity='1';">
+        <div class="tilted-card w-72 bg-zinc-950 border border-zinc-800/80 rounded-xl p-1.5 shadow-2xl cursor-zoom-in strip-card"
+             data-src="public/Screenshot 2026-05-28 170442.png" data-caption="Projects Auto-Discovery">
           <div class="flex gap-1 mb-1 px-1 pt-0.5"><div class="w-2 h-2 rounded-full bg-red-500/50"></div><div class="w-2 h-2 rounded-full bg-yellow-500/50"></div><div class="w-2 h-2 rounded-full bg-green-500/50"></div></div>
           <img src="public/Screenshot 2026-05-28 170442.png" alt="Auto Discovery" class="rounded-lg w-full">
         </div>
       </div>
+
       <div class="perspective-1000 shrink-0 mt-8">
-        <div class="tilted-card w-72 bg-zinc-950 border border-zinc-800/80 rounded-xl p-1.5 shadow-2xl cursor-zoom-in" onclick="document.getElementById('lightbox').classList.remove('pointer-events-none'); document.getElementById('lightbox-img').src='public/Screenshot 2026-05-28 170445.png'; document.getElementById('lightbox-caption').textContent='Cloud Tunnels Manager'; document.getElementById('lightbox').style.opacity='1';">
+        <div class="tilted-card w-72 bg-zinc-950 border border-zinc-800/80 rounded-xl p-1.5 shadow-2xl cursor-zoom-in strip-card"
+             data-src="public/Screenshot 2026-05-28 170445.png" data-caption="Cloud Tunnels Manager">
           <div class="flex gap-1 mb-1 px-1 pt-0.5"><div class="w-2 h-2 rounded-full bg-red-500/50"></div><div class="w-2 h-2 rounded-full bg-yellow-500/50"></div><div class="w-2 h-2 rounded-full bg-green-500/50"></div></div>
           <img src="public/Screenshot 2026-05-28 170445.png" alt="Cloud Tunnels" class="rounded-lg w-full">
         </div>
       </div>
+
       <div class="perspective-1000 shrink-0">
-        <div class="tilted-card w-72 bg-zinc-950 border border-zinc-800/80 rounded-xl p-1.5 shadow-2xl cursor-zoom-in" onclick="document.getElementById('lightbox').classList.remove('pointer-events-none'); document.getElementById('lightbox-img').src='public/Screenshot 2026-05-28 170453.png'; document.getElementById('lightbox-caption').textContent='Traffic Analytics'; document.getElementById('lightbox').style.opacity='1';">
+        <div class="tilted-card w-72 bg-zinc-950 border border-zinc-800/80 rounded-xl p-1.5 shadow-2xl cursor-zoom-in strip-card"
+             data-src="public/Screenshot 2026-05-28 170453.png" data-caption="Traffic Analytics">
           <div class="flex gap-1 mb-1 px-1 pt-0.5"><div class="w-2 h-2 rounded-full bg-red-500/50"></div><div class="w-2 h-2 rounded-full bg-yellow-500/50"></div><div class="w-2 h-2 rounded-full bg-green-500/50"></div></div>
           <img src="public/Screenshot 2026-05-28 170453.png" alt="Analytics" class="rounded-lg w-full">
         </div>
       </div>
+
       <div class="perspective-1000 shrink-0 mt-8">
-        <div class="tilted-card w-72 bg-zinc-950 border border-zinc-800/80 rounded-xl p-1.5 shadow-2xl cursor-zoom-in" onclick="document.getElementById('lightbox').classList.remove('pointer-events-none'); document.getElementById('lightbox-img').src='public/Screenshot 2026-05-28 170502.png'; document.getElementById('lightbox-caption').textContent='About App'; document.getElementById('lightbox').style.opacity='1';">
+        <div class="tilted-card w-72 bg-zinc-950 border border-zinc-800/80 rounded-xl p-1.5 shadow-2xl cursor-zoom-in strip-card"
+             data-src="public/Screenshot 2026-05-28 170502.png" data-caption="About App">
           <div class="flex gap-1 mb-1 px-1 pt-0.5"><div class="w-2 h-2 rounded-full bg-red-500/50"></div><div class="w-2 h-2 rounded-full bg-yellow-500/50"></div><div class="w-2 h-2 rounded-full bg-green-500/50"></div></div>
           <img src="public/Screenshot 2026-05-28 170502.png" alt="About" class="rounded-lg w-full">
         </div>
       </div>
+
     </div>
   </section>
 
@@ -757,7 +831,7 @@
         });
       });
 
-      // 4. Lightbox — supports both the main mockup frame AND the tilted inspector card
+      // 4. Lightbox — supports main mockup, inspector card, and screenshot strip
       const lightbox = document.getElementById("lightbox");
       const lightboxImg = document.getElementById("lightbox-img");
       const lightboxCaption = document.getElementById("lightbox-caption");
@@ -767,45 +841,160 @@
         lightboxImg.src = src;
         lightboxCaption.textContent = caption;
         lightbox.classList.remove("pointer-events-none");
+        lightbox.style.opacity = "1";
         if (animate) {
           animate(lightbox, { opacity: [0, 1] }, { duration: 0.25 });
-          const modalContainer = lightbox.querySelector(".lightbox-inner");
-          animate(modalContainer, { scale: [0.93, 1], opacity: [0, 1] }, { duration: 0.3, easing: [0.16, 1, 0.3, 1] });
-        } else {
-          lightbox.style.opacity = "1";
+          const inner = lightbox.querySelector(".lightbox-inner");
+          if (inner) animate(inner, { scale: [0.93, 1], opacity: [0, 1] }, { duration: 0.3, easing: [0.16, 1, 0.3, 1] });
         }
       }
 
       function closeLightbox() {
-        lightbox.classList.add("pointer-events-none");
         if (animate) {
           animate(lightbox, { opacity: [1, 0] }, { duration: 0.2 });
-          const modalContainer = lightbox.querySelector(".lightbox-inner");
-          animate(modalContainer, { scale: [1, 0.93], opacity: [1, 0] }, { duration: 0.2, easing: "ease-in" });
+          const inner = lightbox.querySelector(".lightbox-inner");
+          if (inner) animate(inner, { scale: [1, 0.93], opacity: [1, 0] }, { duration: 0.2, easing: "ease-in" });
+          setTimeout(() => lightbox.classList.add("pointer-events-none"), 220);
         } else {
           lightbox.style.opacity = "0";
+          lightbox.classList.add("pointer-events-none");
         }
       }
 
-      // Main mockup frame click
+      // Main mockup frame
       const activeImgFrame = activeImg.parentElement;
       activeImgFrame.addEventListener("click", () => {
         openLightboxWith(activeImg.src, activeTitle.textContent + " — " + activeDesc.textContent);
       });
 
-      // Tilted inspector card click
-      const tiltedCard = document.querySelector(".tilted-card");
-      if (tiltedCard) {
-        tiltedCard.addEventListener("click", () => {
-          openLightboxWith(tiltedCard.querySelector("img").src, "Web Request Inspector — Ngrok-style proxy capturing payloads with 1-click replay.");
+      // Inspector tilted card (first .tilted-card in #inspector)
+      const inspectorCard = document.querySelector("#inspector .tilted-card");
+      if (inspectorCard) {
+        inspectorCard.addEventListener("click", () => {
+          const img = inspectorCard.querySelector("img");
+          openLightboxWith(img.src, "Web Request Inspector — Ngrok-style proxy capturing payloads with 1-click replay.");
         });
       }
+
+      // Screenshot strip cards — all .strip-card elements
+      document.querySelectorAll(".strip-card").forEach(card => {
+        card.addEventListener("click", () => {
+          const src     = card.getAttribute("data-src");
+          const caption = card.getAttribute("data-caption");
+          openLightboxWith(src, caption);
+        });
+      });
 
       closeBtn.addEventListener("click", closeLightbox);
       lightbox.addEventListener("click", (e) => { if (e.target === lightbox) closeLightbox(); });
       document.addEventListener("keydown", (e) => {
         if (e.key === "Escape" && !lightbox.classList.contains("pointer-events-none")) closeLightbox();
       });
+
+      // 5. SVG Particle Pipeline Animation
+      // Waits for layout then draws animated connecting lines between nodes
+      function initPipeline() {
+        const svg    = document.getElementById("pipeline-svg");
+        const nodesEl = document.querySelectorAll(".pipeline-node");
+        if (!svg || nodesEl.length < 2) return;
+
+        const container = svg.parentElement;
+        const cRect     = container.getBoundingClientRect();
+
+        // Get center points of each node relative to the container
+        const centers = Array.from(nodesEl).map(n => {
+          const r = n.getBoundingClientRect();
+          return {
+            x: r.left - cRect.left + r.width / 2,
+            y: r.top  - cRect.top  + r.height / 2,
+          };
+        });
+
+        const baseGroup = document.getElementById("pipe-base-lines");
+        const glowGroup = document.getElementById("pipe-glow-lines");
+        const partGroup = document.getElementById("pipe-particles");
+        if (!baseGroup || !glowGroup || !partGroup) return;
+
+        const NS = "http://www.w3.org/2000/svg";
+
+        // Draw lines between consecutive node centers
+        for (let i = 0; i < centers.length - 1; i++) {
+          const a = centers[i], b = centers[i + 1];
+
+          // Base dim line
+          const baseLine = document.createElementNS(NS, "line");
+          baseLine.setAttribute("x1", a.x); baseLine.setAttribute("y1", a.y);
+          baseLine.setAttribute("x2", b.x); baseLine.setAttribute("y2", b.y);
+          baseLine.setAttribute("stroke", "rgba(63,63,70,0.35)");
+          baseLine.setAttribute("stroke-width", "1.5");
+          baseLine.setAttribute("stroke-linecap", "round");
+          baseGroup.appendChild(baseLine);
+
+          // Animated glowing dashed line
+          const glowLine = document.createElementNS(NS, "line");
+          glowLine.setAttribute("x1", a.x); glowLine.setAttribute("y1", a.y);
+          glowLine.setAttribute("x2", b.x); glowLine.setAttribute("y2", b.y);
+          glowLine.setAttribute("stroke", "url(#pipe-grad-1)");
+          glowLine.setAttribute("stroke-width", "2.5");
+          glowLine.setAttribute("stroke-linecap", "round");
+          glowLine.setAttribute("stroke-dasharray", "12 30");
+          glowLine.setAttribute("filter", "url(#glow)");
+          const glowAnim = document.createElementNS(NS, "animateTransform");
+          // Use animateTransform on dashoffset instead: simple dash offset animation
+          const dashAnim = document.createElementNS(NS, "animate");
+          dashAnim.setAttribute("attributeName", "stroke-dashoffset");
+          dashAnim.setAttribute("from", "0");
+          dashAnim.setAttribute("to", "-84");
+          dashAnim.setAttribute("dur", (2.5 + i * 0.4) + "s");
+          dashAnim.setAttribute("repeatCount", "indefinite");
+          glowLine.appendChild(dashAnim);
+          glowGroup.appendChild(glowLine);
+
+          // 2 staggered particle dots per segment
+          [0, 0.5].forEach((offset, pi) => {
+            const circ = document.createElementNS(NS, "circle");
+            circ.setAttribute("r", "4");
+            circ.setAttribute("fill", pi === 0 ? "#f97316" : "#fbbf24");
+            circ.setAttribute("filter", "url(#glow)");
+
+            // Animate cx and cy along the line
+            const dur = (3.0 + i * 0.35) + "s";
+            const delay = (offset * (3.0 + i * 0.35)) + "s";
+
+            const animX = document.createElementNS(NS, "animate");
+            animX.setAttribute("attributeName", "cx");
+            animX.setAttribute("from", a.x); animX.setAttribute("to", b.x);
+            animX.setAttribute("dur", dur);
+            animX.setAttribute("begin", delay);
+            animX.setAttribute("repeatCount", "indefinite");
+
+            const animY = document.createElementNS(NS, "animate");
+            animY.setAttribute("attributeName", "cy");
+            animY.setAttribute("from", a.y); animY.setAttribute("to", b.y);
+            animY.setAttribute("dur", dur);
+            animY.setAttribute("begin", delay);
+            animY.setAttribute("repeatCount", "indefinite");
+
+            const animO = document.createElementNS(NS, "animate");
+            animO.setAttribute("attributeName", "opacity");
+            animO.setAttribute("values", "0;1;1;0");
+            animO.setAttribute("keyTimes", "0;0.08;0.92;1");
+            animO.setAttribute("dur", dur);
+            animO.setAttribute("begin", delay);
+            animO.setAttribute("repeatCount", "indefinite");
+
+            circ.setAttribute("cx", a.x);
+            circ.setAttribute("cy", a.y);
+            circ.appendChild(animX);
+            circ.appendChild(animY);
+            circ.appendChild(animO);
+            partGroup.appendChild(circ);
+          });
+        }
+      }
+
+      // Run after a paint frame to ensure layout is settled
+      requestAnimationFrame(() => setTimeout(initPipeline, 100));
     });
   </script>
 </body>
