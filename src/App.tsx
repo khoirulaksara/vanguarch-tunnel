@@ -154,13 +154,13 @@ export default function App() {
             if (isDown && !wasDown) {
               new Notification("⚠️ Tunnel Down", {
                 body: `${proc.config.name || tunnelName} → ${domain} is not responding`,
-                icon: "/icon.png",
+                icon: "/logo.png",
                 silent: false,
               });
             } else if (!isDown && wasDown) {
               new Notification("✅ Tunnel Recovered", {
                 body: `${proc.config.name || tunnelName} is back online (${result.latency_ms}ms)`,
-                icon: "/icon.png",
+                icon: "/logo.png",
                 silent: false,
               });
             }
@@ -180,7 +180,7 @@ export default function App() {
           if (Notification.permission === "granted" && !wasDown) {
             new Notification("⚠️ Tunnel Unreachable", {
               body: `${proc.config.name || tunnelName} → ${domain} is unreachable`,
-              icon: "/icon.png",
+              icon: "/logo.png",
               silent: false,
             });
           }
@@ -344,7 +344,7 @@ export default function App() {
           `}
         </style>
         <img
-          src="/icon.png"
+          src="/logo.png"
           alt="Vanguarch Logo"
           className="w-16 h-16 object-contain mb-6"
           style={{
@@ -403,7 +403,7 @@ export default function App() {
             <div
               className="w-12 h-12 bg-linear-to-r from-orange-500 to-red-500"
               style={{
-                WebkitMaskImage: `url(/icon.png)`,
+                WebkitMaskImage: `url(/logo.png)`,
                 WebkitMaskRepeat: "no-repeat",
                 WebkitMaskPosition: "center",
                 WebkitMaskSize: "contain",

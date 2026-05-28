@@ -55,7 +55,7 @@ export function Titlebar() {
     >
       {/* Left: Logo */}
       <div data-tauri-drag-region="true" className="flex items-center w-[60px] pointer-events-none">
-        <img data-tauri-drag-region="true" src="/icon.png" alt="Logo" className="w-5 h-5 object-contain" />
+        <img data-tauri-drag-region="true" src="/logo.png" alt="Logo" className="w-5 h-5 object-contain" />
       </div>
       
       {/* Center: Title */}

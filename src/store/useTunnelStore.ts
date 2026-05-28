@@ -200,7 +200,7 @@ export const useTunnelStore = create<TunnelStore>()(
                     ) {
                       new Notification("Tunnel Connected 🚀", {
                         body: `${p.config.name || tunnel_name} → ${p.config.publicDomain}`,
-                        icon: "/icon.png",
+                        icon: "/logo.png",
                         silent: false,
                       });
                     }

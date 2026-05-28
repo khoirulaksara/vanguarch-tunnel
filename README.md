@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="public/icon.png" width="100" height="100" alt="Vanguarch Logo">
+  <img src="public/logo.png" width="100" height="100" alt="Vanguarch Logo">
   <h1>Vanguarch Tunnel</h1>
   <p>A desktop GUI for Cloudflare Argo Tunnel (<code>cloudflared</code>)</p>
 </div>

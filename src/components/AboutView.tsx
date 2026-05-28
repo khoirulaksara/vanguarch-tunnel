@@ -91,7 +91,7 @@ export function AboutView() {
               <div className="absolute inset-0 bg-gradient-to-br from-orange-400 to-red-600 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-500" />
               <div className="w-24 h-24 rounded-3xl bg-[#0a0a0a] ring-1 ring-orange-500/50 flex items-center justify-center overflow-hidden relative shadow-[inset_0_0_20px_rgba(249,115,22,0.2)]">
                 <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-transparent" />
-                <img src="/icon.png" alt="Vanguarch" className="w-14 h-14 relative z-10 group-hover:scale-110 transition-transform duration-500 drop-shadow-2xl" />
+                <img src="/logo.png" alt="Vanguarch" className="w-14 h-14 relative z-10 group-hover:scale-110 transition-transform duration-500 drop-shadow-2xl" />
               </div>
             </div>
             
