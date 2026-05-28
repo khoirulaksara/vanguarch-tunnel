@@ -13,8 +13,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700;800;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Motion One library via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/motion@11.11.13/dist/motion.js"></script>
   
   <script>
+    document.documentElement.classList.add('js-enabled');
     tailwind.config = {
       theme: {
         extend: {
@@ -54,6 +57,27 @@
       pointer-events: none;
       z-index: -1;
     }
+    
+    /* Avoid Flash of Unstyled Content by hiding elements initially if JS is active */
+    .js-enabled #hero-title,
+    .js-enabled #hero-desc,
+    .js-enabled #hero-downloads,
+    .js-enabled #hero-mockup,
+    .js-enabled .feature-card,
+    .js-enabled .inspector-text,
+    .js-enabled .inspector-mockup {
+      opacity: 0;
+    }
+    
+    /* GPU accelerated transition for feature cards hover */
+    .feature-card {
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .feature-card:hover {
+      transform: translateY(-4px) scale(1.015);
+      border-color: rgba(249, 115, 22, 0.4) !important;
+      box-shadow: 0 12px 30px -10px rgba(249, 115, 22, 0.12);
+    }
   </style>
 </head>
 <body class="font-sans antialiased overflow-x-hidden selection:bg-brand-500/30 selection:text-brand-100">
@@ -87,15 +111,15 @@
         Introducing Version 2.4.0 — Codename Archangel
       </div>
       
-      <h1 class="font-display font-black text-5xl md:text-7xl tracking-tight max-w-4xl mx-auto leading-[1.05] mb-6">
+      <h1 id="hero-title" class="font-display font-black text-5xl md:text-7xl tracking-tight max-w-4xl mx-auto leading-[1.05] mb-6">
         Expose your local servers to the world with <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-500 to-amber-400">unparalleled elegance</span>
       </h1>
       
-      <p class="text-zinc-400 text-lg md:text-xl max-w-2xl mx-auto font-light leading-relaxed mb-12">
+      <p id="hero-desc" class="text-zinc-400 text-lg md:text-xl max-w-2xl mx-auto font-light leading-relaxed mb-12">
         Vanguarch is a fast, predictable, and gorgeous desktop GUI wrapper for <code class="font-mono text-zinc-300 bg-zinc-800/50 px-1.5 py-0.5 rounded">cloudflared</code>. Expose ports, inspect webhooks, and monitor analytics with zero CLI headache.
       </p>
 
-      <div class="flex flex-col items-center justify-center gap-4 max-w-md mx-auto mb-16" id="download">
+      <div id="hero-downloads" class="flex flex-col items-center justify-center gap-4 max-w-md mx-auto mb-16">
         <a id="download-btn" href="https://github.com/khoirulaksara/vanguarch-tunnel/releases/latest" class="w-full sm:w-auto px-10 py-4 bg-brand-500 text-white font-display font-bold text-sm uppercase tracking-wider rounded-xl hover:bg-brand-600 shadow-lg shadow-brand-500/25 transition-all text-center flex items-center justify-center gap-2">
           <span>Detecting OS...</span>
         </a>
@@ -104,15 +128,133 @@
         </a>
       </div>
       
-      <!-- Visual App Mockup / Feature Showcase -->
-      <div class="relative max-w-5xl mx-auto rounded-2xl border border-zinc-800/80 bg-zinc-950/80 p-2 shadow-2xl shadow-brand-500/5">
+      <!-- Interactive App Mockup / Feature Showcase -->
+      <div id="hero-mockup" class="relative max-w-6xl mx-auto rounded-2xl border border-zinc-800 bg-zinc-950/80 p-3 shadow-2xl shadow-brand-500/5 text-left">
         <div class="absolute inset-0 bg-gradient-to-b from-brand-500/10 to-transparent blur-2xl opacity-30 -z-10 rounded-2xl"></div>
-        <div class="rounded-xl overflow-hidden border border-zinc-800 bg-[#09090b] aspect-video flex flex-col items-center justify-center p-8 text-center text-zinc-500">
-          <div class="w-16 h-16 rounded-full bg-brand-500/10 flex items-center justify-center mb-4">
-            <svg class="w-8 h-8 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        
+        <!-- Desktop Window Titlebar -->
+        <div class="flex items-center justify-between border-b border-zinc-800/80 pb-3 mb-4 px-3 select-none">
+          <div class="flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full bg-red-500/80 hover:bg-red-500 transition-colors cursor-pointer"></div>
+            <div class="w-3 h-3 rounded-full bg-yellow-500/80 hover:bg-yellow-500 transition-colors cursor-pointer"></div>
+            <div class="w-3 h-3 rounded-full bg-green-500/80 hover:bg-green-500 transition-colors cursor-pointer"></div>
+            <span class="text-xs text-zinc-500 font-mono ml-4 select-none">vanguarch-tunnel-gui</span>
           </div>
-          <h3 class="font-display font-bold text-lg text-white mb-1">Visualizing Dashboard & Web Inspector</h3>
-          <p class="text-xs max-w-sm mx-auto">Vanguarch includes a fully integrated dark-cyberpunk styled dashboard, Recharts-based statistics, and an ngrok-like proxy request capture log.</p>
+          <div class="flex items-center gap-1.5 px-3 py-1 bg-zinc-900 border border-zinc-800/60 rounded-lg text-[11px] text-zinc-400 font-mono select-none w-48 justify-center">
+            <span class="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse"></span>
+            <span>127.0.0.1:4040</span>
+          </div>
+          <div class="w-16"></div> <!-- spacer -->
+        </div>
+
+        <!-- Interactive Grid Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 p-2 min-h-[480px]">
+          <!-- Sidebar selector (lg: col-span-1, mobile: scrolling list) -->
+          <div id="screenshot-tabs" class="lg:col-span-1 flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-y-auto lg:overflow-x-visible pb-3 lg:pb-0 pr-0 lg:pr-3 lg:max-h-[500px] scrollbar-thin scrollbar-thumb-zinc-800">
+            
+            <button data-screenshot="public/Screenshot 2026-05-28 170502.png" data-title="Interactive Dashboard" data-desc="Overview of active tunnels, real-time request rates, latency health, and quick actions." class="tab-btn active w-full text-left px-3.5 py-3.5 rounded-xl border border-zinc-800 bg-zinc-900/60 transition-all flex items-center gap-3 shrink-0 lg:shrink select-none">
+              <div class="w-8 h-8 rounded-lg bg-orange-500/10 text-brand-500 flex items-center justify-center shrink-0 text-sm">
+                📊
+              </div>
+              <div class="truncate">
+                <div class="font-display font-semibold text-white text-xs">Dashboard</div>
+                <div class="text-[10px] text-zinc-400 truncate">Overview & active widget</div>
+              </div>
+            </button>
+
+            <button data-screenshot="public/Screenshot 2026-05-28 170434.png" data-title="Manual Tunnel Setup" data-desc="Expose local ports, configure custom domains, protocol schemes, and inject custom headers manually." class="tab-btn w-full text-left px-3.5 py-3.5 rounded-xl border border-transparent hover:bg-zinc-900/40 transition-all flex items-center gap-3 shrink-0 lg:shrink select-none">
+              <div class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm">
+                🔌
+              </div>
+              <div class="truncate">
+                <div class="font-display font-semibold text-zinc-300 text-xs">Manual Tunnel</div>
+                <div class="text-[10px] text-zinc-500 truncate">Configure local ports</div>
+              </div>
+            </button>
+
+            <button data-screenshot="public/Screenshot 2026-05-28 170437.png" data-title="Saved Tunnel Presets" data-desc="Save complex local-to-public mapping configs to run multiple tunnels concurrently with one-click." class="tab-btn w-full text-left px-3.5 py-3.5 rounded-xl border border-transparent hover:bg-zinc-900/40 transition-all flex items-center gap-3 shrink-0 lg:shrink select-none">
+              <div class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm">
+                🔖
+              </div>
+              <div class="truncate">
+                <div class="font-display font-semibold text-zinc-300 text-xs">Tunnel Presets</div>
+                <div class="text-[10px] text-zinc-500 truncate">Quick save and restore</div>
+              </div>
+            </button>
+
+            <button data-screenshot="public/Screenshot 2026-05-28 170440.png" data-title="Projects Auto-Discovery" data-desc="Scans workspace folders to discover active framework servers like Vite, Next.js, WordPress, and Laravel." class="tab-btn w-full text-left px-3.5 py-3.5 rounded-xl border border-transparent hover:bg-zinc-900/40 transition-all flex items-center gap-3 shrink-0 lg:shrink select-none">
+              <div class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm">
+                📂
+              </div>
+              <div class="truncate">
+                <div class="font-display font-semibold text-zinc-300 text-xs">Auto Discovery</div>
+                <div class="text-[10px] text-zinc-500 truncate">Scan local framework ports</div>
+              </div>
+            </button>
+
+            <button data-screenshot="public/Screenshot 2026-05-28 170442.png" data-title="Cloud Tunnels Manager" data-desc="Login to Cloudflare API to manage, start, and host persistent cloud-routed tunnels directly within the desktop UI." class="tab-btn w-full text-left px-3.5 py-3.5 rounded-xl border border-transparent hover:bg-zinc-900/40 transition-all flex items-center gap-3 shrink-0 lg:shrink select-none">
+              <div class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm">
+                ☁️
+              </div>
+              <div class="truncate">
+                <div class="font-display font-semibold text-zinc-300 text-xs">Cloud Tunnels</div>
+                <div class="text-[10px] text-zinc-500 truncate">Cloudflare API credentials</div>
+              </div>
+            </button>
+
+            <button data-screenshot="public/Screenshot 2026-05-28 170445.png" data-title="Quick Folder Sharing" data-desc="Spin up an instant filesharing web server on a random port, and expose it instantly over a secure tunnel." class="tab-btn w-full text-left px-3.5 py-3.5 rounded-xl border border-transparent hover:bg-zinc-900/40 transition-all flex items-center gap-3 shrink-0 lg:shrink select-none">
+              <div class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm">
+                ⚡
+              </div>
+              <div class="truncate">
+                <div class="font-display font-semibold text-zinc-300 text-xs">Folder Sharing</div>
+                <div class="text-[10px] text-zinc-500 truncate">Static web server host</div>
+              </div>
+            </button>
+
+            <button data-screenshot="public/Screenshot 2026-05-28 170448.png" data-title="Web Request Inspector" data-desc="Ngrok-style proxy capturing incoming webhook payloads, path headers, and request body with 1-click replay." class="tab-btn w-full text-left px-3.5 py-3.5 rounded-xl border border-transparent hover:bg-zinc-900/40 transition-all flex items-center gap-3 shrink-0 lg:shrink select-none">
+              <div class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm">
+                🔍
+              </div>
+              <div class="truncate">
+                <div class="font-display font-semibold text-zinc-300 text-xs">Web Inspector</div>
+                <div class="text-[10px] text-zinc-500 truncate">Inspect webhook payloads</div>
+              </div>
+            </button>
+
+            <button data-screenshot="public/Screenshot 2026-05-28 170456.png" data-title="Real-time Traffic Analytics" data-desc="Analyze request/response success status, throughput rates, and top paths using responsive, modern charts." class="tab-btn w-full text-left px-3.5 py-3.5 rounded-xl border border-transparent hover:bg-zinc-900/40 transition-all flex items-center gap-3 shrink-0 lg:shrink select-none">
+              <div class="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 flex items-center justify-center shrink-0 text-sm">
+                📈
+              </div>
+              <div class="truncate">
+                <div class="font-display font-semibold text-zinc-300 text-xs">Analytics Graphs</div>
+                <div class="text-[10px] text-zinc-500 truncate">Trafik and response metrics</div>
+              </div>
+            </button>
+            
+          </div>
+
+          <!-- Active screenshot image frame -->
+          <div class="lg:col-span-3 relative rounded-xl overflow-hidden border border-zinc-800 bg-[#09090b] aspect-[16/10] group cursor-zoom-in">
+            <!-- Loading indicator background -->
+            <div class="absolute inset-0 flex items-center justify-center bg-zinc-950 -z-20">
+              <span class="w-6 h-6 border-2 border-brand-500 border-t-transparent rounded-full animate-spin"></span>
+            </div>
+            
+            <img id="active-screenshot" src="public/Screenshot 2026-05-28 170502.png" alt="Active Feature Screenshot" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.015]">
+            
+            <!-- Overlay Info & Action Hint -->
+            <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-zinc-950 via-zinc-950/85 to-transparent p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <h4 id="active-tab-title" class="font-display font-bold text-white text-base">Interactive Dashboard Overview</h4>
+                <p id="active-tab-desc" class="text-xs text-zinc-400 mt-0.5">Overview of active tunnels, real-time request rates, latency health, and quick actions.</p>
+              </div>
+              <div class="self-start sm:self-center px-3 py-1.5 bg-brand-500/10 border border-brand-500/20 rounded-lg text-brand-500 text-xs font-semibold flex items-center gap-1.5 shrink-0 select-none">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m4-3H6"/></svg>
+                Click to Zoom
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -128,7 +270,7 @@
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <!-- Feature 1 -->
-        <div class="bg-zinc-900/40 border border-zinc-800/80 hover:border-brand-500/30 rounded-2xl p-6 transition-all group">
+        <div class="feature-card bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-6 transition-all group">
           <div class="w-10 h-10 rounded-lg bg-brand-500/10 text-brand-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
           </div>
@@ -137,7 +279,7 @@
         </div>
 
         <!-- Feature 2 -->
-        <div class="bg-zinc-900/40 border border-zinc-800/80 hover:border-brand-500/30 rounded-2xl p-6 transition-all group">
+        <div class="feature-card bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-6 transition-all group">
           <div class="w-10 h-10 rounded-lg bg-brand-500/10 text-brand-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
           </div>
@@ -146,7 +288,7 @@
         </div>
 
         <!-- Feature 3 -->
-        <div class="bg-zinc-900/40 border border-zinc-800/80 hover:border-brand-500/30 rounded-2xl p-6 transition-all group">
+        <div class="feature-card bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-6 transition-all group">
           <div class="w-10 h-10 rounded-lg bg-brand-500/10 text-brand-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
           </div>
@@ -155,7 +297,7 @@
         </div>
 
         <!-- Feature 4 -->
-        <div class="bg-zinc-900/40 border border-zinc-800/80 hover:border-brand-500/30 rounded-2xl p-6 transition-all group">
+        <div class="feature-card bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-6 transition-all group">
           <div class="w-10 h-10 rounded-lg bg-brand-500/10 text-brand-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"/></svg>
           </div>
@@ -164,7 +306,7 @@
         </div>
 
         <!-- Feature 5 -->
-        <div class="bg-zinc-900/40 border border-zinc-800/80 hover:border-brand-500/30 rounded-2xl p-6 transition-all group">
+        <div class="feature-card bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-6 transition-all group">
           <div class="w-10 h-10 rounded-lg bg-brand-500/10 text-brand-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 10.742L19.885 5.142A.5.5 0 0120.5 5.5v13a.5.5 0 01-.615.485L8.684 13.258A1 1 0 018 12v-1.258a1 1 0 01.684-.516zM4 9h2v6H4V9z"/></svg>
           </div>
@@ -173,7 +315,7 @@
         </div>
 
         <!-- Feature 6 -->
-        <div class="bg-zinc-900/40 border border-zinc-800/80 hover:border-brand-500/30 rounded-2xl p-6 transition-all group">
+        <div class="feature-card bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-6 transition-all group">
           <div class="w-10 h-10 rounded-lg bg-brand-500/10 text-brand-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
           </div>
@@ -187,7 +329,7 @@
   <!-- Web Inspector Spotlight -->
   <section id="inspector" class="py-24 glow-effect">
     <div class="max-w-6xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-      <div class="space-y-6">
+      <div class="inspector-text space-y-6">
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-brand-500 text-xs font-bold uppercase tracking-wider">
           Ngrok-style Inspector
         </div>
@@ -213,7 +355,7 @@
         </ul>
       </div>
       <!-- Code View UI Mockup -->
-      <div class="bg-zinc-950 border border-zinc-800 rounded-xl p-4 font-mono text-xs text-zinc-400 shadow-2xl relative overflow-hidden">
+      <div class="inspector-mockup bg-zinc-950 border border-zinc-800 rounded-xl p-4 font-mono text-xs text-zinc-400 shadow-2xl relative overflow-hidden">
         <div class="flex items-center justify-between border-b border-zinc-800 pb-3 mb-3">
           <div class="flex items-center gap-2">
             <div class="w-3 h-3 rounded-full bg-red-500"></div>
@@ -291,8 +433,20 @@
     </div>
   </footer>
 
+  <!-- Lightbox Modal -->
+  <div id="lightbox" class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300">
+    <button id="lightbox-close" class="absolute top-6 right-6 text-zinc-400 hover:text-white transition-colors p-2 bg-zinc-900/50 hover:bg-zinc-800 rounded-full">
+      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+    <div class="max-w-[90vw] max-h-[85vh] relative overflow-hidden rounded-xl border border-zinc-800 shadow-2xl bg-zinc-950/60 p-1">
+      <img id="lightbox-img" src="" alt="Enlarged screenshot" class="w-full h-full object-contain max-h-[83vh] rounded-lg">
+      <div id="lightbox-caption" class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-5 text-center text-sm text-zinc-300 font-semibold font-display"></div>
+    </div>
+  </div>
+
   <script>
     document.addEventListener("DOMContentLoaded", function() {
+      // 1. OS Download Button Detection
       const btn = document.getElementById("download-btn");
       const userAgent = window.navigator.userAgent.toLowerCase();
       let os = "windows";
@@ -325,7 +479,6 @@
             let matchedAsset = null;
             
             if (os === "windows") {
-              // Prefer msi, fallback to exe
               matchedAsset = data.assets.find(a => a.name.endsWith(".msi")) || data.assets.find(a => a.name.endsWith("-setup.exe") || a.name.endsWith(".exe"));
             } else if (os === "macos") {
               matchedAsset = data.assets.find(a => a.name.endsWith(".dmg")) || data.assets.find(a => a.name.endsWith(".tar.gz"));
@@ -343,6 +496,140 @@
         .catch(err => {
           console.warn("Failed to fetch latest GitHub release assets, using fallback link.", err);
         });
+
+      // 2. Motion One Animations Setup
+      const { animate, inView } = window.Motion || {};
+      
+      if (animate && inView) {
+        // Page Load Hero animations
+        animate("#hero-title", { opacity: [0, 1], y: [30, 0] }, { duration: 0.8, easing: [0.16, 1, 0.3, 1] });
+        animate("#hero-desc", { opacity: [0, 1], y: [20, 0] }, { duration: 0.8, delay: 0.12, easing: [0.16, 1, 0.3, 1] });
+        animate("#hero-downloads", { opacity: [0, 1], y: [15, 0] }, { duration: 0.8, delay: 0.22, easing: [0.16, 1, 0.3, 1] });
+        animate("#hero-mockup", { opacity: [0, 1], scale: [0.97, 1] }, { duration: 1.0, delay: 0.35, easing: [0.16, 1, 0.3, 1] });
+
+        // Scroll InView Feature Cards
+        inView("#features", (info) => {
+          const cards = info.target.querySelectorAll(".feature-card");
+          cards.forEach((card, index) => {
+            animate(card, { opacity: [0, 1], y: [35, 0] }, { duration: 0.6, delay: index * 0.08, easing: [0.16, 1, 0.3, 1] });
+          });
+        });
+
+        // Scroll InView Web Inspector
+        inView("#inspector", (info) => {
+          const textCol = info.target.querySelector(".inspector-text");
+          const mockupCol = info.target.querySelector(".inspector-mockup");
+          animate(textCol, { opacity: [0, 1], x: [-35, 0] }, { duration: 0.75, easing: [0.16, 1, 0.3, 1] });
+          animate(mockupCol, { opacity: [0, 1], x: [35, 0] }, { duration: 0.75, easing: [0.16, 1, 0.3, 1] });
+        });
+      } else {
+        // Fallback for JS opacity if Motion library failed to load
+        document.querySelectorAll("#hero-title, #hero-desc, #hero-downloads, #hero-mockup, .feature-card, .inspector-text, .inspector-mockup").forEach(el => {
+          el.style.opacity = "1";
+        });
+      }
+
+      // 3. Interactive Mockup Tabs Switching
+      const tabs = document.querySelectorAll(".tab-btn");
+      const activeImg = document.getElementById("active-screenshot");
+      const activeTitle = document.getElementById("active-tab-title");
+      const activeDesc = document.getElementById("active-tab-desc");
+
+      tabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+          if (tab.classList.contains("active")) return;
+
+          // Remove active styles from current active tab
+          tabs.forEach(t => {
+            t.classList.remove("active", "border-zinc-800", "bg-zinc-900/60");
+            t.classList.add("border-transparent");
+            
+            const icon = t.querySelector(".w-8");
+            icon.classList.remove("bg-orange-500/10", "text-brand-500");
+            icon.classList.add("bg-zinc-800", "text-zinc-400");
+            
+            const text = t.querySelector(".font-display");
+            text.classList.remove("text-white");
+            text.classList.add("text-zinc-300");
+          });
+
+          // Add active styles to this tab
+          tab.classList.add("active", "border-zinc-800", "bg-zinc-900/60");
+          tab.classList.remove("border-transparent");
+          
+          const icon = tab.querySelector(".w-8");
+          icon.classList.remove("bg-zinc-800", "text-zinc-400");
+          icon.classList.add("bg-orange-500/10", "text-brand-500");
+          
+          const text = tab.querySelector(".font-display");
+          text.classList.remove("text-zinc-300");
+          text.classList.add("text-white");
+
+          // Extract attributes
+          const targetSrc = tab.getAttribute("data-screenshot");
+          const targetTitle = tab.getAttribute("data-title");
+          const targetDesc = tab.getAttribute("data-desc");
+
+          // Transition screenshot out, switch src, and transition in
+          if (animate) {
+            animate(activeImg, { opacity: 0, scale: 0.985 }, { duration: 0.15 });
+            setTimeout(() => {
+              activeImg.src = targetSrc;
+              activeTitle.textContent = targetTitle;
+              activeDesc.textContent = targetDesc;
+              animate(activeImg, { opacity: 1, scale: 1 }, { duration: 0.25, easing: "ease-out" });
+            }, 150);
+          } else {
+            activeImg.src = targetSrc;
+            activeTitle.textContent = targetTitle;
+            activeDesc.textContent = targetDesc;
+          }
+        });
+      });
+
+      // 4. Lightbox Zoom functionality
+      const lightbox = document.getElementById("lightbox");
+      const lightboxImg = document.getElementById("lightbox-img");
+      const lightboxCaption = document.getElementById("lightbox-caption");
+      const closeBtn = document.getElementById("lightbox-close");
+      const activeImgFrame = activeImg.parentElement;
+
+      function openLightbox() {
+        lightboxImg.src = activeImg.src;
+        lightboxCaption.textContent = activeTitle.textContent + " — " + activeDesc.textContent;
+        lightbox.classList.remove("pointer-events-none");
+
+        if (animate) {
+          animate(lightbox, { opacity: [0, 1] }, { duration: 0.25 });
+          const modalContainer = lightbox.querySelector("div");
+          animate(modalContainer, { scale: [0.95, 1], opacity: [0, 1] }, { duration: 0.25, easing: [0.16, 1, 0.3, 1] });
+        } else {
+          lightbox.style.opacity = "1";
+        }
+      }
+
+      function closeLightbox() {
+        lightbox.classList.add("pointer-events-none");
+
+        if (animate) {
+          animate(lightbox, { opacity: [1, 0] }, { duration: 0.2 });
+          const modalContainer = lightbox.querySelector("div");
+          animate(modalContainer, { scale: [1, 0.95], opacity: [1, 0] }, { duration: 0.2, easing: "ease-in" });
+        } else {
+          lightbox.style.opacity = "0";
+        }
+      }
+
+      activeImgFrame.addEventListener("click", openLightbox);
+      closeBtn.addEventListener("click", closeLightbox);
+      lightbox.addEventListener("click", (e) => {
+        if (e.target === lightbox) closeLightbox();
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && !lightbox.classList.contains("pointer-events-none")) {
+          closeLightbox();
+        }
+      });
     });
   </script>
 </body>
