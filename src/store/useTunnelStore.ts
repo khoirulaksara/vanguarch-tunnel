@@ -222,13 +222,34 @@ export const useTunnelStore = create<TunnelStore>()(
                 cloudflaredPath,
                 tunnelName: config.tunnelName,
                 subdomain,
-              });
+              }); // Note: localUrl not needed here — auto_tunnel_setup only creates & routes DNS
             } catch (err: any) {
               const errStr = String(err).toLowerCase();
               if (!errStr.includes("already exists")) {
                 get().addLog(tunnelName, {
                   timestamp: new Date().toISOString(),
                   message: `[Warning] Tunnel setup error (may affect routing): ${err}`,
+                  type: "error",
+                });
+              }
+            }
+
+            // Inject APP_URL into Laravel .env before starting the tunnel
+            if (config.framework === "Laravel" && config.projectPath) {
+              try {
+                const msg: string = await invoke("inject_laravel_env", {
+                  projectPath: config.projectPath,
+                  tunnelUrl: `https://${config.publicDomain}`,
+                });
+                get().addLog(tunnelName, {
+                  timestamp: new Date().toISOString(),
+                  message: `[Laravel] ${msg}`,
+                  type: "info",
+                });
+              } catch (e) {
+                get().addLog(tunnelName, {
+                  timestamp: new Date().toISOString(),
+                  message: `[Laravel] Gagal inject .env: ${e}`,
                   type: "error",
                 });
               }
@@ -325,6 +346,12 @@ export const useTunnelStore = create<TunnelStore>()(
               await invoke("stop_inspector_for_tunnel", {
                 tunnelName: activeProcess.config.tunnelName,
               }).catch(() => {});
+            }
+            // Restore Laravel .env from .env.tunnel backup
+            if (activeProcess?.config?.framework === "Laravel" && activeProcess?.config?.projectPath) {
+              invoke("restore_laravel_env", {
+                projectPath: activeProcess.config.projectPath,
+              }).catch((e: any) => console.warn("[Laravel] Gagal restore .env:", e));
             }
           } catch (e) {
             console.error(e);

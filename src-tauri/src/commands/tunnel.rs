@@ -297,7 +297,6 @@ pub async fn auto_tunnel_setup(
     cloudflared_path: String,
     tunnel_name: String,
     subdomain: String,
-    _local_url: String,
 ) -> Result<String, String> {
     let bin_path = if !cloudflared_path.trim().is_empty() {
         cloudflared_path

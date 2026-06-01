@@ -7,6 +7,10 @@ export interface TunnelConfig {
   tunnelName: string;
   protocol?: 'http' | 'tcp' | 'ssh' | 'rdp';
   enableInspector?: boolean;
+  /** Absolute path to the project on disk. Required for Laravel .env injection. */
+  projectPath?: string;
+  /** Detected framework, e.g. 'Laravel'. Used to gate env injection logic. */
+  framework?: string;
   options: {
     httpHostHeader: boolean;
     originServerName: boolean;
@@ -37,9 +41,10 @@ export interface DiscoveredProject {
   id: string;
   name: string;
   path: string;
-  framework: 'WordPress' | 'Laravel' | 'Next.js' | 'Vite' | 'Unknown';
+  framework: string;
   suggestedUrl: string;
   wpHelperInstalled?: boolean;
+  laravelProxyInstalled?: boolean;
 }
 
 export interface SessionRecord {

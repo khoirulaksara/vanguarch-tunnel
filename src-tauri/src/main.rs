@@ -97,7 +97,10 @@ fn main() {
             commands::inspector::stop_inspector_for_tunnel,
             commands::inspector::replay_request,
             commands::system::ping_url,
-            commands::system::check_internet
+            commands::system::check_internet,
+            commands::project::inject_laravel_env,
+            commands::project::restore_laravel_env,
+            commands::project::inject_laravel_trust_proxies
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

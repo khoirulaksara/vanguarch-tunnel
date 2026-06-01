@@ -1,6 +1,6 @@
 [package]
 name = "vanguarch"
-version = "2.4.0"
+version = "2.5.0"
 description = "Vanguarch Tunnel"
 authors = ["Khoirul Aksara"]
 edition = "2021"

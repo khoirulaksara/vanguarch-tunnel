@@ -8,7 +8,7 @@ import { Folder, Search, Link as LinkIcon, Code2, RefreshCw, CheckCircle2, XCirc
 import { invoke } from '@tauri-apps/api/core';
 
 export function ProjectList() {
-  const { projects, isScanning, scanProjects, injectWpHelper } = useProjectStore();
+  const { projects, isScanning, scanProjects, injectWpHelper, injectLaravelTrustProxies } = useProjectStore();
   const { workspaceDirectories, singleProjectDirectories, cloudflaredPath, publicDomain } = useSettingsStore();
   const { tunnels, fetchTunnels } = useCloudflareStore();
   const { activeProcesses } = useTunnelStore();
@@ -102,6 +102,19 @@ export function ProjectList() {
     }
   };
 
+  const handleLaravelInject = async (id: string, path: string) => {
+    setInjectStatus(prev => ({ ...prev, [id]: { loading: true, error: undefined, success: undefined } }));
+    try {
+      const msg = await injectLaravelTrustProxies(id, path);
+      setInjectStatus(prev => ({ ...prev, [id]: { loading: false, success: msg } }));
+      setTimeout(() => {
+        setInjectStatus(prev => ({ ...prev, [id]: { ...prev[id], success: undefined } }));
+      }, 3000);
+    } catch (err: any) {
+      setInjectStatus(prev => ({ ...prev, [id]: { loading: false, error: err.message } }));
+    }
+  };
+
   const toggleHelper = (id: string) => {
     setExpandedHelpers(prev => ({...prev, [id]: !prev[id]}));
   };
@@ -167,7 +180,13 @@ export function ProjectList() {
             {filteredProjects.map(project => (
               <div 
                 key={project.id} 
-                className={`bg-[#18181b]/50 border p-4 rounded-xl flex flex-col justify-between gap-3 transition-colors ${project.framework === 'WordPress' ? 'border-orange-500/30 hover:border-orange-500 bg-[#18181b]' : 'border-[#27272a] hover:border-[#52525b]'}`}
+                className={`bg-[#18181b]/50 border p-4 rounded-xl flex flex-col justify-between gap-3 transition-colors ${
+                  project.framework === 'WordPress' 
+                    ? 'border-orange-500/30 hover:border-orange-500 bg-[#18181b]' 
+                    : project.framework === 'Laravel'
+                    ? 'border-red-500/30 hover:border-red-500 bg-[#18181b]'
+                    : 'border-[#27272a] hover:border-[#52525b]'
+                }`}
               >
                 <div className="flex flex-col gap-2">
                   <div className="flex justify-between items-start gap-2">
@@ -183,7 +202,13 @@ export function ProjectList() {
                       }) && (
                         <span className="text-[10px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider bg-blue-500/10 text-blue-400" title="Active Tunnel"><Cloud className="w-3 h-3"/></span>
                       )}
-                      <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider ${project.framework === 'WordPress' ? 'bg-orange-500/10 text-orange-400' : 'bg-[#27272a] text-[#a1a1aa]'}`}>
+                      <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider ${
+                        project.framework === 'WordPress' 
+                          ? 'bg-orange-500/10 text-orange-400' 
+                          : project.framework === 'Laravel'
+                          ? 'bg-red-500/10 text-red-400'
+                          : 'bg-[#27272a] text-[#a1a1aa]'
+                      }`}>
                         {project.framework}
                       </span>
                     </div>
@@ -196,6 +221,16 @@ export function ProjectList() {
                         <><CheckCircle2 className="w-3 h-3" /> WP Helper Active</>
                       ) : (
                         <><XCircle className="w-3 h-3" /> No Helper</>
+                      )}
+                    </div>
+                  )}
+
+                  {project.framework === 'Laravel' && project.laravelProxyInstalled !== undefined && (
+                    <div className={`flex items-center gap-1 text-[9px] uppercase font-bold tracking-wider ${project.laravelProxyInstalled ? 'text-green-500' : 'text-red-500'}`}>
+                      {project.laravelProxyInstalled ? (
+                        <><CheckCircle2 className="w-3 h-3" /> Trust Proxies Active</>
+                      ) : (
+                        <><XCircle className="w-3 h-3" /> Trust Proxies Disabled</>
                       )}
                     </div>
                   )}
@@ -278,6 +313,58 @@ export function ProjectList() {
 
                           <pre className="text-[8px] text-[#a1a1aa] font-mono overflow-x-auto whitespace-pre bg-black p-2 rounded border border-[#27272a] max-h-32">
                             {`if ( ! defined('WP_CLI') ) {\n    $is_https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https' || ($_SERVER['SERVER_PORT'] ?? null) == 443;\n    if ($is_https) $_SERVER['HTTPS'] = 'on';\n    $scheme = $is_https ? 'https' : 'http';\n    $host = $_SERVER['HTTP_X_FORWARDED_HOST'] ?? $_SERVER['HTTP_HOST'];\n    define('WP_HOME', $scheme . '://' . $host);\n    define('WP_SITEURL', $scheme . '://' . $host);\n}`}
+                          </pre>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {project.framework === 'Laravel' && (
+                    <div className="bg-[#0c0c0e] border border-[#27272a] rounded overflow-hidden">
+                      <div 
+                        className="flex items-center justify-between p-2 cursor-pointer hover:bg-[#18181b] transition-colors"
+                        onClick={() => toggleHelper(project.id)}
+                      >
+                        <div className="flex items-center gap-1.5">
+                          <Code2 className="w-3 h-3 text-red-500" />
+                          <span className="text-[9px] font-bold text-[#52525b] uppercase tracking-widest text-red-400">Trust Proxies</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {!project.laravelProxyInstalled && project.laravelProxyInstalled !== undefined && (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); handleLaravelInject(project.id, project.path); }}
+                              disabled={injectStatus[project.id]?.loading}
+                              className="text-[9px] uppercase font-bold tracking-wider bg-[#27272a] hover:bg-[#3f3f46] text-[#e4e4e7] disabled:opacity-50 px-1.5 py-0.5 rounded flex items-center gap-1 transition-colors"
+                            >
+                              {injectStatus[project.id]?.loading ? (
+                                <RefreshCw className="w-3 h-3 animate-spin" />
+                              ) : (
+                                <Plus className="w-3 h-3" />
+                              )}
+                              Inject
+                            </button>
+                          )}
+                          <div className="text-[#52525b]">
+                            {expandedHelpers[project.id] ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {expandedHelpers[project.id] && (
+                        <div className="p-2 pt-0 border-t border-[#27272a] mt-1">
+                          {injectStatus[project.id]?.error && (
+                            <div className="mb-2 mt-1 p-1.5 bg-red-950/30 border border-red-900/50 rounded text-[9px] text-red-500 font-mono">
+                              {injectStatus[project.id]?.error}
+                            </div>
+                          )}
+                          {injectStatus[project.id]?.success && (
+                            <div className="mb-2 mt-1 p-1.5 bg-green-950/30 border border-green-900/50 rounded text-[9px] text-green-500 font-mono">
+                              {injectStatus[project.id]?.success}
+                            </div>
+                          )}
+
+                          <pre className="text-[8px] text-[#a1a1aa] font-mono overflow-x-auto whitespace-pre bg-black p-2 rounded border border-[#27272a] max-h-32">
+                            {`// For Laravel 11+ in bootstrap/app.php:\n$middleware->trustProxies(at: '*');\n\n// For Laravel <= 10 in TrustProxies.php:\nprotected $proxies = '*';`}
                           </pre>
                         </div>
                       )}

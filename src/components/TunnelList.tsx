@@ -119,6 +119,8 @@ export function TunnelList() {
         },
         protocol: "http" as const,
         enableInspector: withInspector,
+        framework: project?.framework,
+        projectPath: project?.path,
       };
 
       await startTunnel(config);

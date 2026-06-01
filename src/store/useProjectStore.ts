@@ -8,6 +8,7 @@ interface ProjectStore {
   isScanning: boolean;
   scanProjects: () => Promise<void>;
   injectWpHelper: (id: string, path: string) => Promise<string>;
+  injectLaravelTrustProxies: (id: string, path: string) => Promise<string>;
 }
 
 const MOCK_PROJECTS: DiscoveredProject[] = [
@@ -25,6 +26,7 @@ const MOCK_PROJECTS: DiscoveredProject[] = [
     path: 'C:/laragon/www/api-gateway',
     framework: 'Laravel',
     suggestedUrl: 'http://localhost:8000',
+    laravelProxyInstalled: false,
   },
   {
     id: '3',
@@ -79,7 +81,7 @@ export const useProjectStore = create<ProjectStore>((set) => ({
         
         // Sort by path for deterministic deduplication order
         allProjects.sort((a, b) => a.path.localeCompare(b.path));
-
+ 
         // Deduplicate names
         const nameCounts: Record<string, number> = {};
         for (const p of allProjects) {
@@ -91,7 +93,7 @@ export const useProjectStore = create<ProjectStore>((set) => ({
             nameCounts[originalName] = 0;
           }
         }
-
+ 
         set({ projects: allProjects, isScanning: false });
       } catch (err) {
         console.error("Failed to scan projects:", err);
@@ -113,7 +115,7 @@ export const useProjectStore = create<ProjectStore>((set) => ({
           mockNameCounts[originalName] = 0;
         }
       }
-
+ 
       set({ projects: mockProjects, isScanning: false });
     }
   },
@@ -138,6 +140,29 @@ export const useProjectStore = create<ProjectStore>((set) => ({
         )
       }));
       return "Berhasil memasang WordPress helper (Mock)";
+    }
+  },
+  injectLaravelTrustProxies: async (id: string, path: string) => {
+    if (invoke) {
+      try {
+        const msg = await invoke('inject_laravel_trust_proxies', { projectPath: path });
+        set(state => ({
+          projects: state.projects.map(p => 
+            p.id === id ? { ...p, laravelProxyInstalled: true } : p
+          )
+        }));
+        return msg as string;
+      } catch (err) {
+        throw new Error(String(err));
+      }
+    } else {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      set(state => ({
+        projects: state.projects.map(p => 
+          p.id === id ? { ...p, laravelProxyInstalled: true } : p
+        )
+      }));
+      return "Berhasil mengonfigurasi trust proxies (Mock)";
     }
   }
 }));
