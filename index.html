@@ -395,7 +395,7 @@
                     <span
                         class="w-2 h-2 bg-brand-500 rounded-full animate-pulse"
                     ></span>
-                    Introducing Version 2.4.0 — Codename Archangel
+                    Introducing Version 2.5.0 — Codename Archangel
                 </div>
 
                 <h1
@@ -449,7 +449,7 @@
                 <!-- Line-Powered SVG Connection Pipeline -->
                 <div
                     id="hero-pipeline"
-                    class="relative max-w-5xl mx-auto my-16"
+                    class="relative max-w-5xl mx-auto mt-2 mb-16"
                 >
                     <!-- Label -->
                     <div class="text-center mb-6">
@@ -558,7 +558,7 @@
                         <!-- Nodes Grid -->
                         <div
                             id="pipeline-nodes"
-                            class="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-6"
+                            class="relative z-10 grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-6"
                         >
                             <!-- Node 1: Local Port -->
                             <div
@@ -1423,7 +1423,7 @@
                     <span
                         class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"
                     ></span>
-                    All views available in v2.4.0 Archangel
+                    All views available in v2.5.0 Archangel
                 </span>
                 <h2
                     class="font-display font-black text-3xl md:text-4xl tracking-tight text-white"
@@ -2195,7 +2195,10 @@
                             cy: r.top - cRect.top + r.height / 2,
                             left: r.left - cRect.left,
                             right: r.right - cRect.left,
+                            top: r.top - cRect.top,
+                            bottom: r.bottom - cRect.top,
                             width: r.width,
+                            height: r.height,
                         };
                     });
 
@@ -2206,13 +2209,20 @@
                     const partGroup = document.getElementById("pipe-particles");
                     if (!baseGroup || !glowGroup || !partGroup) return;
 
+                    // Clear previous lines and particles to avoid accumulation on redraw/resize
+                    baseGroup.innerHTML = "";
+                    glowGroup.innerHTML = "";
+                    partGroup.innerHTML = "";
+
                     const NS = "http://www.w3.org/2000/svg";
-                    const lineY = nodeData[0].cy;
+                    const isVertical = nodeData[1].cy > nodeData[0].cy + 10;
 
                     const segments = [
                         {
-                            from: nodeData[0].right,
-                            to: nodeData[1].left,
+                            x1: isVertical ? nodeData[0].cx : nodeData[0].right,
+                            y1: isVertical ? nodeData[0].bottom : nodeData[0].cy,
+                            x2: isVertical ? nodeData[1].cx : nodeData[1].left,
+                            y2: isVertical ? nodeData[1].top : nodeData[1].cy,
                             label: "local",
                             dash: "4 6",
                             color: "rgba(249,115,22,0.5)",
@@ -2221,8 +2231,10 @@
                             particleR: 4,
                         },
                         {
-                            from: nodeData[1].right,
-                            to: nodeData[2].left,
+                            x1: isVertical ? nodeData[1].cx : nodeData[1].right,
+                            y1: isVertical ? nodeData[1].bottom : nodeData[1].cy,
+                            x2: isVertical ? nodeData[2].cx : nodeData[2].left,
+                            y2: isVertical ? nodeData[2].top : nodeData[2].cy,
                             label: "tunnel",
                             dash: "12 30",
                             color: "rgba(249,115,22,0.5)",
@@ -2231,8 +2243,10 @@
                             particleR: 4,
                         },
                         {
-                            from: nodeData[2].right,
-                            to: nodeData[3].left,
+                            x1: isVertical ? nodeData[2].cx : nodeData[2].right,
+                            y1: isVertical ? nodeData[2].bottom : nodeData[2].cy,
+                            x2: isVertical ? nodeData[3].cx : nodeData[3].left,
+                            y2: isVertical ? nodeData[3].top : nodeData[3].cy,
                             label: "public",
                             dash: "12 30",
                             color: "rgba(34,197,94,0.4)",
@@ -2244,10 +2258,10 @@
 
                     segments.forEach((seg, i) => {
                         const baseLine = document.createElementNS(NS, "line");
-                        baseLine.setAttribute("x1", seg.from);
-                        baseLine.setAttribute("y1", lineY);
-                        baseLine.setAttribute("x2", seg.to);
-                        baseLine.setAttribute("y2", lineY);
+                        baseLine.setAttribute("x1", seg.x1);
+                        baseLine.setAttribute("y1", seg.y1);
+                        baseLine.setAttribute("x2", seg.x2);
+                        baseLine.setAttribute("y2", seg.y2);
                         baseLine.setAttribute("stroke", seg.color);
                         baseLine.setAttribute(
                             "stroke-width",
@@ -2260,10 +2274,10 @@
                         baseGroup.appendChild(baseLine);
 
                         const glowLine = document.createElementNS(NS, "line");
-                        glowLine.setAttribute("x1", seg.from);
-                        glowLine.setAttribute("y1", lineY);
-                        glowLine.setAttribute("x2", seg.to);
-                        glowLine.setAttribute("y2", lineY);
+                        glowLine.setAttribute("x1", seg.x1);
+                        glowLine.setAttribute("y1", seg.y1);
+                        glowLine.setAttribute("x2", seg.x2);
+                        glowLine.setAttribute("y2", seg.y2);
                         glowLine.setAttribute("stroke", `url(#${seg.gradId})`);
                         glowLine.setAttribute("stroke-width", "2.5");
                         glowLine.setAttribute("stroke-linecap", "round");
@@ -2308,8 +2322,8 @@
                                 "animate",
                             );
                             animX.setAttribute("attributeName", "cx");
-                            animX.setAttribute("from", seg.from);
-                            animX.setAttribute("to", seg.to);
+                            animX.setAttribute("from", seg.x1);
+                            animX.setAttribute("to", seg.x2);
                             animX.setAttribute("dur", dur + "s");
                             animX.setAttribute("begin", delay);
                             animX.setAttribute("repeatCount", "indefinite");
@@ -2319,8 +2333,8 @@
                                 "animate",
                             );
                             animY.setAttribute("attributeName", "cy");
-                            animY.setAttribute("from", lineY);
-                            animY.setAttribute("to", lineY);
+                            animY.setAttribute("from", seg.y1);
+                            animY.setAttribute("to", seg.y2);
                             animY.setAttribute("dur", dur + "s");
                             animY.setAttribute("begin", delay);
                             animY.setAttribute("repeatCount", "indefinite");
@@ -2336,8 +2350,8 @@
                             animO.setAttribute("begin", delay);
                             animO.setAttribute("repeatCount", "indefinite");
 
-                            circ.setAttribute("cx", seg.from);
-                            circ.setAttribute("cy", lineY);
+                            circ.setAttribute("cx", seg.x1);
+                            circ.setAttribute("cy", seg.y1);
                             circ.appendChild(animX);
                             circ.appendChild(animY);
                             circ.appendChild(animO);
@@ -2347,6 +2361,10 @@
                 }
 
                 requestAnimationFrame(() => setTimeout(initPipeline, 100));
+
+                window.addEventListener("resize", () => {
+                    initPipeline();
+                });
 
                 // 6. Scroll Progress Bar
                 const scrollProgress =
